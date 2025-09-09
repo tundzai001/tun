@@ -31,12 +31,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================
     // PHẦN 2: DỮ LIỆU CÁ NHÂN HÓA VÀ CÀI ĐẶT
     // =================================================================
-    // LƯU Ý: Dán nội dung các mảng dài của bạn vào các vị trí dưới đây.
-    
-    const birthdayData = { 
-            day: 9, month: 6,
-                letter: { title: "Gửi em, cô gái tuyệt vời nhất từng được sinh ra =))) nghe hơi sến tí nhưng mà thôi kệ di hehee", content: `<p>Hôm nay là ngày sinh nhật của em, là ngày mà mẹ em đã sinh ra em =))) anh biết nhưng mà ý là kiểu ngày mà mẹ em đẻ ra thiên thần luôn rồi ấy kiểu em tuyệt vời mà xinh xắn lại còn giỏi giang nữa omg</p><p> Có lẽ nếu xét về tình cảm dành cho em chắc anh thua mỗi mẹ em thôi ấy, anh yêu em nhiều lắm luôn í. Thôi anh nhắn v th tại anh viết thư tay cho em rồi mà =)) đọc thư tay nó mới tình cảm hơn chứ <p>Chúc em sinh nhật vui vẻ!</p></p>` },
-                song: { file: "https://treuah.netlify.app/ordinary.mp3", title: "Ordinary - Alex Warren" }
+    // DỮ LIỆU CỦA BẠN SẼ NẰM Ở ĐÂY
+    const birthdayData = {
+        day: 9, month: 6,
+        letter: { title: "Gửi em, cô gái tuyệt vời nhất từng được sinh ra =))) nghe hơi sến tí nhưng mà thôi kệ di hehee", content: `<p>Hôm nay là ngày sinh nhật của em, là ngày mà mẹ em đã sinh ra em =))) anh biết nhưng mà ý là kiểu ngày mà mẹ em đẻ ra thiên thần luôn rồi ấy kiểu em tuyệt vời mà xinh xắn lại còn giỏi giang nữa omg</p><p> Có lẽ nếu xét về tình cảm dành cho em chắc anh thua mỗi mẹ em thôi ấy, anh yêu em nhiều lắm luôn í. Thôi anh nhắn v th tại anh viết thư tay cho em rồi mà =)) đọc thư tay nó mới tình cảm hơn chứ <p>Chúc em sinh nhật vui vẻ!</p></p>` },
+        song: { file: "https://treuah.netlify.app/ordinary.mp3", title: "Ordinary - Alex Warren" }
     };
     const mainPlaylist = [
         { file: "https://treuah.netlify.app/leduong.mp3", title: "Lễ đường - Kai Đinh" }, 
@@ -60,7 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
         { file: "https://treuah.netlify.app/ladykillers.mp3", title: "Lady Killers II - G-Eazy" },
         { file: "https://treuah.netlify.app/allthestars.mp3", title: "All The Stars - Kendrick Lamar x SZA" },
     ];
-
     const dailySongs = [
         { day: 1, song: { file: "https://treuah.netlify.app/main/fever.mp3", title: "Fever - COLDZY" } },
         { day: 2, song: { file: "https://treuah.netlify.app/main/art.mp3", title: "Art - Tyla" } },
@@ -94,7 +92,8 @@ document.addEventListener('DOMContentLoaded', function() {
         { day: 30, song: { file: "https://treuah.netlify.app/openarms.mp3", title: "Open Arms - SZA" } },
         { day: 31, song: { file: "https://treuah.netlify.app/main/theboyismine.mp3", title: "The boy is mine - Ariana Grande" } }
     ];
-      const dailyLetters = [
+
+    const dailyLetters = [
         { day: 1, title: "hello cậu, ngày học đầu tiên của tháng kết thúc rồi", content: `<p>Vậy là một ngày nữa ở Thành Đô đã qua. Cậu đã vất vả, mệt mỏi rồi. Mọi thứ hôm nay vẫn ổn chứ? Có điều gì cậu muốn kể cho tớ nghe không?</p><p>Tuy là ở xa, nhưng mà tớ vẫn luôn ở đây lắng nghe cậu. Giờ thì nghỉ ngơi thôi nhé </p>` },
         { day: 2, title: "xin cả chào nhesee, ngày thứ hai của cậu mệt không?", content: `<p>Tan học rồi, chắc cậu mệt lắm. Đừng ôm hết mọi mệt mỏi một mình nhé, hãy chia sẻ với tớ. Tớ không ở cạnh để chăm sóc cậu được, nên chỉ có thể lắng nghe thôi và an ủi cậu thôi.</p><p>Hôm nay của tớ ở Việt Nam cũng hơi mệt mỏi một chút, nhưng mà kiểu có cậu ấy nên cảm giác thoải mái v =)) Có chuyện thì hãy kể tớ nhé, tớ luôn ở đây ❤️</p>` },
         { day: 3, title: "Gửi cậu, ngày thứ ba, lại một ngày nỗ lực rồi", content: `<p>Tớ biết việc học và thích nghi với môi trường mới, các bạn mới không dễ dàng. Tớ tự hào về cậu nhiều lắm. Mỗi ngày trôi qua, cậu lại càng giỏi giang hơn một chút đấy.</p><p>Hôm nay có gì vui hay có gì khiến cậu mệt mỏi, tức giận không? Kể cho tớ nghe, lov u so much luôn</p>` },
@@ -182,8 +181,8 @@ document.addEventListener('DOMContentLoaded', function() {
         { id: 'jupiter', type: 'planet', name: 'Sao Mộc', texture: assetPaths.jupiter, size: 20, orbitRadius: 250, orbitSpeed: 0.4, spinSpeed: 1.0, fact: "Sao Mộc là hành tinh lớn nhất...", message: "...giống tớ í là yêu cậu nhiều ấy =)))) ." },
         { id: 'saturn', type: 'planet', name: 'Sao Thổ', texture: assetPaths.saturn, ringTexture: assetPaths.saturnRing, size: 15, orbitRadius: 350, orbitSpeed: 0.3, spinSpeed: 0.9, fact: "Sao Thổ nổi tiếng với vành đai tuyệt đẹp của nó...", message: "...biết đâu sau này mình cũng có thêm nhiều kỷ niệm vòng quanh nhau ha =)))." },
         { id: 'neptune', type: 'planet', name: 'Sao Hải Vương', texture: assetPaths.neptune, size: 8, orbitRadius: 450, orbitSpeed: 0.2, spinSpeed: 0.6, fact: "Sao Hải Vương là hành tinh xa mặt trời nhất...", message: "...nhưng dù ở xa thế nào thì khoảng cách vẫn chưa bao giờ là vấn đề." }
-    ];
-
+        ];
+        
     const isMobile = window.innerWidth <= 768;
     const config = { maxParticles: isMobile ? 30 : 50, particleInterval: isMobile ? 300 : 200 };
     const messages = ["U are the best", "Cố lên !!!", "Yêu cậu", "Love u so much", "nhớ cậu nhiều", "tớ luôn bên cạnh cậu", "💖", "💕", "🌟", "✨", "You're my angel", "Đừng bỏ cuộc nhé !!!", "I'm alws here", "😘", "🥰", "❤️", "💘", "💝", "💞"];
@@ -394,8 +393,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const closeBtn = document.createElement('button'); closeBtn.id = 'close-letter-btn'; closeBtn.innerHTML = '×';
         const tempDiv = document.createElement('div'); tempDiv.innerHTML = letterData.content;
         const pElements = Array.from(tempDiv.querySelectorAll('p'));
-        letterContentDiv.innerHTML = ''; // Xóa sạch nội dung cũ
-        letterContentDiv.append(closeBtn, titleEl, ...pElements, signatureEl);
+        letterContentDiv.innerHTML = ''; letterContentDiv.append(closeBtn, titleEl, ...pElements, signatureEl);
         const signatureText = isBirthday ? 'Yêu cậu nhất luôn,<br>tun' : (specialSong ? 'Yêu cậu rất nhiều,<br>tun' : 'Luôn bên cạnh cậu,<br>tun');
         const elementsToType = [{ element: titleEl, text: letterData.title }];
         pElements.forEach(p => { elementsToType.push({ element: p, text: p.innerHTML }); });
