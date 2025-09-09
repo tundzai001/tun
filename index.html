@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gửi Em, Tình Yêu Của Anh</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Nạp thư viện WaveSurfer cho trình phát nhạc -->
+    <script src="https://unpkg.com/wavesurfer.js"></script>
+</head>
+<body>
+    <!-- Canvas nơi Three.js sẽ vẽ vũ trụ 3D -->
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- Màn hình chờ -->
+    <div id="loading-screen">
+        <p>Đang kiến tạo vũ trụ của chúng ta...</p>
+        <div class="heart-loader"></div>
+    </div>
+    
+    <!-- Lớp phủ yêu cầu bật nhạc -->
+    <div id="music-overlay">
+        <p>Chạm để bước vào vũ trụ của chúng ta<br/>(Nhớ bật âm thanh nhé)</p>
+    </div>
+    
+    <!-- Nút mở thư -->
+    <button id="special-day-btn" class="hidden">
+        <div id="btn-icon-heart"></div>
+    </button>
+    
+    <!-- Khung hiển thị thư -->
+    <div id="letter-container" class="hidden">
+        <div class="letter-content"></div>
+    </div>
+    
+    <!-- Bảng điều khiển cài đặt -->
+    <button id="settings-toggle-btn" class="hidden">⚙️</button>
+    <div id="settings-panel" class="hidden">
+        <div class="setting-item">
+            <label for="volume-slider">Âm lượng</label>
+            <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.7">
+        </div>
+        <div class="setting-item">
+            <label for="gyro-toggle">Con quay hồi chuyển (Tạm tắt)</label>
+            <label class="switch">
+                <input type="checkbox" id="gyro-toggle" disabled>
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+    
+    <!-- Trình điều khiển nhạc -->
+    <div id="waveform-controls" class="hidden">
+        <div id="waveform"></div>
+        <div class="timing">
+            <span id="current-time">0:00</span>
+            <span id="duration">0:00</span>
+        </div>
+        <div class="song-info">
+            <div id="song-title">Đang tải...</div>
+            <div class="controls-buttons">
+                <button id="prev-btn">⏮</button>
+                <button id="play-pause-btn">▶</button>
+                <button id="next-btn">⏭</button>
+            </div>
+            <button id="favorite-btn">❤</button>
+        </div>
+    </div>
+    
+    <!-- Hiệu ứng sinh nhật -->
+    <div id="birthday-celebration" class="hidden">
+        <h1>CHÚC MỪNG SINH NHẬT EM!</h1>
+    </div>
+
+    <!-- Thẻ thông tin hành tinh -->
+    <div id="planet-info-card" class="hidden">
+        <button id="close-info-btn">×</button>
+        <h2 id="info-card-title"></h2>
+        <p id="info-card-fact"></p>
+        <p id="info-card-message"></p>
+    </div>
+
+    <!-- Phần tử Audio (ẩn) -->
+    <audio id="bg-music" crossOrigin="anonymous"></audio>
+
+    <!-- NẠP THƯ VIỆN THREE.JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Nạp công cụ điều khiển camera (OrbitControls) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- Script chính của bạn -->
+    <script src="script.js"></script>
+</body>
+</html>
