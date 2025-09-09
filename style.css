@@ -2,35 +2,33 @@
 /* 1. THIẾT LẬP CHUNG VÀ RESET                            */
 /* ======================================================= */
 :root {
-    --parallax-x-far: 0px;
-    --parallax-x-mid: 0px;
-    --parallax-x-near: 0px;
-    --gyro-rotate-x: 0deg;
-    --gyro-rotate-y: 0deg;
+    --parallax-x-far: 0px; --parallax-x-mid: 0px; --parallax-x-near: 0px;
+    --gyro-rotate-x: 0deg; --gyro-rotate-y: 0deg;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body {
     width: 100%; height: 100%; position: fixed; overflow: hidden;
     -webkit-overflow-scrolling: touch; overscroll-behavior: none;
-    -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
+    -webkit-user-select: none; user-select: none;
 }
 body {
     background-color: #000;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-    cursor: default; 
-    touch-action: none;
-    -webkit-tap-highlight-color: transparent;
-    position: relative;
+    cursor: default; touch-action: none; -webkit-tap-highlight-color: transparent; position: relative;
 }
 body .hidden, [hidden] { display: none !important; }
 
 /* ======================================================= */
-/* 2. CÁC LỚP NỀN VŨ TRỤ (PARALLAX & GYRO)              */
+/* 2. CÁC LỚP NỀN VŨ TRỤ & SAO BĂNG                      */
 /* ======================================================= */
-body::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(1px 1px at 20px 30px, #eee, transparent), radial-gradient(1px 1px at 40px 70px, #fff, transparent), radial-gradient(1px 1px at 50px 160px, #ddd, transparent), radial-gradient(1px 1px at 90px 40px, #fff, transparent), radial-gradient(2px 2px at 150px 120px, #fff, transparent); background-size: 200px 200px; background-position: 0 0; z-index: -3; animation: pan-stars-slow 250s linear infinite; will-change: transform; transform: translateX(var(--parallax-x-far)); transition: transform 0.2s ease-out; }
-body::after { content: ''; position: absolute; inset: -50vmin; z-index: -2; background: radial-gradient(ellipse at 70% 30%, #3a2d54 0%, transparent 50%), radial-gradient(ellipse at 30% 70%, #2c3e50 0%, transparent 40%); animation: rotate-nebula 180s linear infinite alternate; will-change: transform; opacity: 0.5; transform: translateX(var(--parallax-x-mid)) rotateX(var(--gyro-rotate-x)) rotateY(var(--gyro-rotate-y)); transition: transform 0.2s ease-out; }
+body::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(1px 1px at 20px 30px, #eee, transparent), radial-gradient(1px 1px at 40px 70px, #fff, transparent), radial-gradient(1px 1px at 50px 160px, #ddd, transparent), radial-gradient(1px 1px at 90px 40px, #fff, transparent), radial-gradient(2px 2px at 150px 120px, #fff, transparent); background-size: 200px 200px; z-index: -3; animation: pan-stars-slow 250s linear infinite; will-change: transform; transform: translateX(var(--parallax-x-far)); transition: transform 0.2s ease-out; }
+body::after { content: ''; position: absolute; inset: -50vmin; z-index: -2; background: #000; will-change: transform; transform: translateX(var(--parallax-x-mid)) rotateX(var(--gyro-rotate-x)) rotateY(var(--gyro-rotate-y)); transition: transform 0.2s ease-out; }
 body.gyro-active::after { animation: none; }
-#background-overlay { position: absolute; inset: 0; background-image: radial-gradient(2px 2px at 50px 50px, #fff, transparent), radial-gradient(2px 2px at 100px 200px, #ddd, transparent), radial-gradient(3px 3px at 200px 80px, #fff, transparent); background-size: 250px 250px; background-position: 0 0; z-index: -1; animation: pan-stars-fast 100s linear infinite; will-change: transform; transform: translateX(var(--parallax-x-near)); transition: transform 0.2s ease-out; }
+#background-overlay { position: absolute; inset: 0; background-image: radial-gradient(2px 2px at 50px 50px, #fff, transparent), radial-gradient(2px 2px at 100px 200px, #ddd, transparent); background-size: 250px 250px; z-index: -1; animation: pan-stars-fast 100s linear infinite; will-change: transform; transform: translateX(var(--parallax-x-near)); transition: transform 0.2s ease-out; }
+
+#shooting-stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.star { position: absolute; width: 2px; height: 120px; background: linear-gradient(to bottom, #fff, rgba(255,255,255,0)); animation: shoot 5s linear infinite; transform-origin: top left; }
+.star::before { content: ''; position: absolute; top: -1px; left: -1px; width: 4px; height: 4px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px #fff, 0 0 20px #fff; }
 
 /* ======================================================= */
 /* 3. HIỆU ỨNG CHỮ RƠI "GALAXY"                           */
@@ -53,17 +51,18 @@ body.gyro-active::after { animation: none; }
 .heart-loader:before, .heart-loader:after { content: ""; position: absolute; width: 50px; height: 50px; background: #ff6b9d; border-radius: 50%; }
 .heart-loader:before { top: -25px; left: 0; }
 .heart-loader:after { top: 0; left: -25px; }
-#music-overlay { z-index: 9999; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.85); color: #fff; font-size: 1.25rem; letter-spacing: 1px; cursor: pointer; text-align: center; padding: 20px; font-family: 'Orbitron', -apple-system, sans-serif; }
+
+#music-overlay { z-index: 9999; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); backdrop-filter: blur(10px) saturate(150%); -webkit-backdrop-filter: blur(10px) saturate(150%); cursor: pointer; }
+.overlay-content { text-align: center; color: #fff; padding: 40px; border-radius: 20px; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1); transform: scale(0.95); opacity: 0; animation: fade-in-up 0.8s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.overlay-content p { font-size: 1.5rem; letter-spacing: 1px; font-family: 'Orbitron', -apple-system, sans-serif; text-shadow: 0 0 15px rgba(255, 255, 255, 0.5); }
+
 #birthday-celebration { inset: 0; z-index: 10001; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.5); pointer-events: none; opacity: 0; transition: opacity 1s ease-in-out; }
 #birthday-celebration h1 { font-size: 5vw; color: white; text-shadow: 0 0 10px #ff6b9d, 0 0 20px #ff6b9d, 0 0 40px #ff6b9d; animation: birthday-pulse 2s infinite; font-family: 'Orbitron', -apple-system, sans-serif; }
 
 /* ======================================================= */
 /* 5. CÁC THÀNH PHẦN GIAO DIỆN (UI COMPONENTS)            */
 /* ======================================================= */
-/* --- Canvas 3D --- */
 #webgl-canvas { position: fixed; top: 0; left: 0; outline: none; z-index: -10; }
-
-/* --- Trình phát nhạc --- */
 #waveform-controls { position: fixed; bottom: 15px; left: 15px; right: 15px; z-index: 1000; max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; color: #fff; padding: 8px 12px; background: rgba(20, 20, 25, 0.5); backdrop-filter: blur(12px); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); }
 #waveform { width: 100%; height: 50px; margin: 5px 0; }
 .song-info { width: 100%; display: flex; align-items: center; gap: 10px; }
@@ -77,15 +76,13 @@ body.gyro-active::after { animation: none; }
 #favorite-btn.favorited { color: #ff6b9d; }
 .timing { display: flex; justify-content: space-between; width: 100%; font-size: 0.6875rem; font-family: monospace; color: #ccc; margin-top: -5px; margin-bottom: 5px; padding: 0 5px; }
 
-/* --- Thẻ thông tin hành tinh --- */
-#planet-info-card { position: fixed; bottom: 30px; left: 50%; width: 90%; max-width: 450px; background: rgba(25, 25, 35, 0.6); backdrop-filter: blur(12px); border-radius: 12px; padding: 20px; color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); opacity: 0; transform: translate(-50%, 20px) scale(0.95); transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; z-index: 1002; }
+#planet-info-card { position: fixed; left: 50%; width: 90%; max-width: 450px; background: rgba(25, 25, 35, 0.6); backdrop-filter: blur(12px); border-radius: 12px; padding: 20px; color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); opacity: 0; transform: translate(-50%, 20px) scale(0.95); transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.5s ease; pointer-events: none; z-index: 1002; }
 #planet-info-card:not(.hidden) { opacity: 1; transform: translate(-50%, 0) scale(1); pointer-events: auto; }
 #close-info-btn { position: absolute; top: 8px; right: 12px; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
 #info-card-title { color: var(--glow-color, #ff6b9d); font-family: 'Orbitron', sans-serif; margin-bottom: 10px; text-shadow: 0 0 10px var(--glow-color, #ff6b9d); }
 #info-card-fact { font-style: italic; color: #ccc; margin-bottom: 15px; font-size: 0.9rem; }
 #info-card-message { font-size: 1rem; line-height: 1.5; }
 
-/* --- Hộp thư --- */
 #letter-container { position: fixed; inset: 0; z-index: 10000; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); padding: 20px; opacity: 0; transform: scale(0.95); transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; }
 #letter-container:not(.hidden) { display: flex; justify-content: center; align-items: center; opacity: 1; transform: scale(1); pointer-events: auto; }
 .letter-content { background: rgba(20, 20, 30, 0.9); color: #eee; padding: 30px 40px; border-radius: 10px; border: 1px solid #ff6b9d; max-width: 90%; width: 600px; max-height: 80vh; overflow-y: auto; position: relative; }
@@ -94,18 +91,15 @@ body.gyro-active::after { animation: none; }
 .letter-content .signature { text-align: right; margin-top: 30px; font-style: italic; }
 #close-letter-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; color: #fff; font-size: 1.875rem; cursor: pointer; }
 
-/* --- Nút cài đặt --- */
 #settings-toggle-btn { position: fixed; top: 20px; right: 20px; z-index: 1001; background: rgba(0,0,0,0.5); color: #fff; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.25rem; cursor: pointer; }
 #settings-panel { position: fixed; top: 70px; right: 20px; z-index: 1001; background: rgba(25, 25, 35, 0.6); backdrop-filter: blur(12px); border-radius: 12px; padding: 15px; color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; gap: 15px; }
 .setting-item { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
 
-/* --- Nút bấm đặc biệt --- */
-#special-day-btn { position: fixed; bottom: calc(115px + 20px); right: 20px; z-index: 1000; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; background: linear-gradient(145deg, #ff6b9d, #c534ed); box-shadow: 0 0 15px #ff6b9d, 0 0 25px #c534ed; border: 1px solid rgba(255, 255, 255, 0.3); animation: pulse 2s infinite; transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; justify-content: center; align-items: center; padding: 0; }
+#special-day-btn { position: fixed; bottom: calc(115px + 20px); right: 20px; z-index: 1000; width: 55px; height: 55px; border-radius: 50%; cursor: pointer; background: linear-gradient(145deg, #ff6b9d, #c534ed); box-shadow: 0 0 15px #ff6b9d, 0 0 25px #c534ed; border: 1px solid rgba(255, 255, 255, 0.3); animation: pulse 2s infinite; transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; justify-content: center; align-items: center; padding: 0; }
 #special-day-btn:hover { transform: scale(1.1); box-shadow: 0 0 25px #ff6b9d, 0 0 40px #c534ed; }
-#btn-icon-heart { position: relative; width: 15px; height: 15px; transform: rotate(45deg); z-index: 2; }
-#btn-icon-heart::before, #btn-icon-heart::after { content: ''; position: absolute; width: 100%; height: 100%; background: #fff; border-radius: 50%; box-shadow: 0 0 8px #ff4757; }
-#btn-icon-heart::before { top: -50%; left: 0; }
-#btn-icon-heart::after { top: 0; left: -50%; }
+.sparkle-icon { width: 24px; height: 24px; position: relative; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; }
+.sparkle-icon::before, .sparkle-icon::after { content: '✨'; position: absolute; animation: sparkle-anim 2s infinite; opacity: 0; }
+.sparkle-icon::after { animation-delay: 1s; }
 
 /* ======================================================= */
 /* 6. ANIMATIONS                                         */
@@ -115,7 +109,9 @@ body.gyro-active::after { animation: none; }
 @keyframes birthday-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 @keyframes pan-stars-slow { from { background-position: 0 0; } to { background-position: -200px -200px; } }
 @keyframes pan-stars-fast { from { background-position: 0 0; } to { background-position: -250px -250px; } }
-@keyframes rotate-nebula { from { transform: rotate(0deg) scale(1.5); } to { transform: rotate(360deg) scale(1.5); } }
+@keyframes shoot { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(100vh) scale(0); opacity: 0; } }
+@keyframes fade-in-up { to { transform: scale(1); opacity: 1; } }
+@keyframes sparkle-anim { 0%, 100% { transform: scale(0.5); opacity: 0; } 50% { transform: scale(1.2) rotate(15deg); opacity: 1; } }
 
 /* ======================================================= */
 /* 7. MEDIA QUERIES (RESPONSIVE DESIGN)                  */
