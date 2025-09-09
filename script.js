@@ -2,10 +2,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================
     // PHẦN 1: KHAI BÁO BIẾN VÀ DOM ELEMENTS
     // =================================================================
-
-    // --- DOM Elements chính ---
     const bodyEl = document.body;
     const galaxy = document.getElementById('galaxy');
+    const shootingStarsContainer = document.getElementById('shooting-stars');
     const audio = document.getElementById('bg-music');
     const overlay = document.getElementById('music-overlay');
     const songTitleEl = document.getElementById('song-title');
@@ -34,44 +33,34 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================
     // LƯU Ý: Dán nội dung các mảng dài của bạn vào các vị trí dưới đây.
     
-    const birthdayData = {
-        day: 9, month: 6,
-        letter: { title: "Gửi em, cô gái tuyệt vời nhất...", content: `<p>Hôm nay là ngày sinh nhật của em...</p>` },
-        song: { file: "https://treuah.netlify.app/ordinary.mp3", title: "Ordinary - Alex Warren" }
+    const birthdayData = { 
+            day: 9, month: 6,
+                letter: { title: "Gửi em, cô gái tuyệt vời nhất từng được sinh ra =))) nghe hơi sến tí nhưng mà thôi kệ di hehee", content: `<p>Hôm nay là ngày sinh nhật của em, là ngày mà mẹ em đã sinh ra em =))) anh biết nhưng mà ý là kiểu ngày mà mẹ em đẻ ra thiên thần luôn rồi ấy kiểu em tuyệt vời mà xinh xắn lại còn giỏi giang nữa omg</p><p> Có lẽ nếu xét về tình cảm dành cho em chắc anh thua mỗi mẹ em thôi ấy, anh yêu em nhiều lắm luôn í. Thôi anh nhắn v th tại anh viết thư tay cho em rồi mà =)) đọc thư tay nó mới tình cảm hơn chứ <p>Chúc em sinh nhật vui vẻ!</p></p>` },
+                song: { file: "https://treuah.netlify.app/ordinary.mp3", title: "Ordinary - Alex Warren" }
     };
     const mainPlaylist = [
-        { day: 1, song: { file: "https://treuah.netlify.app/main/fever.mp3", title: "Fever - COLDZY" } },
-        { day: 2, song: { file: "https://treuah.netlify.app/main/art.mp3", title: "Art - Tyla" } },
-        { day: 3, song: { file: "https://treuah.netlify.app/main/nambenanh.mp3", title: "Nằm bên anh - Minh Đinh" } },
-        { day: 4, song: { file: "https://treuah.netlify.app/main/Fantasize.mp3", title: "Fantasize - Ariana Grande" } },
-        { day: 5, song: { file: "https://treuah.netlify.app/main/stillwithyou.mp3", title: "Still With You - Jung Kook" } },
-        { day: 6, song: { file: "https://treuah.netlify.app/main/calloutmyname.mp3", title: "Call Out My Name - The Weeknd" } },
-        { day: 7, song: { file: "https://treuah.netlify.app/main/khobaudanhroi.mp3", title: "Kho báu đánh rơi - tlinh" } },
-        { day: 8, song: { file: "https://treuah.netlify.app/main/babyonemoretime.mp3", title: "Baby One More Time - Britney Spears" } },
-        { day: 9, song: { file: "https://treuah.netlify.app/main/Snooze.mp3", title: "snooze - SZA" } },
-        { day: 10, song: { file: "https://treuah.netlify.app/main/earnedit.mp3", title: "Earned It - The Weeknd" } }, 
-        { day: 11, song: { file: "https://treuah.netlify.app/main/dearfuturehusband.mp3", title: "Dear Future Husband - Meghan Trainor" } },
-        { day: 12, song: { file: "https://treuah.netlify.app/main/luther.mp3", title: "Luther - Kendrick Lamar & SZA" } },
-        { day: 13, song: { file: "https://treuah.netlify.app/main/thegioithantien.mp3", title: "Thế giới thần tiên - tlinh" } },
-        { day: 14, song: { file: "https://treuah.netlify.app/main/muathamlanggioi.mp3", title: "Mưa thâm lặng giời - BigDaddy ft.GREY D" } },
-        { day: 15, song: { file: "https://treuah.netlify.app/main/afterlastnight.mp3", title: "After Last Night - Bruno Mars & Anderson Paak" } },
-        { day: 16, song: { file: "https://treuah.netlify.app/main/Saturn.mp3", title: "Saturn - SZA" } },
-        { day: 17, song: { file: "https://treuah.netlify.app/main/nuocmatdautheroiduoc.mp3", title: "Nước mắt đâu thể rơi được - 24kRight & tlinh" } },
-        { day: 18, song: { file: "https://treuah.netlify.app/main/oldlove.mp3", title: "Old Love - Yuji ft. Putri Dahlia" } },
-        { day: 19, song: { file: "https://treuah.netlify.app/main/only.mp3", title: "ONLY - LeeHi" } },
-        { day: 20, song: { file: "https://treuah.netlify.app/main/detoiomembanggiaidieunay.mp3", title: "Để tôi ôm em bằng giai điệu này - Kai Dinh x Min x Grey D" } },
-        { day: 21, song: { file: "https://treuah.netlify.app/main/lamlanhchuatinh.mp3", title: "Làm lành chữa tình - tlinh" } },
-        { day: 22, song: { file: "https://treuah.netlify.app/main/SexyBack.mp3", title: "SexyBack - Justin Timberlake" } },
-        { day: 23, song: { file: "https://treuah.netlify.app/main/duaemvenha.mp3", title: "đưa em về nhà - Grey D x Chillies" } },
-        { day: 24, song: { file: "https://treuah.netlify.app/main/sayyes.mp3", title: "Say Yes - OgeNus x Pia Linh" } },
-        { day: 25, song: { file: "https://treuah.netlify.app/shhhhhhh...mp3", title: "shhhhhhh.. - wean" } },
-        { day: 26, song: { file: "https://treuah.netlify.app/main/Water.mp3", title: "Water - Tyla" } },
-        { day: 27, song: { file: "https://treuah.netlify.app//main/standingnexttoyou.mp3", title: "Standing Next To You - Jung Kook" } },
-        { day: 28, song: { file: "https://treuah.netlify.app/main/chamhoa.mp3", title: "Chăm Hoa - Mono" } },
-        { day: 29, song: { file: "https://treuah.netlify.app/main/freakydeaky.mp3", title: "Freaky Deaky - Tyga x Doja Cat" } },
-        { day: 30, song: { file: "https://treuah.netlify.app/openarms.mp3", title: "Open Arms - SZA" } },
-        { day: 31, song: { file: "https://treuah.netlify.app/main/theboyismine.mp3", title: "The boy is mine - Ariana Grande" } }
+        { file: "https://treuah.netlify.app/leduong.mp3", title: "Lễ đường - Kai Đinh" }, 
+        { file: "https://treuah.netlify.app/dieforyou.mp3", title: "Die For You - The Weeknd" },
+        { file: "https://treuah.netlify.app/ordinary.mp3", title: "Ordinary - Alex Warren" },
+        { file: "https://treuah.netlify.app/supernatural.mp3", title: "supernatural - Ariana Grande" },
+        { file: "https://treuah.netlify.app/youngandbeautiful.mp3", title: "Young and Beautiful - Lana Del Rey" },
+        { file: "https://treuah.netlify.app/tumblrgirls.mp3", title: "Tumblr Girls - G-Eazy" },
+        { file: "https://treuah.netlify.app/sayyeslocopunch.mp3", title: "Say Yes - Loco x Punch" },
+        { file: "https://treuah.netlify.app/carryyouhome.mp3", title: "Carry You Home - Alex Warren" },
+        { file: "https://treuah.netlify.app/prada.mp3", title: "Prada - Cassö x Raye x D Block Europe" },
+        { file: "https://treuah.netlify.app/phepmau.mp3", title: "Phép Màu - MAYDAYs ft.Minh Tốc" },
+        { file: "https://treuah.netlify.app/paris.mp3", title: "Paris - The Chainsmokers" },
+        { file: "https://treuah.netlify.app/wefoundlove.mp3", title: "We Found Love - Rihanna ft.Calvin Harris" },
+        { file: "https://treuah.netlify.app/daylight.mp3", title: "Day Light - Taylor Swift" },
+        { file: "https://treuah.netlify.app/angelnumbers.mp3", title: "Angel Numbers / Ten Toes - Chris Brown" },
+        { file: "https://treuah.netlify.app/oneofthegirls.mp3", title: "One Of The Girls - The Weeknd, JENNIE, Lily-Rose Depp" },
+        { file: "https://treuah.netlify.app/treatyoubetter.mp3", title: "Treat you better - Shawn Mendes " },
+        { file: "https://treuah.netlify.app/goodforyou.mp3", title: "Good For You - Selena Gomez" },
+        { file: "https://treuah.netlify.app/birdsofafeather.mp3", title: "Birds Of a Feather - Billie Eilish" },
+        { file: "https://treuah.netlify.app/ladykillers.mp3", title: "Lady Killers II - G-Eazy" },
+        { file: "https://treuah.netlify.app/allthestars.mp3", title: "All The Stars - Kendrick Lamar x SZA" },
     ];
+
     const dailySongs = [
         { day: 1, song: { file: "https://treuah.netlify.app/main/fever.mp3", title: "Fever - COLDZY" } },
         { day: 2, song: { file: "https://treuah.netlify.app/main/art.mp3", title: "Art - Tyla" } },
@@ -105,8 +94,8 @@ document.addEventListener('DOMContentLoaded', function() {
         { day: 30, song: { file: "https://treuah.netlify.app/openarms.mp3", title: "Open Arms - SZA" } },
         { day: 31, song: { file: "https://treuah.netlify.app/main/theboyismine.mp3", title: "The boy is mine - Ariana Grande" } }
     ];
-    const dailyLetters = [
-    { day: 1, title: "hello cậu, ngày học đầu tiên của tháng kết thúc rồi", content: `<p>Vậy là một ngày nữa ở Thành Đô đã qua. Cậu đã vất vả, mệt mỏi rồi. Mọi thứ hôm nay vẫn ổn chứ? Có điều gì cậu muốn kể cho tớ nghe không?</p><p>Tuy là ở xa, nhưng mà tớ vẫn luôn ở đây lắng nghe cậu. Giờ thì nghỉ ngơi thôi nhé </p>` },
+      const dailyLetters = [
+        { day: 1, title: "hello cậu, ngày học đầu tiên của tháng kết thúc rồi", content: `<p>Vậy là một ngày nữa ở Thành Đô đã qua. Cậu đã vất vả, mệt mỏi rồi. Mọi thứ hôm nay vẫn ổn chứ? Có điều gì cậu muốn kể cho tớ nghe không?</p><p>Tuy là ở xa, nhưng mà tớ vẫn luôn ở đây lắng nghe cậu. Giờ thì nghỉ ngơi thôi nhé </p>` },
         { day: 2, title: "xin cả chào nhesee, ngày thứ hai của cậu mệt không?", content: `<p>Tan học rồi, chắc cậu mệt lắm. Đừng ôm hết mọi mệt mỏi một mình nhé, hãy chia sẻ với tớ. Tớ không ở cạnh để chăm sóc cậu được, nên chỉ có thể lắng nghe thôi và an ủi cậu thôi.</p><p>Hôm nay của tớ ở Việt Nam cũng hơi mệt mỏi một chút, nhưng mà kiểu có cậu ấy nên cảm giác thoải mái v =)) Có chuyện thì hãy kể tớ nhé, tớ luôn ở đây ❤️</p>` },
         { day: 3, title: "Gửi cậu, ngày thứ ba, lại một ngày nỗ lực rồi", content: `<p>Tớ biết việc học và thích nghi với môi trường mới, các bạn mới không dễ dàng. Tớ tự hào về cậu nhiều lắm. Mỗi ngày trôi qua, cậu lại càng giỏi giang hơn một chút đấy.</p><p>Hôm nay có gì vui hay có gì khiến cậu mệt mỏi, tức giận không? Kể cho tớ nghe, lov u so much luôn</p>` },
         { day: 4, title: "Ngày thứ 4, tớ lại nhớ khoảng khắc đấy =))) dyeu v", content: `<p>Tối nay, tớ lại nghĩ về chiếc huy chương cậu đưa tớ, kiểu nó làm cảm giác như cậu đang ở gần tớ vô cùng luôn ấy =)) cảm giác nhớ cậu v</p><p>Ngày hôm nay của cậu thế nào thế? Việc học có căng thẳng, khó không thế? Cố lên dii, im alws here </p><p> Có chuyện gì hãy nói với tớ nhé </p>` },
@@ -138,8 +127,9 @@ document.addEventListener('DOMContentLoaded', function() {
         { day: 30, title: "Gửi cậu, tối ngày áp chót của tháng", content: `<p>Ngày mai là hết tháng rồi. Cảm ơn cậu vì đã để tớ đồng hành trong suốt một tháng vừa qua. Mỗi tối nói chuyện với cậu đều là một điều quý giá. Hôm nay cậu đã làm rất tốt. Ngủ ngon nhé.</p>` },
         { day: 31, title: "Gửi cậu, khép lại một tháng xa nhau", content: `<p>Tháng 10 kết thúc rồi. Một tháng qua cậu đã rất kiên cường và giỏi giang. Tớ tự hào về cậu lắm. Cảm ơn vì đã luôn chia sẻ cùng tớ dù chúng ta ở xa. Cùng nhau chào đón tháng 11 nhé. Ngủ thật ngon, cô gái của tớ.</p>` },
     ];
+
     const daytimeLetters = [
-         { day: 1, title: "Gửi cậu, ngày đầu tháng tốt lành nhé!", content: `<p>Bắt đầu tháng mới ở Thành Đô, chúc cậu mọi việc đều suôn sẻ. Tớ gửi một chút năng lượng từ Việt Nam qua cho cậu đây. Cố lên nhé!</p>` },
+        { day: 1, title: "Gửi cậu, ngày đầu tháng tốt lành nhé!", content: `<p>Bắt đầu tháng mới ở Thành Đô, chúc cậu mọi việc đều suôn sẻ. Tớ gửi một chút năng lượng từ Việt Nam qua cho cậu đây. Cố lên nhé!</p>` },
         { day: 2, title: "Gửi cậu, ngày thứ hai...", content: `<p>Chúc cậu một ngày học tập hiệu quả. Đừng quên uống đủ nước và cười thật tươi nha. Tối mình nói chuyện sau.</p>` },
         { day: 3, title: "Gửi cậu, ngày thứ ba...", content: `<p>Hôm nay cậu có môn gì khó không? Cứ bình tĩnh xử lý từng chút một nhé, tớ tin cậu làm được. Fighting!</p>` },
         { day: 4, title: "Gửi cậu, ngày thứ tư...", content: `<p>Chỉ là một lời nhắn nhỏ để nói rằng, tớ đang nghĩ đến cậu. Chúc cậu một ngày học vui vẻ!</p>` },
@@ -183,8 +173,9 @@ document.addEventListener('DOMContentLoaded', function() {
         neptune: 'images/neptune.jpg',
         stars: 'images/stars.jpg'
     };
+    
     const celestialData = [
-         { id: 'sun', type: 'star', name: 'Mặt Trời', texture: assetPaths.sun, size: 50, orbitRadius: 0, spinSpeed: 0.05, fact: "Năng lượng của mặt trời sưởi ấm cả vũ trụ này...", message: "...nhưng nụ cười của cậu mới là thứ sưởi ấm mùa đông này =))) ." },
+        { id: 'sun', type: 'star', name: 'Mặt Trời', texture: assetPaths.sun, size: 50, orbitRadius: 0, spinSpeed: 0.05, fact: "Năng lượng của mặt trời sưởi ấm cả vũ trụ này...", message: "...nhưng nụ cười của cậu mới là thứ sưởi ấm mùa đông này =))) ." },
         { id: 'venus', type: 'planet', name: 'Sao Kim', texture: assetPaths.venus, size: 4, orbitRadius: 80, orbitSpeed: 1.2, spinSpeed: 0.1, fact: "Sao Kim được đặt theo tên nữ thần tình yêu và sắc đẹp trong thần thoại La Mã...", message: "...điều đó giải thích tại sao tớ lại tìm thấy cậu ở đây hehe." },
         { id: 'earth', type: 'planet', name: 'Trái Đất', texture: assetPaths.earth, size: 5, orbitRadius: 120, orbitSpeed: 1.0, spinSpeed: 0.5, fact: "Trái Đất là hành tinh duy nhất được biết đến có sự sống...", message: "...và có lẽ chúng ta cũng mới bắt đầu một hành trình nhỏ." },
         { id: 'mars', type: 'planet', name: 'Sao Hỏa', texture: assetPaths.mars, size: 3, orbitRadius: 160, orbitSpeed: 0.8, spinSpeed: 0.4, fact: "Sao Hỏa được gọi là 'Hành tinh Đỏ' vì màu sắc của nó...", message: "...giống như những rung động mới mẻ trong tim của mình hehehehe, í là tim nó cứ đỏ rực th =)))) ." },
@@ -193,7 +184,6 @@ document.addEventListener('DOMContentLoaded', function() {
         { id: 'neptune', type: 'planet', name: 'Sao Hải Vương', texture: assetPaths.neptune, size: 8, orbitRadius: 450, orbitSpeed: 0.2, spinSpeed: 0.6, fact: "Sao Hải Vương là hành tinh xa mặt trời nhất...", message: "...nhưng dù ở xa thế nào thì khoảng cách vẫn chưa bao giờ là vấn đề." }
     ];
 
-    // --- Cài đặt & Dữ liệu cho hiệu ứng "Galaxy" ---
     const isMobile = window.innerWidth <= 768;
     const config = { maxParticles: isMobile ? 30 : 50, particleInterval: isMobile ? 300 : 200 };
     const messages = ["U are the best", "Cố lên !!!", "Yêu cậu", "Love u so much", "nhớ cậu nhiều", "tớ luôn bên cạnh cậu", "💖", "💕", "🌟", "✨", "You're my angel", "Đừng bỏ cuộc nhé !!!", "I'm alws here", "😘", "🥰", "❤️", "💘", "💝", "💞"];
@@ -202,7 +192,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const textStyles = ['love', 'date', 'special'];
     const activeParticles = new Set();
     
-    // --- Biến trạng thái toàn cục ---
     let upNextPlaylist = []; let upNextIndex = 0;
     let isBirthdayMode = false; let isLetterModeActive = false; let typingInterval = null;
     let wavesurfer;
@@ -215,7 +204,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let isAnimatingCamera = false;
     let previousCameraState = null;
 
-
     // =================================================================
     // PHẦN 3: CÁC HÀM TIỆN ÍCH VÀ HIỆU ỨNG
     // =================================================================
@@ -224,29 +212,31 @@ document.addEventListener('DOMContentLoaded', function() {
     function formatTime(seconds) { const minutes = Math.floor(seconds / 60); const secs = Math.floor(seconds % 60); return `${minutes}:${secs < 10 ? '0' : ''}${secs}`; }
     function getRandomItem(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-    // --- CÁC HÀM MỚI: Điều khiển Camera Zoom In/Out mượt mà ---
+    function createShootingStars(count = 4) {
+        for (let i = 0; i < count; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.top = `${Math.random() * 80}%`;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.animationDelay = `${Math.random() * 7}s`;
+            star.style.transform = `rotate(${Math.random() * 60 - 75}deg)`;
+            shootingStarsContainer.appendChild(star);
+        }
+    }
+    
     function animateCamera(targetPosition, targetLookAt, duration = 1500, onComplete = null) {
         if (isAnimatingCamera) return;
         isAnimatingCamera = true;
-
         const startPosition = camera.position.clone();
         const startLookAt = controls.target.clone();
         const clock = new THREE.Clock();
-
         function animate() {
             const elapsedTime = clock.getElapsedTime();
             const progress = Math.min(elapsedTime * 1000 / duration, 1);
             const easeProgress = 0.5 - 0.5 * Math.cos(progress * Math.PI);
-
             camera.position.lerpVectors(startPosition, targetPosition, easeProgress);
             controls.target.lerpVectors(startLookAt, targetLookAt, easeProgress);
-
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            } else {
-                isAnimatingCamera = false;
-                if (onComplete) onComplete();
-            }
+            if (progress < 1) { requestAnimationFrame(animate); } else { isAnimatingCamera = false; if (onComplete) onComplete(); }
         }
         animate();
     }
@@ -256,26 +246,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const messagesToUse = isBirthdayMode ? birthdayMessages : messages;
         const isHeart = isBirthdayMode ? Math.random() > 0.5 : Math.random() > 0.7;
         const particle = document.createElement('div');
-        if (isHeart) {
-            particle.className = 'text-particle heart';
-            particle.textContent = isBirthdayMode ? getRandomItem(["🎉", "🎂", "💖"]) : getRandomItem(heartSymbols);
-        } else {
-            const message = getRandomItem(messagesToUse);
-            const style = isBirthdayMode ? 'birthday' : getRandomItem(textStyles);
-            particle.className = `text-particle ${style}`;
-            particle.textContent = message;
-        }
-        const xPos = Math.random() * 100;
-        const zPos = (Math.random() - 0.5) * 500;
-        const duration = Math.random() * 2 + 3;
-        const size = isMobile ? 10 : 12;
-        const variation = isMobile ? 5 : 6;
-        particle.style.left = `${xPos}%`;
-        particle.style.fontSize = `${Math.random() * variation + size}px`;
-        galaxy.appendChild(particle);
-        activeParticles.add(particle);
-        const startY = -150;
-        const endY = window.innerHeight + 150;
+        if (isHeart) { particle.className = 'text-particle heart'; particle.textContent = isBirthdayMode ? getRandomItem(["🎉", "🎂", "💖"]) : getRandomItem(heartSymbols); } 
+        else { const message = getRandomItem(messagesToUse); const style = isBirthdayMode ? 'birthday' : getRandomItem(textStyles); particle.className = `text-particle ${style}`; particle.textContent = message; }
+        const xPos = Math.random() * 100; const zPos = (Math.random() - 0.5) * 500; const duration = Math.random() * 2 + 3;
+        const size = isMobile ? 10 : 12; const variation = isMobile ? 5 : 6;
+        particle.style.left = `${xPos}%`; particle.style.fontSize = `${Math.random() * variation + size}px`;
+        galaxy.appendChild(particle); activeParticles.add(particle);
+        const startY = -150; const endY = window.innerHeight + 150;
         const animation = particle.animate([
             { transform: `translate3d(0, ${startY}px, ${zPos}px) translateX(-50%)`, opacity: 0 },
             { opacity: 0.9, offset: 0.1 }, { opacity: 0.9, offset: 0.9 },
@@ -287,24 +264,18 @@ document.addEventListener('DOMContentLoaded', function() {
     function setupGyroControls() {
         if (window.DeviceOrientationEvent && 'ontouchstart' in window) {
             window.addEventListener('deviceorientation', (event) => {
-                const { beta, gamma } = event;
-                bodyEl.classList.add('gyro-active');
-                const clampedBeta = Math.max(-45, Math.min(45, beta));
-                const clampedGamma = Math.max(-45, Math.min(45, gamma));
-                bodyEl.style.setProperty('--gyro-rotate-x', `${clampedBeta * -0.3}deg`);
-                bodyEl.style.setProperty('--gyro-rotate-y', `${clampedGamma * 0.3}deg`);
+                const { beta, gamma } = event; bodyEl.classList.add('gyro-active');
+                const clampedBeta = Math.max(-45, Math.min(45, beta)); const clampedGamma = Math.max(-45, Math.min(45, gamma));
+                bodyEl.style.setProperty('--gyro-rotate-x', `${clampedBeta * -0.3}deg`); bodyEl.style.setProperty('--gyro-rotate-y', `${clampedGamma * 0.3}deg`);
             });
         }
     }
     function setupMouseParallax() {
         if (!('ontouchstart' in window)) {
             window.addEventListener('mousemove', (event) => {
-                const { clientX } = event;
-                const width = window.innerWidth;
+                const { clientX } = event; const width = window.innerWidth;
                 const xPercent = (clientX / width - 0.5) * 2;
-                bodyEl.style.setProperty('--parallax-x-far', `${xPercent * -5}px`);
-                bodyEl.style.setProperty('--parallax-x-mid', `${xPercent * -15}px`);
-                bodyEl.style.setProperty('--parallax-x-near', `${xPercent * -25}px`);
+                bodyEl.style.setProperty('--parallax-x-far', `${xPercent * -5}px`); bodyEl.style.setProperty('--parallax-x-mid', `${xPercent * -15}px`); bodyEl.style.setProperty('--parallax-x-near', `${xPercent * -25}px`);
             });
         }
     }
@@ -314,35 +285,39 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================
     
     function typewriterEffect(elementsToType, onComplete = () => {}) {
-        let currentElementIndex = 0, currentCharIndex = 0;
-        const TYPING_SPEED = 35, PAUSE_BETWEEN_ELEMENTS = 500;
         if (typingInterval) clearInterval(typingInterval);
-        function startTypingNextElement() {
-            if (currentElementIndex >= elementsToType.length) { onComplete(); return; }
-            currentCharIndex = 0;
-            elementsToType[currentElementIndex].element.innerHTML = '';
-            type();
-        }
+        let elementIndex = 0; let charIndex = 0;
         const type = () => {
-            const currentItem = elementsToType[currentElementIndex];
-            if (currentCharIndex < currentItem.text.length) {
-                currentItem.element.innerHTML += currentItem.text.charAt(currentCharIndex);
-                currentCharIndex++;
-                typingInterval = setTimeout(type, TYPING_SPEED);
-            } else {
-                currentElementIndex++;
-                setTimeout(startTypingNextElement, PAUSE_BETWEEN_ELEMENTS);
+            if (elementIndex >= elementsToType.length) { if (onComplete) onComplete(); return; }
+            const currentItem = elementsToType[elementIndex]; const fullText = currentItem.text;
+            if (fullText.charAt(charIndex) === '<') {
+                const closingTagIndex = fullText.indexOf('>', charIndex);
+                if (closingTagIndex !== -1) { currentItem.element.innerHTML += fullText.substring(charIndex, closingTagIndex + 1); charIndex = closingTagIndex + 1; }
             }
+            if (charIndex < fullText.length) {
+                const char = fullText.charAt(charIndex); currentItem.element.innerHTML += char; charIndex++;
+                let speed = 50;
+                if (char === '.' || char === '!') speed = 500;
+                if (char === ',') speed = 250;
+                typingInterval = setTimeout(type, speed);
+            } else { elementIndex++; charIndex = 0; setTimeout(type, 500); }
         };
-        startTypingNextElement();
+        const skipTyping = () => {
+            clearTimeout(typingInterval);
+            elementsToType.forEach(item => { item.element.innerHTML = item.text; });
+            letterContainer.removeEventListener('click', skipTyping);
+            if (onComplete) onComplete();
+        };
+        letterContainer.addEventListener('click', skipTyping, { once: true });
+        elementsToType.forEach(item => item.element.innerHTML = '');
+        type();
     }
 
     let fadeInterval = null;
     function stopFade() { if (fadeInterval) { clearInterval(fadeInterval); fadeInterval = null; } }
     function fadeOut(callback) {
         stopFade(); if (!wavesurfer) { if (callback) callback(); return; }
-        const currentVolume = wavesurfer.getVolume();
-        if (currentVolume === 0) { wavesurfer.pause(); if (callback) callback(); return; }
+        const currentVolume = wavesurfer.getVolume(); if (currentVolume === 0) { wavesurfer.pause(); if (callback) callback(); return; }
         fadeInterval = setInterval(() => {
             let newVolume = wavesurfer.getVolume() - 0.1;
             if (newVolume <= 0) { newVolume = 0; stopFade(); wavesurfer.pause(); if (callback) callback(); }
@@ -360,6 +335,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function playTrack(track, isSpecialLetterTrack = false) {
+        if (!track || !track.file) { console.error("Lỗi: Đang cố gắng phát một bài hát không hợp lệ.", track); playNextInMix(); return; }
         if (!wavesurfer) {
             wavesurfer = WaveSurfer.create({ container: waveformContainer, waveColor: 'rgba(200, 200, 200, 0.5)', progressColor: '#ff6b9d', height: 50, barWidth: 2, barRadius: 3, cursorWidth: 0, responsive: true, hideScrollbar: true, media: audio, });
             wavesurfer.on('finish', () => { if (isLetterModeActive) { isLetterModeActive = false; } if (isBirthdayMode && birthdayData) { playTrack(birthdayData.song); } else { playNextInMix(); } });
@@ -369,13 +345,10 @@ document.addEventListener('DOMContentLoaded', function() {
             wavesurfer.on('pause', () => playPauseBtn.textContent = '▶');
         }
         stopFade(); wavesurfer.pause();
-        songTitleEl.textContent = "Đang tải bài hát...";
-        currentTimeEl.textContent = "0:00"; durationEl.textContent = "0:00";
-        wavesurfer.load(track.file);
-        updateFavoriteButton(track.file);
+        songTitleEl.textContent = "Đang tải bài hát..."; currentTimeEl.textContent = "0:00"; durationEl.textContent = "0:00";
+        wavesurfer.load(track.file); updateFavoriteButton(track.file);
         wavesurfer.once('ready', () => {
-            songTitleEl.textContent = track.title;
-            durationEl.textContent = formatTime(wavesurfer.getDuration());
+            songTitleEl.textContent = track.title; durationEl.textContent = formatTime(wavesurfer.getDuration());
             if (isSpecialLetterTrack) { fadeIn(); } else { wavesurfer.play(); }
         });
     }
@@ -390,12 +363,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function runBirthdayCheck() { if (!birthdayData) return false; const now = new Date(); if (now.getDate() === birthdayData.day && now.getMonth() + 1 === birthdayData.month) { isBirthdayMode = true; return true; } return false; }
     
     function activateBirthdayMode() {
-        document.getElementById('special-day-btn').classList.add('hidden');
+        const btn = document.getElementById('special-day-btn'); btn.classList.remove('hidden');
         const celebrationOverlay = document.getElementById('birthday-celebration');
         setTimeout(() => { celebrationOverlay.classList.remove('hidden'); celebrationOverlay.style.opacity = '1'; }, 1000);
         setTimeout(() => { celebrationOverlay.style.opacity = '0'; setTimeout(() => celebrationOverlay.classList.add('hidden'), 1000); }, 5000);
-        const btn = document.getElementById('special-day-btn');
-        btn.classList.remove('hidden');
         btn.addEventListener('click', () => openLetter(birthdayData.letter, birthdayData.song, true));
     }
 
@@ -413,30 +384,21 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkAndSetupLetterButton() {
         const btn = document.getElementById('special-day-btn');
         const letterInfo = getLetterForCurrentTime();
-        if (letterInfo) {
-            btn.classList.remove('hidden');
-            btn.addEventListener('click', () => openLetter(letterInfo.letter, letterInfo.song));
-        }
+        if (letterInfo) { btn.classList.remove('hidden'); btn.addEventListener('click', () => openLetter(letterInfo.letter, letterInfo.song)); }
     }
 
     function openLetter(letterData, specialSong = null, isBirthday = false) {
         if (!letterContainer || !letterContainer.classList.contains('hidden')) return;
         const letterContentDiv = document.querySelector('.letter-content');
-        letterContentDiv.innerHTML = '';
-        const titleEl = document.createElement('h1');
-        const signatureEl = document.createElement('p');
-        signatureEl.className = 'signature';
-        const closeBtn = document.createElement('button');
-        closeBtn.id = 'close-letter-btn'; closeBtn.innerHTML = '×';
-        letterContentDiv.appendChild(closeBtn); letterContentDiv.appendChild(titleEl);
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = letterData.content;
+        const titleEl = document.createElement('h1'); const signatureEl = document.createElement('p'); signatureEl.className = 'signature';
+        const closeBtn = document.createElement('button'); closeBtn.id = 'close-letter-btn'; closeBtn.innerHTML = '×';
+        const tempDiv = document.createElement('div'); tempDiv.innerHTML = letterData.content;
         const pElements = Array.from(tempDiv.querySelectorAll('p'));
-        pElements.forEach(p => letterContentDiv.appendChild(p));
-        letterContentDiv.appendChild(signatureEl);
+        letterContentDiv.innerHTML = ''; // Xóa sạch nội dung cũ
+        letterContentDiv.append(closeBtn, titleEl, ...pElements, signatureEl);
         const signatureText = isBirthday ? 'Yêu cậu nhất luôn,<br>tun' : (specialSong ? 'Yêu cậu rất nhiều,<br>tun' : 'Luôn bên cạnh cậu,<br>tun');
         const elementsToType = [{ element: titleEl, text: letterData.title }];
-        pElements.forEach(p => { elementsToType.push({ element: p, text: p.innerHTML.replace(/<br\s*\/?>/gi, '\n') }); });
+        pElements.forEach(p => { elementsToType.push({ element: p, text: p.innerHTML }); });
         elementsToType.push({ element: signatureEl, text: signatureText });
         letterContainer.classList.remove('hidden');
         typewriterEffect(elementsToType);
@@ -451,9 +413,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function adjustLetterButtonPosition() {
         const btn = document.getElementById('special-day-btn');
         if (btn && waveformControls && !waveformControls.classList.contains('hidden')) {
-            const playerHeight = waveformControls.offsetHeight;
-            const bottomMargin = 15;
-            const desiredGap = 20;
+            const playerHeight = waveformControls.offsetHeight; const bottomMargin = 15; const desiredGap = 20;
             btn.style.bottom = `${playerHeight + bottomMargin + desiredGap}px`;
         }
     }
@@ -461,30 +421,22 @@ document.addEventListener('DOMContentLoaded', function() {
     function setupUIEventListeners() {
         const startAudio = () => {
             if (wavesurfer && wavesurfer.isPlaying()) return;
-            if (!wavesurfer) {
-                if (isBirthdayMode && birthdayData) { playTrack(birthdayData.song); } 
-                else { createDailyMix(); playNextInMix(); }
-            } else { wavesurfer.play(); }
+            if (!wavesurfer) { if (isBirthdayMode && birthdayData) { playTrack(birthdayData.song); } else { createDailyMix(); playNextInMix(); } } 
+            else { wavesurfer.play(); }
             overlay.style.display = 'none';
-            waveformControls.classList.remove('hidden');
-            settingsToggleBtn.classList.remove('hidden');
+            waveformControls.classList.remove('hidden'); settingsToggleBtn.classList.remove('hidden');
             adjustLetterButtonPosition();
         };
         overlay.addEventListener('click', startAudio, { once: true });
-        
-        // --- CẬP NHẬT LỚN: Nút đóng info card giờ đây sẽ zoom camera ra ---
         closeInfoBtn.addEventListener('click', () => {
             infoCard.classList.add('hidden');
             if (previousCameraState && !isAnimatingCamera) {
                 animateCamera(previousCameraState.position, previousCameraState.target, 1200, () => {
-                    previousCameraState = null;
-                    controls.minDistance = 50; // Reset giới hạn zoom
+                    previousCameraState = null; controls.minDistance = 50;
                 });
             }
         });
-
-        nextBtn.addEventListener('click', playNextInMix);
-        prevBtn.addEventListener('click', playPrevInMix);
+        nextBtn.addEventListener('click', playNextInMix); prevBtn.addEventListener('click', playPrevInMix);
         playPauseBtn.addEventListener('click', () => { if (wavesurfer) wavesurfer.playPause(); });
         favoriteBtn.addEventListener('click', () => { if (!wavesurfer || !wavesurfer.getMediaElement().src) return; let favorites = getFavorites(); const currentUrl = wavesurfer.getMediaElement().src; if (favorites.includes(currentUrl)) { favorites = favorites.filter(song => song !== currentUrl); } else { favorites.push(currentUrl); } saveFavorites(favorites); updateFavoriteButton(currentUrl); });
         settingsToggleBtn.addEventListener('click', () => settingsPanel.classList.toggle('hidden'));
@@ -496,116 +448,67 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================
 
     function initThreeJS() {
-        scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
-        camera.position.z = 200;
-        renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
-        scene.add(ambientLight);
-        const pointLight = new THREE.PointLight(0xffffff, 2);
-        scene.add(pointLight);
+        scene = new THREE.Scene(); camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.z = 200; renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.3); scene.add(ambientLight);
+        const pointLight = new THREE.PointLight(0xffffff, 2); scene.add(pointLight);
         controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.minDistance = 50;
-        controls.maxDistance = 500;
-        createStarfield();
-        createSolarSystem();
-        window.addEventListener('resize', onWindowResize);
-        window.addEventListener('click', onClick);
+        controls.enableDamping = true; controls.minDistance = 50; controls.maxDistance = 500;
+        createStarfield(); createSolarSystem();
+        window.addEventListener('resize', onWindowResize); window.addEventListener('click', onClick);
         animate();
     }
     
-    function createStarfield() {
-        const starGeometry = new THREE.SphereGeometry(1000, 64, 64);
-        const starMaterial = new THREE.MeshBasicMaterial({ map: textureLoader.load(assetPaths.stars), side: THREE.BackSide });
-        starfield = new THREE.Mesh(starGeometry, starMaterial);
-        scene.add(starfield);
-    }
+    function createStarfield() { const starGeometry = new THREE.SphereGeometry(1000, 64, 64); const starMaterial = new THREE.MeshBasicMaterial({ map: textureLoader.load(assetPaths.stars), side: THREE.BackSide }); starfield = new THREE.Mesh(starGeometry, starMaterial); scene.add(starfield); }
     
     function createSolarSystem() {
         celestialData.forEach(data => {
-            const pivot = new THREE.Object3D();
-            scene.add(pivot);
-            const geometry = new THREE.SphereGeometry(data.size, 32, 32);
-            let material;
-            if (data.type === 'star') {
-                material = new THREE.MeshBasicMaterial({ map: textureLoader.load(data.texture) });
-            } else {
-                material = new THREE.MeshStandardMaterial({ map: textureLoader.load(data.texture) });
-            }
-            const mesh = new THREE.Mesh(geometry, material);
-            mesh.position.x = data.orbitRadius;
-            mesh.userData = { ...data, mesh: mesh }; // Gán mesh vào userData để dễ truy cập
-            pivot.add(mesh);
+            const pivot = new THREE.Object3D(); scene.add(pivot);
+            const geometry = new THREE.SphereGeometry(data.size, 32, 32); let material;
+            if (data.type === 'star') { material = new THREE.MeshBasicMaterial({ map: textureLoader.load(data.texture) }); } 
+            else { material = new THREE.MeshStandardMaterial({ map: textureLoader.load(data.texture) }); }
+            const mesh = new THREE.Mesh(geometry, material); mesh.position.x = data.orbitRadius;
+            mesh.userData = { ...data, mesh: mesh }; pivot.add(mesh);
             planetObjects.push({ mesh, pivot, orbitSpeed: data.orbitSpeed, spinSpeed: data.spinSpeed });
             if (data.ringTexture) {
                 const ringGeometry = new THREE.RingGeometry(data.size * 1.2, data.size * 2, 64);
                 const ringMaterial = new THREE.MeshBasicMaterial({ map: textureLoader.load(data.ringTexture), side: THREE.DoubleSide, transparent: true });
-                const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
-                ringMesh.rotation.x = -0.5 * Math.PI;
-                mesh.add(ringMesh);
+                const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial); ringMesh.rotation.x = -0.5 * Math.PI; mesh.add(ringMesh);
             }
         });
     }
 
     function animate() {
-        requestAnimationFrame(animate);
-        const delta = 0.01;
-        planetObjects.forEach(obj => {
-            obj.mesh.rotation.y += obj.spinSpeed * delta;
-            obj.pivot.rotation.y += obj.orbitSpeed * delta;
-        });
+        requestAnimationFrame(animate); const delta = 0.01;
+        planetObjects.forEach(obj => { obj.mesh.rotation.y += obj.spinSpeed * delta; obj.pivot.rotation.y += obj.orbitSpeed * delta; });
         if (starfield) starfield.rotation.y -= 0.0001;
-        controls.update();
-        renderer.render(scene, camera);
+        controls.update(); renderer.render(scene, camera);
     }
 
-    function onWindowResize() {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    }
+    function onWindowResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
 
     function onClick(event) {
-        if (!infoCard.classList.contains('hidden') || !letterContainer.classList.contains('hidden')) return;
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        if (!infoCard.classList.contains('hidden') || !letterContainer.classList.contains('hidden') || isAnimatingCamera) return;
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1; mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(planetObjects.map(p => p.mesh));
-        if (intersects.length > 0) {
-            const clickedObjectData = intersects[0].object.userData;
-            showPlanetInfo(clickedObjectData);
-        }
+        if (intersects.length > 0) { showPlanetInfo(intersects[0].object.userData); }
     }
 
-    // --- CẬP NHẬT LỚN: Hàm này giờ đây sẽ zoom camera và tự động căn chỉnh vị trí ---
     function showPlanetInfo(data) {
         if (isAnimatingCamera) return;
-
-        // 1. Zoom Camera
         previousCameraState = { position: camera.position.clone(), target: controls.target.clone() };
-        const planetPosition = new THREE.Vector3();
-        data.mesh.getWorldPosition(planetPosition);
-        
-        const direction = planetPosition.clone().normalize();
-        const distance = data.size * 4; // Khoảng cách camera tới hành tinh
+        const planetPosition = new THREE.Vector3(); data.mesh.getWorldPosition(planetPosition);
+        const direction = new THREE.Vector3().subVectors(camera.position, planetPosition).normalize();
+        const distance = data.size * 4;
         const cameraTargetPosition = planetPosition.clone().add(direction.multiplyScalar(distance));
-        
-        controls.minDistance = data.size * 2; // Giới hạn không cho người dùng zoom quá gần
+        controls.minDistance = data.size * 2;
         animateCamera(cameraTargetPosition, planetPosition);
-
-        // 2. Hiển thị và căn chỉnh thẻ thông tin
-        infoCardTitle.textContent = data.name;
-        infoCardFact.textContent = data.fact;
-        infoCardMessage.textContent = data.message;
+        infoCardTitle.textContent = data.name; infoCardFact.textContent = data.fact; infoCardMessage.textContent = data.message;
         infoCard.style.setProperty('--glow-color', data.glowColor || '#fff');
-        
-        // Căn chỉnh vị trí thẻ để không bị che
         const playerHeight = waveformControls.classList.contains('hidden') ? 0 : waveformControls.offsetHeight;
-        infoCard.style.bottom = `${playerHeight + 30}px`; // Luôn cách trình phát 30px
-        
+        infoCard.style.bottom = `${playerHeight + 30}px`;
         infoCard.classList.remove('hidden');
     }
 
@@ -615,30 +518,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let lastParticleTime = 0;
     function mainLoop(timestamp) {
-        if (timestamp - lastParticleTime > config.particleInterval) {
-            createTextParticle();
-            lastParticleTime = timestamp;
-        }
+        if (timestamp - lastParticleTime > config.particleInterval) { createTextParticle(); lastParticleTime = timestamp; }
         requestAnimationFrame(mainLoop);
     }
 
     function init() {
-        runBirthdayCheck(); // Chạy trước để isBirthdayMode được cập nhật
+        runBirthdayCheck();
         setupUIEventListeners();
         initThreeJS();
+        createShootingStars(isMobile ? 3 : 5);
         setupGyroControls();
         setupMouseParallax();
         requestAnimationFrame(mainLoop);
-        
-        if (!isBirthdayMode) {
-            checkAndSetupLetterButton();
-        } else {
-            activateBirthdayMode();
-        }
-
-        setTimeout(() => {
-            loadingScreen.classList.add('loaded');
-        }, 3000);
+        if (isBirthdayMode) { activateBirthdayMode(); } else { checkAndSetupLetterButton(); }
+        setTimeout(() => { loadingScreen.classList.add('loaded'); }, 3000);
     }
 
     init();
