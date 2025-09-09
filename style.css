@@ -22,7 +22,20 @@ body .hidden, [hidden] { display: none !important; }
 /* 2. CÁC LỚP NỀN VŨ TRỤ & SAO BĂNG                      */
 /* ======================================================= */
 body::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(1px 1px at 20px 30px, #eee, transparent), radial-gradient(1px 1px at 40px 70px, #fff, transparent), radial-gradient(1px 1px at 50px 160px, #ddd, transparent), radial-gradient(1px 1px at 90px 40px, #fff, transparent), radial-gradient(2px 2px at 150px 120px, #fff, transparent); background-size: 200px 200px; z-index: -3; animation: pan-stars-slow 250s linear infinite; will-change: transform; transform: translateX(var(--parallax-x-far)); transition: transform 0.2s ease-out; }
-body::after { content: ''; position: absolute; inset: -50vmin; z-index: -2; background: #000; will-change: transform; transform: translateX(var(--parallax-x-mid)) rotateX(var(--gyro-rotate-x)) rotateY(var(--gyro-rotate-y)); transition: transform 0.2s ease-out; }
+body::after {
+    content: '';
+    position: absolute;
+    inset: -50vmin;
+    z-index: -2;
+    /* THAY THẾ LẠI BẰNG ĐOẠN NÀY ĐỂ CÓ TINH VÂN */
+    background: radial-gradient(ellipse at 70% 30%, #3a2d54 0%, transparent 50%),
+                radial-gradient(ellipse at 30% 70%, #2c3e50 0%, transparent 40%);
+    animation: rotate-nebula 180s linear infinite alternate;
+    will-change: transform;
+    opacity: 0.5; /* Giảm độ sáng một chút để các hiệu ứng khác nổi bật hơn */
+    transform: translateX(var(--parallax-x-mid)) rotateX(var(--gyro-rotate-x)) rotateY(var(--gyro-rotate-y));
+    transition: transform 0.2s ease-out;
+}
 body.gyro-active::after { animation: none; }
 #background-overlay { position: absolute; inset: 0; background-image: radial-gradient(2px 2px at 50px 50px, #fff, transparent), radial-gradient(2px 2px at 100px 200px, #ddd, transparent); background-size: 250px 250px; z-index: -1; animation: pan-stars-fast 100s linear infinite; will-change: transform; transform: translateX(var(--parallax-x-near)); transition: transform 0.2s ease-out; }
 
@@ -112,6 +125,10 @@ body.gyro-active::after { animation: none; }
 @keyframes shoot { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(100vh) scale(0); opacity: 0; } }
 @keyframes fade-in-up { to { transform: scale(1); opacity: 1; } }
 @keyframes sparkle-anim { 0%, 100% { transform: scale(0.5); opacity: 0; } 50% { transform: scale(1.2) rotate(15deg); opacity: 1; } }
+@keyframes rotate-nebula {
+    from { transform: rotate(0deg) scale(1.5); }
+    to { transform: rotate(360deg) scale(1.5); }
+}
 
 /* ======================================================= */
 /* 7. MEDIA QUERIES (RESPONSIVE DESIGN)                  */
