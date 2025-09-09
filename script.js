@@ -342,15 +342,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- CẤU HÌNH DỮ LIỆU 3D (SỬ DỤNG LINK ẢNH ĐÁNG TIN CẬY) ---
     const assetPaths = {
-        sun: 'https://i.ibb.co/dbC0jLp/2k-sun.jpg',
-        venus: 'https://i.ibb.co/XXC7kk4/2k-venus-surface.jpg',
-        earth: 'https://i.ibb.co/dMvjTTg/2k-earth-daymap.jpg',
-        mars: 'https://i.ibb.co/P9zfbj1/2k-mars.jpg',
-        jupiter: 'https://i.ibb.co/Pmx9fG1/2k-jupiter.jpg',
-        saturn: 'https://i.ibb.co/sKtpM3V/2k-saturn.jpg',
-        saturnRing: 'https://i.ibb.co/mN5v1D2/2k-saturn-ring-alpha.png',
-        neptune: 'https://i.ibb.co/XzJ25S0/2k-neptune.jpg',
-        stars: 'https://i.ibb.co/b3S0pXw/2k-stars.jpg'
+        sun: 'images/sun.jpg',
+        venus: 'images/venus.jpg',
+        earth: 'images/earth.jpg',
+        mars: 'images/mars.jpg',
+        jupiter: 'images/jupiter.jpg',
+        saturn: 'images/saturn.jpg',
+        saturnRing: 'images/saturn-ring.jpg',
+        neptune: 'images/neptune.jpg',
+        stars: 'images/stars.jpg'
     };
     
     const celestialData = [
