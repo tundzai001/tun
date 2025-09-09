@@ -1,11 +1,9 @@
 // =================================================================
 // PHẦN 1: GIAO DIỆN NGƯỜI DÙNG (UI)
-// Toàn bộ logic cho nhạc, thư, cài đặt,... nằm ở đây.
 // =================================================================
 
 document.addEventListener('DOMContentLoaded', function() {
     // --- CÁC THÀNH PHẦN DOM CHÍNH ---
-    const galaxy = document.getElementById('galaxy'); // Sẽ không dùng nữa, nhưng giữ lại để tránh lỗi
     const bodyEl = document.body;
     const audio = document.getElementById('bg-music');
     const overlay = document.getElementById('music-overlay');
@@ -29,6 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const infoCardMessage = document.getElementById('info-card-message');
     const closeInfoBtn = document.getElementById('close-info-btn');
     const canvas = document.getElementById('webgl-canvas');
+    const letterContainer = document.getElementById('letter-container');
 
     // =================================================================
     // ★★★ DÁN NỘI DUNG CÁ NHÂN CỦA BẠN VÀO ĐÂY ★★★
@@ -162,6 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
         { day: 31, title: "Gửi cậu, ngày cuối cùng của tháng...", content: `<p>Chúc cậu một ngày học cuối tháng thật thành công để khép lại một tháng trọn vẹn nhé. Tối mình nói chuyện.</p>` },
     ];
 
+
     // --- BIẾN TRẠNG THÁI UI ---
     let upNextPlaylist = []; let upNextIndex = 0;
     let isBirthdayMode = false; let isLetterModeActive = false; let typingInterval = null;
@@ -172,7 +172,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function formatTime(seconds) { const minutes = Math.floor(seconds / 60); const secs = Math.floor(seconds % 60); return `${minutes}:${secs < 10 ? '0' : ''}${secs}`; }
 
     // --- CÁC HÀM LOGIC UI (THƯ, NHẠC, SỰ KIỆN...) ---
-    // (Toàn bộ các hàm này được giữ nguyên từ phiên bản trước)
     function typewriterEffect(elementsToType, onComplete = () => {}) {
         let currentElementIndex = 0; let currentCharIndex = 0; let isTyping = true;
         const TYPING_SPEED = 35; const PAUSE_BETWEEN_ELEMENTS = 500;
@@ -181,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (currentElementIndex >= elementsToType.length) { isTyping = false; onComplete(); return; }
             currentCharIndex = 0;
             const currentElement = elementsToType[currentElementIndex].element;
-            currentElement.innerHTML = ''; // Bắt đầu gõ
+            currentElement.innerHTML = '';
             type();
         }
         const type = () => {
@@ -228,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function playTrack(track, isSpecialLetterTrack = false) {
         if (!wavesurfer) {
             wavesurfer = WaveSurfer.create({ container: waveformContainer, waveColor: 'rgba(200, 200, 200, 0.5)', progressColor: '#ff6b9d', height: 50, barWidth: 2, barRadius: 3, cursorWidth: 0, responsive: true, hideScrollbar: true, media: audio, });
-            wavesurfer.on('finish', () => { if (isLetterModeActive) { isLetterModeActive = false; } if (isBirthdayMode) { playTrack(birthdayData.song); } else { playNextInMix(); } });
+            wavesurfer.on('finish', () => { if (isLetterModeActive) { isLetterModeActive = false; } if (isBirthdayMode && birthdayData) { playTrack(birthdayData.song); } else { playNextInMix(); } });
             wavesurfer.on('audioprocess', () => { currentTimeEl.textContent = formatTime(wavesurfer.getCurrentTime()); });
             wavesurfer.on('error', (err) => { console.error(`Lỗi WaveSurfer: ${err}`); songTitleEl.textContent = "Bài hát lỗi, tự chuyển bài..."; setTimeout(playNextInMix, 2000); });
             wavesurfer.on('play', () => playPauseBtn.textContent = '❚❚');
@@ -268,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     function checkAndSetupLetterButton() { const btn = document.getElementById('special-day-btn'); const letterInfo = getLetterForCurrentTime(); if (letterInfo) { btn.classList.remove('hidden'); btn.addEventListener('click', () => openLetter(letterInfo.letter, letterInfo.song)); } }
     function openLetter(letterData, specialSong = null, isBirthday = false) {
-        const letterContainer = document.getElementById('letter-container');
+        if (!letterContainer) return;
         if (!letterContainer.classList.contains('hidden')) return;
         const letterContentDiv = document.querySelector('.letter-content');
         letterContentDiv.innerHTML = '';
@@ -288,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function() {
         pElements.forEach(p => { elementsToType.push({ element: p, text: p.innerHTML }) });
         elementsToType.push({ element: signatureEl, text: signatureText });
         letterContainer.classList.remove('hidden');
-        typewriterEffect(elementsToType); // Dùng phiên bản đơn giản hơn
+        typewriterEffect(elementsToType);
         if (specialSong && !isBirthday) { fadeToSpecialTrack(specialSong); }
         closeBtn.addEventListener('click', () => {
             letterContainer.classList.add('hidden');
@@ -311,7 +310,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const startAudio = () => {
             if (wavesurfer && wavesurfer.isPlaying()) return;
             if (!wavesurfer) {
-                if (isBirthdayMode) { playTrack(birthdayData.song); } 
+                if (isBirthdayMode && birthdayData) { playTrack(birthdayData.song); } 
                 else { createDailyMix(); playNextInMix(); }
             } else { wavesurfer.play(); }
             overlay.style.display = 'none';
@@ -331,30 +330,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // =================================================================
     // PHẦN 2: THẾ GIỚI 3D (THREE.JS)
-    // Toàn bộ logic cho vũ trụ 3D nằm ở đây.
     // =================================================================
 
     // --- BIẾN TOÀN CỤC THREE.JS ---
     let scene, camera, renderer, controls;
-    let starfield, asteroidBelt;
+    let starfield;
     const planetObjects = [];
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     const textureLoader = new THREE.TextureLoader();
 
-    // --- CẤU HÌNH DỮ LIỆU 3D ---
+    // --- CẤU HÌNH DỮ LIỆU 3D (SỬ DỤNG LINK ẢNH ĐÁNG TIN CẬY) ---
     const assetPaths = {
-        sun: 'https://www.solarsystemscope.com/textures/download/2k_sun.jpg',
-        venus: 'https://www.solarsystemscope.com/textures/download/2k_venus_surface.jpg',
-        earth: 'https://www.solarsystemscope.com/textures/download/2k_earth_daymap.jpg',
-        mars: 'https://www.solarsystemscope.com/textures/download/2k_mars.jpg',
-        jupiter: 'https://www.solarsystemscope.com/textures/download/2k_jupiter.jpg',
-        saturn: 'https://www.solarsystemscope.com/textures/download/2k_saturn.jpg',
-        saturnRing: 'https://www.solarsystemscope.com/textures/download/2k_saturn_ring_alpha.png',
-        neptune: 'https://www.solarsystemscope.com/textures/download/2k_neptune.jpg',
-        stars: 'https://www.solarsystemscope.com/textures/download/2k_stars.jpg'
+        sun: 'https://i.ibb.co/dbC0jLp/2k-sun.jpg',
+        venus: 'https://i.ibb.co/XXC7kk4/2k-venus-surface.jpg',
+        earth: 'https://i.ibb.co/dMvjTTg/2k-earth-daymap.jpg',
+        mars: 'https://i.ibb.co/P9zfbj1/2k-mars.jpg',
+        jupiter: 'https://i.ibb.co/Pmx9fG1/2k-jupiter.jpg',
+        saturn: 'https://i.ibb.co/sKtpM3V/2k-saturn.jpg',
+        saturnRing: 'https://i.ibb.co/mN5v1D2/2k-saturn-ring-alpha.png',
+        neptune: 'https://i.ibb.co/XzJ25S0/2k-neptune.jpg',
+        stars: 'https://i.ibb.co/b3S0pXw/2k-stars.jpg'
     };
-
+    
     const celestialData = [
         { id: 'sun', type: 'star', name: 'Mặt Trời', texture: assetPaths.sun, size: 50, orbitRadius: 0, spinSpeed: 0.05, fact: "Năng lượng của mặt trời sưởi ấm cả vũ trụ này...", message: "...nhưng nụ cười của em mới là thứ sưởi ấm trái tim anh." },
         { id: 'venus', type: 'planet', name: 'Sao Kim', texture: assetPaths.venus, size: 4, orbitRadius: 80, orbitSpeed: 1.2, spinSpeed: 0.1, fact: "Sao Kim được đặt theo tên nữ thần tình yêu và sắc đẹp...", message: "...điều đó giải thích tại sao anh lại tìm thấy em ở đây." },
@@ -367,39 +365,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- HÀM KHỞI TẠO THẾ GIỚI 3D ---
     function initThreeJS() {
-        // 1. Scene
         scene = new THREE.Scene();
-
-        // 2. Camera
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
         camera.position.z = 200;
-
-        // 3. Renderer
         renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        // 4. Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
         scene.add(ambientLight);
         const pointLight = new THREE.PointLight(0xffffff, 1.5);
-        scene.add(pointLight); // Ánh sáng mặt trời
-
-        // 5. Controls
+        scene.add(pointLight);
         controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.minDistance = 50;
         controls.maxDistance = 500;
-
-        // 6. Tạo các đối tượng
         createStarfield();
         createSolarSystem();
-        
-        // 7. Sự kiện
         window.addEventListener('resize', onWindowResize);
         window.addEventListener('click', onClick);
-
-        // 8. Bắt đầu vòng lặp
         animate();
     }
     
@@ -416,9 +399,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function createSolarSystem() {
         celestialData.forEach(data => {
-            const pivot = new THREE.Object3D(); // Điểm xoay cho quỹ đạo
+            const pivot = new THREE.Object3D();
             scene.add(pivot);
-
             const geometry = new THREE.SphereGeometry(data.size, 32, 32);
             let material;
             if (data.type === 'star') {
@@ -426,15 +408,11 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 material = new THREE.MeshStandardMaterial({ map: textureLoader.load(data.texture) });
             }
-            
             const mesh = new THREE.Mesh(geometry, material);
             mesh.position.x = data.orbitRadius;
-            mesh.userData = data; // Gắn dữ liệu vào đối tượng 3D
+            mesh.userData = data;
             pivot.add(mesh);
-            
             planetObjects.push({ mesh, pivot, orbitSpeed: data.orbitSpeed, spinSpeed: data.spinSpeed });
-
-            // Tạo vành đai Sao Thổ
             if (data.ringTexture) {
                 const ringGeometry = new THREE.RingGeometry(data.size * 1.2, data.size * 2, 64);
                 const ringMaterial = new THREE.MeshBasicMaterial({
@@ -444,26 +422,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
                 ringMesh.rotation.x = -0.5 * Math.PI;
-                mesh.add(ringMesh); // Gắn vành đai vào hành tinh
+                mesh.add(ringMesh);
             }
         });
     }
 
     // --- VÒNG LẶP RENDER VÀ SỰ KIỆN 3D ---
-    const clock = new THREE.Clock();
     function animate() {
         requestAnimationFrame(animate);
-        const elapsedTime = clock.getElapsedTime();
-
-        // Xoay các hành tinh và quỹ đạo
         planetObjects.forEach(obj => {
             obj.mesh.rotation.y += obj.spinSpeed * 0.01;
             obj.pivot.rotation.y += obj.orbitSpeed * 0.01;
         });
-
-        // Xoay nền sao
         if (starfield) starfield.rotation.y -= 0.0001;
-        
         controls.update();
         renderer.render(scene, camera);
     }
@@ -475,17 +446,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function onClick(event) {
-        // Chỉ xử lý click nếu không có UI nào đang mở
         if (!infoCard.classList.contains('hidden') || !letterContainer.classList.contains('hidden')) {
             return;
         }
-
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(planetObjects.map(p => p.mesh));
-
         if (intersects.length > 0) {
             const clickedObjectData = intersects[0].object.userData;
             showPlanetInfo(clickedObjectData);
@@ -502,18 +469,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- HÀM KHỞI TẠO TỔNG ---
     function init() {
-        setupUIEventListeners(); // Thiết lập sự kiện cho các nút UI
-        initThreeJS(); // Khởi tạo thế giới 3D
-        
+        setupUIEventListeners();
+        initThreeJS();
         if (runBirthdayCheck()) {
             activateBirthdayMode();
         } else {
             checkAndSetupLetterButton();
         }
-        
         setTimeout(() => {
             loadingScreen.classList.add('loaded');
-        }, 2500);
+        }, 3000);
     }
 
     init();
