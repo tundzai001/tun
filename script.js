@@ -270,19 +270,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const asteroidGroup = new THREE.Group();
-        const size = Math.random() * 2 + 1;
+        // TĂNG KÍCH THƯỚC: Lõi thiên thạch giờ sẽ lớn hơn ( 6 đơn vị)
+        const size = Math.random() * 4 + 2;
 
         const coreGeometry = new THREE.DodecahedronGeometry(size, 1);
         const coreMaterial = new THREE.MeshStandardMaterial({
             map: textureLoader.load(assetPaths.asteroid),
             emissive: 0xff6a00,
-            emissiveIntensity: 1.5,
+            // TĂNG ĐỘ SÁNG: Cường độ phát sáng mạnh hơn để trông rực rỡ hơn
+            emissiveIntensity: 3.5,
             roughness: 1
         });
         const asteroidCore = new THREE.Mesh(coreGeometry, coreMaterial);
         asteroidGroup.add(asteroidCore);
 
-        const particleCount = 700;
+        // TĂNG SỐ LƯỢNG: Nhiều hạt lửa hơn để tạo ra cái đuôi dày đặc
+        const particleCount = 1500;
         const particlesGeometry = new THREE.BufferGeometry();
         const posArray = new Float32Array(particleCount * 3);
         const particleVelocities = [];
@@ -305,7 +308,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const particleMaterial = new THREE.PointsMaterial({
             map: particleTexture,
-            size: 0.5,
+            // TĂNG KÍCH THƯỚC HẠT LỬA LÊN ĐÁNG KỂ (từ 0.5 lên 2.0)
+            size: 2.0,
             blending: THREE.AdditiveBlending,
             transparent: true,
             depthWrite: false,
@@ -314,16 +318,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const fireParticles = new THREE.Points(particlesGeometry, particleMaterial);
         asteroidGroup.add(fireParticles);
 
-        const spawnRadius = 800;
-        const startX = (Math.random() - 0.5) * spawnRadius * 2;
-        const startY = (Math.random() - 0.5) * spawnRadius;
-        const startZ = (Math.random() - 0.5) * spawnRadius * 2;
+        // THAY ĐỔI VỊ TRÍ XUẤT HIỆN ĐỂ DỄ THẤY HƠN
+        const spawnRadius = 1000; // Tăng nhẹ bán kính tổng thể
+        const startX = (Math.random() - 0.5) * spawnRadius * 1.5; // Mở rộng phạm vi ngang
+        const startY = (Math.random() - 0.5) * 200; // Giới hạn độ cao để không bay quá cao hoặc quá thấp
+        const startZ = (Math.random() > 0.5 ? 1 : -1) * (spawnRadius * 0.8); // Đảm bảo nó xuất hiện ở xa hơn trên trục Z
         asteroidGroup.position.set(startX, startY, startZ);
         scene.add(asteroidGroup);
 
         const duration = Math.random() * 10 + 10;
         gsap.to(asteroidGroup.position, {
-            x: -startX, y: -startY, z: -startZ,
+            x: -startX, y: -startY * 1.5, z: -startZ, // Thêm chút thay đổi Y để có quỹ đạo cong nhẹ
             duration: duration, ease: "none",
             onComplete: () => {
                 scene.remove(asteroidGroup);
@@ -744,58 +749,68 @@ document.addEventListener('DOMContentLoaded', function() {
             startAudio();
         }, { once: true });
 
-        closeInfoBtn.addEventListener('click', () => {
-            if (isAnimatingCamera) return;
+        // TÌM ĐOẠN CODE NÀY TRONG FILE SCRIPT.JS VÀ THAY THẾ NÓ
 
-            isAnimatingCamera = true;
-            controls.enabled = false;
+    closeInfoBtn.addEventListener('click', () => {
+        if (isAnimatingCamera) return;
 
-            infoCard.classList.add('hidden');
-            followedObject = null;
+        isAnimatingCamera = true;
+        controls.enabled = false;
 
-            const overviewPosition = new THREE.Vector3(0, 150, 400); 
-            const overviewTarget = new THREE.Vector3(0, 0, 0);
+        infoCard.classList.add('hidden');
+        followedObject = null;
 
-            const currentTarget = controls.target.clone();
+        // Vị trí và mục tiêu nhìn tổng quan cuối cùng
+        const overviewPosition = new THREE.Vector3(0, 150, 400);
+        const overviewTarget = new THREE.Vector3(0, 0, 0);
+        const planetPosition = controls.target.clone(); // Vị trí hành tinh hiện tại
 
-            const intermediatePosition = camera.position.clone().lerp(currentTarget, -0.5).add(new THREE.Vector3(0, 70, 0));
+        // ---- LOGIC CAMERA ----
+        // 1. Tính toán một vị trí "lùi lại" (pull back) an toàn.
+        // Camera sẽ lùi ra xa hành tinh theo hướng nhìn hiện tại, tạo ra một vòng cung đẹp mắt.
+        const pullBackDirection = new THREE.Vector3().subVectors(camera.position, planetPosition).normalize();
+        // Khoảng cách lùi lại sẽ dựa trên khoảng cách của hành tinh tới tâm, đảm bảo đủ xa cho các hành tinh ở xa.
+        const pullBackDistance = planetPosition.length() * 0.4 + 150;
+        const pullBackPosition = planetPosition.clone().add(pullBackDirection.multiplyScalar(pullBackDistance));
 
-            const tl = gsap.timeline({
-                onComplete: () => {
-                    controls.minDistance = 20;
-                    controls.maxDistance = 1200;
-                    controls.enablePan = true;
-                    controls.enabled = true;
-                    isAnimatingCamera = false;
-                }
-            });
-            // Giai đoạn 1: Lùi ra và bay lên
-            tl.to(camera.position, {
-                x: intermediatePosition.x,
-                y: intermediatePosition.y,
-                z: intermediatePosition.z,
-                duration: 1.2,
-                ease: 'power2.out'
-            }, 0);
-
-            // Giai đoạn 2: Bay về vị trí tổng quan
-            tl.to(camera.position, {
-                x: overviewPosition.x,
-                y: overviewPosition.y,
-                z: overviewPosition.z,
-                duration: 1.0,
-                ease: 'power2.in'
-            }, ">-0.2"); // Bắt đầu trước khi giai đoạn 1 kết thúc một chút
-
-            // Đồng thời, di chuyển điểm nhìn (target) về trung tâm
-            tl.to(controls.target, {
-                x: overviewTarget.x,
-                y: overviewTarget.y,
-                z: overviewTarget.z,
-                duration: 2.0, // Di chuyển mượt trong suốt quá trình
-                ease: 'power2.inOut'
-            }, 0);
+        const tl = gsap.timeline({
+            onComplete: () => {
+                controls.minDistance = 20;
+                controls.maxDistance = 1200;
+                controls.enablePan = true;
+                controls.enabled = true;
+                isAnimatingCamera = false;
+            }
         });
+
+        // 2. Tạo chuỗi chuyển động mượt mà với GSAP
+        // Giai đoạn 1: Lùi camera ra vị trí "pullBackPosition" và nâng nhẹ lên để tạo đường cong
+        tl.to(camera.position, {
+            x: pullBackPosition.x,
+            y: pullBackPosition.y + 50, // Thêm 50 vào trục Y để tạo hiệu ứng bay vòng lên
+            z: pullBackPosition.z,
+            duration: 1.2,
+            ease: 'power2.out'
+        }, 0);
+
+        // Giai đoạn 2: Từ vị trí đó, bay về vị trí tổng quan cuối cùng
+        tl.to(camera.position, {
+            x: overviewPosition.x,
+            y: overviewPosition.y,
+            z: overviewPosition.z,
+            duration: 1.1,
+            ease: 'power2.inOut'
+        }, ">-0.4"); // Bắt đầu trước khi giai đoạn 1 kết thúc 0.4s để chuyển động liền mạch
+
+        // Đồng thời, di chuyển điểm nhìn (target) từ hành tinh về trung tâm (0,0,0) trong suốt quá trình
+        tl.to(controls.target, {
+            x: overviewTarget.x,
+            y: overviewTarget.y,
+            z: overviewTarget.z,
+            duration: 2.0, // Kéo dài để tạo cảm giác mượt mà
+            ease: 'power2.inOut'
+        }, 0);
+    });
             
 
         nextBtn.addEventListener('click', playNextInMix);
@@ -1000,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         celestialObjects.forEach(obj => {
             if (obj.pivot) {
-                obj.pivot.rotation.y += (obj.orbitSpeed || 0) * 0.1 * delta;
+                obj.pivot.rotation.y += (obj.orbitSpeed || 0) * 0.5 * delta;
             }
             if (obj.spinPivot) {
                 obj.spinPivot.rotation.y += (obj.spinSpeed || 0) * delta;
