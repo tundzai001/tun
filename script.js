@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================
     /* --- DỮ LIỆU SINH NHẬT --- */
     const birthdayData = { 
-        day: 9, 
+        day: 9,
         month: 6,
         letter: { 
             title: "Gửi em, cô gái tuyệt vời nhất từng được sinh ra =))) nghe hơi sến tí nhưng mà thôi", 
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* --- PLAYLIST CHÍNH  --- */
     const mainPlaylist = [ 
-         { file: "https://treuah.netlify.app/leduong.mp3", title: "Lễ đường - Kai Đinh" }, 
+        { file: "https://treuah.netlify.app/leduong.mp3", title: "Lễ đường - Kai Đinh" }, 
         { file: "https://treuah.netlify.app/dieforyou.mp3", title: "Die For You - The Weeknd" },
         { file: "https://treuah.netlify.app/ordinary.mp3", title: "Ordinary - Alex Warren" },
         { file: "https://treuah.netlify.app/supernatural.mp3", title: "supernatural - Ariana Grande" },
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* --- DANH SÁCH BÀI HÁT HÀNG NGÀY --- */
     const dailySongs = [ 
-         { day: 1, song: { file: "https://treuah.netlify.app/main/fever.mp3", title: "Fever - COLDZY" } },
+        { day: 1, song: { file: "https://treuah.netlify.app/main/fever.mp3", title: "Fever - COLDZY" } },
         { day: 2, song: { file: "https://treuah.netlify.app/main/art.mp3", title: "Art - Tyla" } },
         { day: 3, song: { file: "https://treuah.netlify.app/main/nambenanh.mp3", title: "Nằm bên anh - Minh Đinh" } },
         { day: 4, song: { file: "https://treuah.netlify.app/main/Fantasize.mp3", title: "Fantasize - Ariana Grande" } },
@@ -745,18 +745,58 @@ document.addEventListener('DOMContentLoaded', function() {
         }, { once: true });
 
         closeInfoBtn.addEventListener('click', () => {
+            if (isAnimatingCamera) return;
+
+            isAnimatingCamera = true;
+            controls.enabled = false;
+
             infoCard.classList.add('hidden');
             followedObject = null;
-            controls.enablePan = true;
 
-            const overviewPosition = new THREE.Vector3(0, 150, 350); 
+            const overviewPosition = new THREE.Vector3(0, 150, 400); 
             const overviewTarget = new THREE.Vector3(0, 0, 0);
 
-            animateCamera(overviewPosition, overviewTarget, 1.5, () => {
-                 controls.minDistance = 20;
-                 controls.maxDistance = 1200;
+            const currentTarget = controls.target.clone();
+
+            const intermediatePosition = camera.position.clone().lerp(currentTarget, -0.5).add(new THREE.Vector3(0, 70, 0));
+
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    controls.minDistance = 20;
+                    controls.maxDistance = 1200;
+                    controls.enablePan = true;
+                    controls.enabled = true;
+                    isAnimatingCamera = false;
+                }
             });
+            // Giai đoạn 1: Lùi ra và bay lên
+            tl.to(camera.position, {
+                x: intermediatePosition.x,
+                y: intermediatePosition.y,
+                z: intermediatePosition.z,
+                duration: 1.2,
+                ease: 'power2.out'
+            }, 0);
+
+            // Giai đoạn 2: Bay về vị trí tổng quan
+            tl.to(camera.position, {
+                x: overviewPosition.x,
+                y: overviewPosition.y,
+                z: overviewPosition.z,
+                duration: 1.0,
+                ease: 'power2.in'
+            }, ">-0.2"); // Bắt đầu trước khi giai đoạn 1 kết thúc một chút
+
+            // Đồng thời, di chuyển điểm nhìn (target) về trung tâm
+            tl.to(controls.target, {
+                x: overviewTarget.x,
+                y: overviewTarget.y,
+                z: overviewTarget.z,
+                duration: 2.0, // Di chuyển mượt trong suốt quá trình
+                ease: 'power2.inOut'
+            }, 0);
         });
+            
 
         nextBtn.addEventListener('click', playNextInMix);
         prevBtn.addEventListener('click', playPrevInMix);
@@ -784,8 +824,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function initThreeJS() {
         scene = new THREE.Scene(); 
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
-        camera.position.z = 350;
+        camera.position.set(0, 150, 400);
         renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+        renderer.setClearColor(0x000000, 0); 
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
         renderer.setSize(window.innerWidth, window.innerHeight);
         
@@ -1028,13 +1069,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function onClick(event) {
-        if (!infoCard.classList.contains('hidden') || !letterContainer.classList.contains('hidden') || isAnimatingCamera) return;
+        if (overlay.classList.contains('hidden-overlay') === false || 
+            letterContainer.classList.contains('hidden') === false) {
+            return;
+        }
+
+        if (isAnimatingCamera) return;
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1; 
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(mouse, camera);
         const clickableObjects = celestialObjects.map(p => p.mesh).filter(m => m.userData.isClickable);
         const intersects = raycaster.intersectObjects(clickableObjects, true);
-        if (intersects.length > 0) showPlanetInfo(intersects[0].object.userData);
+        if (intersects.length > 0) {
+            if (infoCard.classList.contains('hidden')) {
+                showPlanetInfo(intersects[0].object.userData);
+            }
+        }
     }
 
     function showPlanetInfo(data) {
