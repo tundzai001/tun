@@ -802,6 +802,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const retreatDistance = planetPosition.length() + 200; // Thêm 200 đơn vị khoảng cách
         const safeRetreatPosition = retreatDirection.multiplyScalar(retreatDistance);
         safeRetreatPosition.y = 50; // Giữ camera bay hơi cao lên để tạo vòng cung
+        
         const tl = gsap.timeline({
             onComplete: () => {
                 controls.minDistance = 20;
@@ -1126,17 +1127,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const intersects = raycaster.intersectObjects(clickableObjects, true);
         if (intersects.length > 0) {
             if (infoCard.classList.contains('hidden')) {
+                const clickedObject = intersects[0].object;
                 showPlanetInfo(intersects[0].object.userData);
             }
         }
     }
 
-    function showPlanetInfo(data) {
-        if (isAnimatingCamera || followedObject) return;
+    function showPlanetInfo(data, clickedMesh) {
+        if (isAnimatingCamera || followedObject || !clickedMesh) return;
         
         controls.enablePan = false; 
         
         const planetPosition = new THREE.Vector3();
+        clickedMesh.getWorldPosition(planetPosition);
         data.mesh.getWorldPosition(planetPosition);
         
         const distance = data.size * 4;
@@ -1144,7 +1147,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const cameraTargetPosition = planetPosition.clone().add(direction.multiplyScalar(distance));
         
         animateCamera(cameraTargetPosition, planetPosition, 1.5, () => {
-            followedObject = data.mesh;
+            followedObject = clickedMesh;
             controls.minDistance = data.size * 1.5;
             controls.maxDistance = data.size * 10;
             cameraOffset.subVectors(camera.position, planetPosition);
