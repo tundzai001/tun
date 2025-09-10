@@ -249,6 +249,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let upNextPlaylist = []; let upNextIndex = 0; let isBirthdayMode = false; let isLetterModeActive = false; let typingInterval = null; let wavesurfer; let scene, camera, renderer, controls; let starfield; const celestialObjects = []; const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2(); const textureLoader = new THREE.TextureLoader(); let isAnimatingCamera = false; let followedObject = null; let cameraOffset = new THREE.Vector3(); let activeAsteroids = []; let activeComets = []; let sunEffects = {};
     let spaceStationEffects = {};
     const clock = new THREE.Clock();
+    let isPreloadingNextSong = false;
 
     // =================================================================
     // PHẦN 3: CÁC HÀM TIỆN ÍCH VÀ HIỆU ỨNG
@@ -597,7 +598,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function playTrack(track, isSpecialLetterTrack = false) {
+        // Reset trạng thái tải trước mỗi khi bắt đầu một bài hát mới
+        isPreloadingNextSong = false;
+
         if (!track || !track.file) { console.error("Lỗi: Đang cố gắng phát một bài hát không hợp lệ.", track); playNextInMix(); return; }
+
         if (!wavesurfer) {
             wavesurfer = WaveSurfer.create({
                 container: waveformContainer, waveColor: 'rgba(200, 200, 200, 0.5)', progressColor: '#ff6b9d',
@@ -607,7 +612,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 isLetterModeActive = false;
                 if (isBirthdayMode && birthdayData) { playTrack(birthdayData.song); } else { playNextInMix(); }
             });
-            wavesurfer.on('audioprocess', () => currentTimeEl.textContent = formatTime(wavesurfer.getCurrentTime()));
+            
+            // ---- LOGIC TẢI TRƯỚC BÀI HÁT MỚI ----
+            wavesurfer.on('audioprocess', () => {
+                const currentTime = wavesurfer.getCurrentTime();
+                const duration = wavesurfer.getDuration();
+                currentTimeEl.textContent = formatTime(currentTime);
+
+                // Khi bài hát còn dưới 20 giây và chưa bắt đầu tải trước
+                if (duration > 20 && (duration - currentTime) < 20 && !isPreloadingNextSong) {
+                    isPreloadingNextSong = true; // Đánh dấu đã bắt đầu tải
+                    
+                    // Lấy thông tin bài hát tiếp theo trong danh sách phát
+                    const nextTrackIndex = upNextIndex % upNextPlaylist.length;
+                    const nextTrack = upNextPlaylist[nextTrackIndex];
+
+                    if (nextTrack && nextTrack.file) {
+                        console.log(`Đang tải trước bài hát tiếp theo: ${nextTrack.title}`);
+                        // Tạo một đối tượng Audio tạm thời để trình duyệt tải file vào cache
+                        const preloader = new Audio();
+                        preloader.src = nextTrack.file;
+                    }
+                }
+            });
+            // ---- KẾT THÚC LOGIC TẢI TRƯỚC ----
+
             wavesurfer.on('error', (err) => { console.error(`Lỗi WaveSurfer: ${err}`); songTitleEl.textContent = "Bài hát lỗi, tự chuyển bài..."; setTimeout(playNextInMix, 2000); });
             wavesurfer.on('play', () => playPauseBtn.textContent = '❚❚');
             wavesurfer.on('pause', () => playPauseBtn.textContent = '▶');
@@ -766,13 +795,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const planetPosition = controls.target.clone(); // Vị trí hành tinh hiện tại
 
         // ---- LOGIC CAMERA ----
-        // 1. Tính toán một vị trí "lùi lại" (pull back) an toàn.
-        // Camera sẽ lùi ra xa hành tinh theo hướng nhìn hiện tại, tạo ra một vòng cung đẹp mắt.
-        const pullBackDirection = new THREE.Vector3().subVectors(camera.position, planetPosition).normalize();
-        // Khoảng cách lùi lại sẽ dựa trên khoảng cách của hành tinh tới tâm, đảm bảo đủ xa cho các hành tinh ở xa.
-        const pullBackDistance = planetPosition.length() * 0.4 + 150;
-        const pullBackPosition = planetPosition.clone().add(pullBackDirection.multiplyScalar(pullBackDistance));
-
+        // 1. Tính toán một vị trí "thoát ra" (retreat) an toàn.
+        // Vị trí này nằm trên đường thẳng kéo dài từ tâm (Mặt Trời) qua hành tinh.
+        // Điều này đảm bảo camera luôn di chuyển ra xa khỏi trung tâm.
+        const retreatDirection = planetPosition.clone().normalize();
+        const retreatDistance = planetPosition.length() + 200; // Thêm 200 đơn vị khoảng cách
+        const safeRetreatPosition = retreatDirection.multiplyScalar(retreatDistance);
+        safeRetreatPosition.y = 50; // Giữ camera bay hơi cao lên để tạo vòng cung
         const tl = gsap.timeline({
             onComplete: () => {
                 controls.minDistance = 20;
@@ -783,13 +812,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // 2. Tạo chuỗi chuyển động mượt mà với GSAP
-        // Giai đoạn 1: Lùi camera ra vị trí "pullBackPosition" và nâng nhẹ lên để tạo đường cong
+        // 2. Tạo chuỗi chuyển động mượt mà
+        // Giai đoạn 1: Bay từ vị trí hiện tại đến điểm "thoát ra" an toàn.
+        // Trong giai đoạn này, camera vẫn nhìn về phía hành tinh.
         tl.to(camera.position, {
             x: pullBackPosition.x,
-            y: pullBackPosition.y + 50, // Thêm 50 vào trục Y để tạo hiệu ứng bay vòng lên
+            y: pullBackPosition.y,
             z: pullBackPosition.z,
-            duration: 1.2,
+            duration: 1.5,
             ease: 'power2.out'
         }, 0);
 
@@ -798,21 +828,20 @@ document.addEventListener('DOMContentLoaded', function() {
             x: overviewPosition.x,
             y: overviewPosition.y,
             z: overviewPosition.z,
-            duration: 1.1,
+            duration: 1.2,
             ease: 'power2.inOut'
-        }, ">-0.4"); // Bắt đầu trước khi giai đoạn 1 kết thúc 0.4s để chuyển động liền mạch
+        }, ">-0.5"); // Bắt đầu trước khi giai đoạn 1 kết thúc 0.5s để chuyển động liền mạch
 
         // Đồng thời, di chuyển điểm nhìn (target) từ hành tinh về trung tâm (0,0,0) trong suốt quá trình
         tl.to(controls.target, {
             x: overviewTarget.x,
             y: overviewTarget.y,
             z: overviewTarget.z,
-            duration: 2.0, // Kéo dài để tạo cảm giác mượt mà
+            duration: 2.5, // Kéo dài để tạo cảm giác mượt mà
             ease: 'power2.inOut'
         }, 0);
     });
-            
-
+        
         nextBtn.addEventListener('click', playNextInMix);
         prevBtn.addEventListener('click', playPrevInMix);
         playPauseBtn.addEventListener('click', () => wavesurfer?.playPause());
