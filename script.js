@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
         { day: 7, title: "Gửi cậu, tối thứ bảy ở Thành Đô...", content: `<p>Ngày nghỉ đầu tiên của cậu thế nào? Có đi đâu chơi hay khám phá được món gì ngon không? Tớ tò mò về cuộc sống của cậu ở bên đó lắm.</p><p>Dù chúng ta xa nhau, nhưng được nghe cậu kể về một ngày của mình làm tớ cảm thấy khoảng cách như ngắn lại. Chúc cậu ngủ ngon.</p>` },
         { day: 8, title: "helo bae, ê í là cậu yêu vkl =)) ", content: `<p>Thế là đầu tuần cuối cùng ở Việt Nam =))) nghe cứ hụt hẫng tdn ấy cậu ơi nma tớ hy vọng cậu đừng khóc nhé =)) nhớ lời tớ dặn về khóc khi nào rồi đấy =))) .</p><p>Đừng lo lắng quá nhé, Bên cạnh cậu còn gia đình, còn tớ nữa. Tớ luôn tin ở cậu. Mạnh mẽ lên !!! love u so much luôn </p>` },
         { day: 9, title: "Hê và lô cậu =))) ê nma cậu yêu vl ", content: `<p>Hoa đẹp chứ? Ê ý là thấy tone màu đấy hợp cả cậu vl =)) kiểu xinh xinh lại còn dịu dàng nữa omg tuyệt. Cậu alws phải vui vẻ, same cái vibe với bông hoa nhé =)) kiểu là luôn tươi cười, vui vẻ như cách bông hoa nở rộ nhé. Tớ yêu cậu nhiều lắm luôn ý </p>` },
-        { day: 10, title: "Gửi cậu, còn 3 ngày nữa là cậu lên đường rùi", content: `<p>Công nhận thời gian trôi nhanh thật =))) mới ngày nào còn mới nói chuyện vậy mà đã chuẩn bị đi rồi huhu không phải buồn 1 chút nữa rồi mà buồn nhiều nhiều chút. Nhưng mà trộm vía mỗi tối được nói chuyện với cậu là kiểu vui vl ấy =))  Love you so so so so so.... much luôn.</p>` },
+        { day: 10, title: "Gửi cậu, còn 3 ngày nữa là cậu lên đường rùi", content: `<p>Công nhận thời gian trôi nhanh thật =))) mới ngày nào còn mới nói chuyện vậy mà đã chuẩn bị đi rồi huhu không phải buồn 1 chút nữa rồi mà buồn nhiều nhiều chút. Nhưng mà trộm vía mỗi tối được nói chuyện với bae là kiểu vui vl ấy =)) bae dyeu vl  Love you so so so so so.... much luôn.</p>` },
         { day: 11, title: "Còn 2 ngày nữa, ối giời ơi...", content: `<p>ê sao trôi nhanh thế dcm , nhớ ơi nhớ, nhớ b hà nhiều chút =))) chắc không phải bạn nữa rồi khả năng giờ phải lên wife luôn, chứ yêu quá rồi đấy =)))) Nhớ nhiều nhiều chút =)) ước được bên cạnh suốt ngày =))))))))))))) </p>` },
         { day: 12, title: "Nhanh thật chưa gì còn hơn 20 tiếng nữa...", content: `<p>Cố lên, không buồn tớ vẫn luôn ở đây với cậu mà, cố lên nào, không được khóc nhé. Tớ thương cậu nhiều lắm luôn í, nhớ lời tớ dặn không được khóc khi không có tớ ở bên, mạnh mẽ lên!!!!</p>` },
         { day: 13, title: "Thế là bay rùi, omg sao dcm nhanh thế", content: `<p>Buồn quá, vợ đi rồi buồn vl, không dám nói tại sao không gặp sớm hơn, nhưng mà biết đâu số phận sắp đặt để lần này có thể tiến xa idk =))) but i want to say that  i love u so much, i miss u. Nhưng mà sang đấy phải cố gắng lên nhé, tớ luôn ở bên cạnh cậu mà</p>` },
@@ -253,6 +253,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const textStyles = ['love', 'date', 'special'];
     const activeParticles = new Set();
     let upNextPlaylist = []; let upNextIndex = 0; let isBirthdayMode = false; let isLetterModeActive = false; let typingInterval = null; let wavesurfer; let scene, camera, renderer, controls; let starfield; const celestialObjects = []; const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2(); const textureLoader = new THREE.TextureLoader(); let isAnimatingCamera = false; let followedObject = null; let cameraOffset = new THREE.Vector3(); let activeAsteroids = []; let activeComets = []; let sunEffects = {};
+    let originalCameraPosition = new THREE.Vector3();
+    let originalControlsTarget = new THREE.Vector3();
+    let originalControlsDistance = { min: 20, max: 1200 };
     let spaceStationEffects = {};
     const clock = new THREE.Clock();
     let isPreloadingNextSong = false;
@@ -452,8 +455,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         tl.to(camera.position, {
-            x: targetPosition.x, y: targetPosition.y, z: targetPosition.z,
-            duration: duration, ease: "power3.inOut"
+            x: targetPosition.x, 
+            y: targetPosition.y,
+            z: targetPosition.z,
+            duration: duration, ease: "power2.inOut"
         }, 0);
 
         tl.to(controls.target, {
@@ -772,62 +777,49 @@ document.addEventListener('DOMContentLoaded', function() {
             startAudio();
         }, { once: true });
 
-        // ========== SỬA LỖI CAMERA TẠI ĐÂY ==========
-        closeInfoBtn.addEventListener('click', () => {
+       closeInfoBtn.addEventListener('click', () => {
             if (isAnimatingCamera) return;
-
-            isAnimatingCamera = true;
-            controls.enabled = false;
+    
             infoCard.classList.add('hidden');
+            
+            if (!followedObject) return;
+
+            // Xóa theo dõi ngay lập tức
             followedObject = null;
 
-            const overviewPosition = new THREE.Vector3(0, 150, 400);
-            const overviewTarget = new THREE.Vector3(0, 0, 0);
-            const planetPosition = controls.target.clone();
+            // Bật lại animation
+            isAnimatingCamera = true;
+            controls.enabled = false;
 
-            const retreatDirection = planetPosition.clone().normalize();
-            const retreatDistance = planetPosition.length() + 200;
-            const safeRetreatPosition = retreatDirection.multiplyScalar(retreatDistance);
-            safeRetreatPosition.y = 50;
-
+            // Tạo animation trở về vị trí ban đầu
             const tl = gsap.timeline({
                 onComplete: () => {
-                    controls.minDistance = 20;
-                    controls.maxDistance = 1200;
+                    // Reset controls về trạng thái ban đầu
+                    controls.minDistance = originalControlsDistance.min;
+                    controls.maxDistance = originalControlsDistance.max;
                     controls.enablePan = true;
                     controls.enabled = true;
                     isAnimatingCamera = false;
                 }
             });
 
-            // Giai đoạn 1: Bay đến điểm an toàn
+            // Animation mượt mà trở về vị trí ban đầu
             tl.to(camera.position, {
-                x: safeRetreatPosition.x, // SỬA: Dùng safeRetreatPosition
-                y: safeRetreatPosition.y, // SỬA: Dùng safeRetreatPosition
-                z: safeRetreatPosition.z, // SỬA: Dùng safeRetreatPosition
+                x: originalCameraPosition.x,
+                y: originalCameraPosition.y,
+                z: originalCameraPosition.z,
                 duration: 1.5,
-                ease: 'power2.out'
-            }, 0);
-
-            // Giai đoạn 2: Bay về vị trí tổng quan
-            tl.to(camera.position, {
-                x: overviewPosition.x,
-                y: overviewPosition.y,
-                z: overviewPosition.z,
-                duration: 1.2,
                 ease: 'power2.inOut'
-            }, ">-0.5");
-
-            // Di chuyển điểm nhìn
-            tl.to(controls.target, {
-                x: overviewTarget.x,
-                y: overviewTarget.y,
-                z: overviewTarget.z,
-                duration: 2.5,
+            }, 0)
+            .to(controls.target, {
+                x: originalControlsTarget.x,
+                y: originalControlsTarget.y,
+                z: originalControlsTarget.z,
+                duration: 1.5,
                 ease: 'power2.inOut'
             }, 0);
         });
-        // ========== KẾT THÚC SỬA LỖI ==========
+
 
         nextBtn.addEventListener('click', playNextInMix);
         prevBtn.addEventListener('click', playPrevInMix);
@@ -881,6 +873,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.addEventListener('resize', onWindowResize);
         window.addEventListener('click', onClick);
         animate();
+        initializeDefaultCameraPosition();
     }
 
     function createSunEffects(sunMesh) {
@@ -1081,77 +1074,156 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (starfield) starfield.rotation.y -= 0.00005;
-
-        if (followedObject) {
-            const targetPosition = new THREE.Vector3();
-            followedObject.getWorldPosition(targetPosition);
-            const desiredCameraPosition = targetPosition.clone().add(cameraOffset);
-            camera.position.lerp(desiredCameraPosition, 0.1);
-            controls.target.lerp(targetPosition, 0.1);
-        }
-
+        updateFollowedObject();
         controls.update();
         renderer.render(scene, camera);
     }
 
+    function updateFollowedObject() {
+        if (!followedObject) return;
+        
+        const targetPosition = new THREE.Vector3();
+        followedObject.getWorldPosition(targetPosition);
+        
+        // Kiểm tra xem đối tượng có phải mặt trời không
+        const isSun = followedObject.userData && followedObject.userData.id === 'sun';
+        
+        if (isSun) {
+            // Xử lý đặc biệt cho mặt trời - ít aggressive hơn
+            const desiredCameraPosition = targetPosition.clone().add(cameraOffset);
+            camera.position.lerp(desiredCameraPosition, 0.02); // Lerp chậm hơn
+            controls.target.lerp(targetPosition, 0.03);
+            
+            // Kiểm tra khoảng cách cho mặt trời
+            const distance = camera.position.distanceTo(targetPosition);
+            const minDistance = controls.minDistance;
+            if (distance < minDistance) {
+                const direction = new THREE.Vector3()
+                    .subVectors(camera.position, targetPosition)
+                    .normalize();
+                camera.position.copy(targetPosition.clone().add(direction.multiplyScalar(minDistance + 5)));
+            }
+        } else {
+            // Logic cũ cho các hành tinh khác
+            const desiredCameraPosition = targetPosition.clone().add(cameraOffset);
+            camera.position.lerp(desiredCameraPosition, 0.05);
+            controls.target.lerp(targetPosition, 0.08);
+            
+            const distance = camera.position.distanceTo(targetPosition);
+            const minDistance = controls.minDistance;
+            if (distance < minDistance) {
+                const direction = new THREE.Vector3()
+                    .subVectors(camera.position, targetPosition)
+                    .normalize();
+                camera.position.copy(targetPosition.clone().add(direction.multiplyScalar(minDistance)));
+            }
+        }
+    }
     function onWindowResize() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-    // ========== SỬA LỖI KHI NHẤP VÀO HÀNH TINH TẠI ĐÂY ==========
     function onClick(event) {
-        if (overlay.classList.contains('hidden-overlay') === false ||
-            letterContainer.classList.contains('hidden') === false) {
-            return;
-        }
-
-        if (isAnimatingCamera) return;
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-        raycaster.setFromCamera(mouse, camera);
-        const clickableObjects = celestialObjects.map(p => p.mesh).filter(m => m.userData.isClickable);
-        const intersects = raycaster.intersectObjects(clickableObjects, true);
-        if (intersects.length > 0) {
-            if (infoCard.classList.contains('hidden')) {
-                const clickedObject = intersects[0].object;
-                // SỬA: Truyền cả userData và chính đối tượng đã được nhấp
-                showPlanetInfo(clickedObject.userData, clickedObject);
-            }
-        }
+    if (overlay.classList.contains('hidden-overlay') === false ||
+        letterContainer.classList.contains('hidden') === false) {
+        return;
     }
 
-    function showPlanetInfo(data, clickedMesh) { // Nhận thêm tham số 'clickedMesh'
-        if (isAnimatingCamera || followedObject || !clickedMesh) return; // Thêm kiểm tra an toàn
-
-        controls.enablePan = false;
-
-        const planetPosition = new THREE.Vector3();
-        // SỬA: Sử dụng trực tiếp 'clickedMesh'
-        clickedMesh.getWorldPosition(planetPosition);
-
-        const distance = data.size * 4;
-        const direction = new THREE.Vector3().subVectors(camera.position, planetPosition).normalize();
-        const cameraTargetPosition = planetPosition.clone().add(direction.multiplyScalar(distance));
-
-        animateCamera(cameraTargetPosition, planetPosition, 1.5, () => {
-            followedObject = clickedMesh;
-            controls.minDistance = data.size * 1.5;
-            controls.maxDistance = data.size * 10;
-            cameraOffset.subVectors(camera.position, planetPosition);
-        });
-
-        infoCardTitle.textContent = data.name;
-        infoCardFact.textContent = data.fact;
-        infoCardMessage.textContent = data.message;
-        infoCard.style.setProperty('--glow-color', data.glowColor || '#ff6b9d');
-        const playerHeight = waveformControls.classList.contains('hidden') ? 0 : waveformControls.offsetHeight;
-        infoCard.style.bottom = `${playerHeight + 30}px`;
-        infoCard.classList.remove('hidden');
+    if (isAnimatingCamera) return;
+    
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    
+    // Lấy tất cả objects có thể click
+    const clickableObjects = celestialObjects
+        .map(obj => obj.mesh)
+        .filter(mesh => mesh.userData && mesh.userData.isClickable);
+    
+    const intersects = raycaster.intersectObjects(clickableObjects, false);
+    
+    if (intersects.length > 0 && infoCard.classList.contains('hidden')) {
+        const clickedMesh = intersects[0].object;
+        if (clickedMesh.userData) {
+            // LƯU VỊ TRÍ CAMERA HIỆN TẠI TRƯỚC KHI CHUYỂN ĐỔI
+            originalCameraPosition.copy(camera.position);
+            originalControlsTarget.copy(controls.target);
+            originalControlsDistance.min = controls.minDistance;
+            originalControlsDistance.max = controls.maxDistance;
+            showPlanetInfo(clickedMesh);
+        }
     }
-    // ========== KẾT THÚC SỬA LỖI ==========
+}
 
+    function showPlanetInfo(clickedMesh) { 
+    if (isAnimatingCamera || !clickedMesh || !clickedMesh.userData) return;
+    
+    const data = clickedMesh.userData;
+    controls.enablePan = false;
+
+    // Lấy vị trí thế giới chính xác
+    const planetPosition = new THREE.Vector3();
+    clickedMesh.getWorldPosition(planetPosition);
+    let distance, cameraTargetPosition;
+    if (data.id === 'sun') {
+        distance = data.size * 2.5;
+        const directionToSun = new THREE.Vector3()
+            .subVectors(camera.position, planetPosition)
+            .normalize();
+        cameraTargetPosition = planetPosition.clone()
+            .add(directionToSun.multiplyScalar(distance)); // Use positive distance
+        cameraTargetPosition.y = Math.max(cameraTargetPosition.y, data.size * 0.5);
+    } else {
+        // Tính toán vị trí camera phù hợp
+        distance = Math.max(data.size * 4, 50); // Đảm bảo khoảng cách tối thiểu
+        const currentCameraDir = new THREE.Vector3()
+            .subVectors(camera.position, planetPosition)
+            .normalize();
+        
+        cameraTargetPosition = planetPosition.clone()
+            .add(currentCameraDir.multiplyScalar(distance));
+    }
+
+    animateCamera(cameraTargetPosition, planetPosition, 1.5, () => {
+        // Lưu đối tượng đang theo dõi
+        followedObject = clickedMesh;
+        
+        // Thiết lập giới hạn controls dựa trên loại thiên thể
+        if (data.id === 'sun') {
+            controls.minDistance = data.size * 1.8;
+            controls.maxDistance = data.size * 5;
+        } else {
+            controls.minDistance = Math.max(data.size * 1.5, 20);
+            controls.maxDistance = Math.max(data.size * 10, 200);
+        }
+        
+        // Tính toán và lưu offset camera - QUAN TRỌNG: Tính sau animation
+        setTimeout(() => {
+            const currentPosition = new THREE.Vector3();
+            clickedMesh.getWorldPosition(currentPosition);
+            cameraOffset.subVectors(camera.position, currentPosition);
+        }, 100); // Đợi animation ổn định
+    });
+
+    // Hiển thị thông tin
+    infoCardTitle.textContent = data.name || 'Unknown';
+    infoCardFact.textContent = data.fact || '';
+    infoCardMessage.textContent = data.message || '';
+    
+    // Cập nhật vị trí info card
+    const playerHeight = waveformControls.classList.contains('hidden') ? 0 : waveformControls.offsetHeight;
+    infoCard.style.bottom = `${playerHeight + 30}px`;
+    infoCard.classList.remove('hidden');
+}
+    function initializeDefaultCameraPosition() {
+        // Lưu vị trí camera mặc định
+        originalCameraPosition.set(0, 150, 400);
+        originalControlsTarget.set(0, 0, 0);
+        originalControlsDistance.min = 20;
+        originalControlsDistance.max = 1200;
+    }
     // =================================================================
     // PHẦN 6: VÒNG LẶP CHÍNH VÀ KHỞI TẠO
     // =================================================================
