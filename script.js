@@ -32,19 +32,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // PHẦN 2: DỮ LIỆU CÁ NHÂN HÓA VÀ CÀI ĐẶT
     // =================================================================
     /* --- DỮ LIỆU SINH NHẬT --- */
-    const birthdayData = { 
+    const birthdayData = {
         day: 9,
         month: 6,
-        letter: { 
-            title: "Gửi em, cô gái tuyệt vời nhất từng được sinh ra =))) nghe hơi sến tí nhưng mà thôi", 
-            content: `<p>Hôm nay là ngày sinh nhật của em, là ngày mà mẹ em đã sinh ra em =))) anh biết nhưng mà ý là kiểu ngày mà mẹ em đẻ ra thiên thần luôn rồi ấy kiểu em tuyệt vời mà xinh xắn lại còn giỏi giang nữa omg</p><p> Có lẽ nếu xét về tình cảm dành cho em chắc anh thua mỗi mẹ em thôi ấy, anh yêu em nhiều lắm luôn í. Thôi anh nhắn v th tại anh viết thư tay cho em rồi mà =)) đọc thư tay nó mới tình cảm hơn chứ <p>Chúc em sinh nhật vui vẻ!</p></p>` 
+        letter: {
+            title: "Gửi em, cô gái tuyệt vời nhất từng được sinh ra =))) nghe hơi sến tí nhưng mà thôi",
+            content: `<p>Hôm nay là ngày sinh nhật của em, là ngày mà mẹ em đã sinh ra em =))) anh biết nhưng mà ý là kiểu ngày mà mẹ em đẻ ra thiên thần luôn rồi ấy kiểu em tuyệt vời mà xinh xắn lại còn giỏi giang nữa omg</p><p> Có lẽ nếu xét về tình cảm dành cho em chắc anh thua mỗi mẹ em thôi ấy, anh yêu em nhiều lắm luôn í. Thôi anh nhắn v th tại anh viết thư tay cho em rồi mà =)) đọc thư tay nó mới tình cảm hơn chứ <p>Chúc em sinh nhật vui vẻ!</p></p>`
         },
         song: { file: "https://treuah.netlify.app/ordinary.mp3", title: "Ordinary - Alex Warren" }
     };
 
     /* --- PLAYLIST CHÍNH  --- */
-    const mainPlaylist = [ 
-        { file: "https://treuah.netlify.app/leduong.mp3", title: "Lễ đường - Kai Đinh" }, 
+    const mainPlaylist = [
+        { file: "https://treuah.netlify.app/leduong.mp3", title: "Lễ đường - Kai Đinh" },
         { file: "https://treuah.netlify.app/dieforyou.mp3", title: "Die For You - The Weeknd" },
         { file: "https://treuah.netlify.app/ordinary.mp3", title: "Ordinary - Alex Warren" },
         { file: "https://treuah.netlify.app/supernatural.mp3", title: "supernatural - Ariana Grande" },
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
 
     /* --- DANH SÁCH BÀI HÁT HÀNG NGÀY --- */
-    const dailySongs = [ 
+    const dailySongs = [
         { day: 1, song: { file: "https://treuah.netlify.app/main/fever.mp3", title: "Fever - COLDZY" } },
         { day: 2, song: { file: "https://treuah.netlify.app/main/art.mp3", title: "Art - Tyla" } },
         { day: 3, song: { file: "https://treuah.netlify.app/main/nambenanh.mp3", title: "Nằm bên anh - Minh Đinh" } },
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
         { day: 7, song: { file: "https://treuah.netlify.app/main/khobaudanhroi.mp3", title: "Kho báu đánh rơi - tlinh" } },
         { day: 8, song: { file: "https://treuah.netlify.app/main/babyonemoretime.mp3", title: "Baby One More Time - Britney Spears" } },
         { day: 9, song: { file: "https://treuah.netlify.app/main/Snooze.mp3", title: "snooze - SZA" } },
-        { day: 10, song: { file: "https://treuah.netlify.app/main/earnedit.mp3", title: "Earned It - The Weeknd" } }, 
+        { day: 10, song: { file: "https://treuah.netlify.app/main/earnedit.mp3", title: "Earned It - The Weeknd" } },
         { day: 11, song: { file: "https://treuah.netlify.app/main/dearfuturehusband.mp3", title: "Dear Future Husband - Meghan Trainor" } },
         { day: 12, song: { file: "https://treuah.netlify.app/main/luther.mp3", title: "Luther - Kendrick Lamar & SZA" } },
         { day: 13, song: { file: "https://treuah.netlify.app/main/thegioithantien.mp3", title: "Thế giới thần tiên - tlinh" } },
@@ -98,11 +98,11 @@ document.addEventListener('DOMContentLoaded', function() {
         { day: 28, song: { file: "https://treuah.netlify.app/main/chamhoa.mp3", title: "Chăm Hoa - Mono" } },
         { day: 29, song: { file: "https://treuah.netlify.app/main/freakydeaky.mp3", title: "Freaky Deaky - Tyga x Doja Cat" } },
         { day: 30, song: { file: "https://treuah.netlify.app/openarms.mp3", title: "Open Arms - SZA" } },
-        { day: 31, song: { file: "https://treuah.netlify.app/main/theboyismine.mp3", title: "The boy is mine - Ariana Grande" } } 
+        { day: 31, song: { file: "https://treuah.netlify.app/main/theboyismine.mp3", title: "The boy is mine - Ariana Grande" } }
     ];
 
     /* --- DANH SÁCH THƯ BUỔI TỐI --- */
-    const dailyLetters = [ 
+    const dailyLetters = [
         { day: 1, title: "hello cậu, ngày học đầu tiên của tháng kết thúc rồi", content: `<p>Vậy là một ngày nữa ở Thành Đô đã qua. Cậu đã vất vả, mệt mỏi rồi. Mọi thứ hôm nay vẫn ổn chứ? Có điều gì cậu muốn kể cho tớ nghe không?</p><p>Tuy là ở xa, nhưng mà tớ vẫn luôn ở đây lắng nghe cậu. Giờ thì nghỉ ngơi thôi nhé </p>` },
         { day: 2, title: "xin cả chào nhesee, ngày thứ hai của cậu mệt không?", content: `<p>Tan học rồi, chắc cậu mệt lắm. Đừng ôm hết mọi mệt mỏi một mình nhé, hãy chia sẻ với tớ. Tớ không ở cạnh để chăm sóc cậu được, nên chỉ có thể lắng nghe thôi và an ủi cậu thôi.</p><p>Hôm nay của tớ ở Việt Nam cũng hơi mệt mỏi một chút, nhưng mà kiểu có cậu ấy nên cảm giác thoải mái v =)) Có chuyện thì hãy kể tớ nhé, tớ luôn ở đây ❤️</p>` },
         { day: 3, title: "Gửi cậu, ngày thứ ba, lại một ngày nỗ lực rồi", content: `<p>Tớ biết việc học và thích nghi với môi trường mới, các bạn mới không dễ dàng. Tớ tự hào về cậu nhiều lắm. Mỗi ngày trôi qua, cậu lại càng giỏi giang hơn một chút đấy.</p><p>Hôm nay có gì vui hay có gì khiến cậu mệt mỏi, tức giận không? Kể cho tớ nghe, lov u so much luôn</p>` },
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
 
     /* --- DANH SÁCH THƯ BAN NGÀY  --- */
-    const daytimeLetters = [ 
+    const daytimeLetters = [
         { day: 1, title: "Gửi cậu, ngày đầu tháng tốt lành nhé!", content: `<p>Bắt đầu tháng mới ở Thành Đô, chúc cậu mọi việc đều suôn sẻ. Tớ gửi một chút năng lượng từ Việt Nam qua cho cậu đây. Cố lên nhé!</p>` },
         { day: 2, title: "Gửi cậu, ngày thứ hai...", content: `<p>Chúc cậu một ngày học tập hiệu quả. Đừng quên uống đủ nước và cười thật tươi nha. Tối mình nói chuyện sau.</p>` },
         { day: 3, title: "Gửi cậu, ngày thứ ba...", content: `<p>Hôm nay cậu có môn gì khó không? Cứ bình tĩnh xử lý từng chút một nhé, tớ tin cậu làm được. Fighting!</p>` },
@@ -172,79 +172,85 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
 
     /* --- ĐƯỜNG DẪN ẢNH (ASSETS)  --- */
-    const assetPaths = { 
-        sun: 'images/sun.jpg', 
-        venus: 'images/venus.jpg', 
+    const assetPaths = {
+        sun: 'images/sun.jpg',
+        venus: 'images/venus.jpg',
         earth: 'images/earth.jpg',
-        mars: 'images/mars.jpg', 
-        jupiter: 'images/jupiter.jpg', 
+        mars: 'images/mars.jpg',
+        jupiter: 'images/jupiter.jpg',
         saturn: 'images/saturn.jpg',
-        neptune: 'images/neptune.jpg', 
+        neptune: 'images/neptune.jpg',
         stars: 'images/stars.jpg',
-        moon: 'images/moon.jpg', 
+        moon: 'images/moon.jpg',
         phobos: 'images/phobos.jpg',
         asteroid: 'images/asteroid.jpg',
         vetinh: 'images/vetinh.jpg'
     };
 
     /* --- DỮ LIỆU CÁC THIÊN THỂ  --- */
-    const celestialData = [ 
+    const celestialData = [
         { id: 'sun', type: 'star', name: 'Mặt Trời', texture: assetPaths.sun, size: 80, orbitRadius: 0, spinSpeed: 0.05, 
-            fact: "Năng lượng của mặt trời sưởi ấm cả vũ trụ này...", message: "...nhưng nụ cười của cậu mới là thứ sưởi ấm mùa đông này =))) ." }, 
+            fact: "Năng lượng của mặt trời sưởi ấm cả vũ trụ này...", 
+            message: "...nhưng nụ cười của cậu mới là thứ sưởi ấm mùa đông này =))) ." },
         { id: 'venus', type: 'planet', name: 'Sao Kim', texture: assetPaths.venus, size: 6, orbitRadius: 150, orbitSpeed: 1.2, spinSpeed: 0.1, 
-            fact: "Sao Kim được đặt theo tên nữ thần tình yêu và sắc đẹp trong thần thoại La Mã...", message: "...điều đó giải thích tại sao tớ lại tìm thấy cậu ở đây hehe." },
+            fact: "Sao Kim được đặt theo tên nữ thần tình yêu và sắc đẹp trong thần thoại La Mã...", 
+            message: "...điều đó giải thích tại sao tớ lại tìm thấy cậu ở đây hehe." },
         { id: 'earth', type: 'planet', name: 'Trái Đất', texture: assetPaths.earth, size: 7, orbitRadius: 220, orbitSpeed: 1.0, spinSpeed: 0.5, 
-            fact: "Trái Đất là hành tinh duy nhất được biết đến có sự sống...", message: "...và có lẽ chúng ta cũng mới bắt đầu một hành trình nhỏ.", 
-            moons: [ { id: 'moon', name: 'Mặt Trăng', texture: assetPaths.moon, size: 1.5, orbitRadius: 15, orbitSpeed: 1.5, spinSpeed: 0.2 } ] }, 
+            fact: "Trái Đất là hành tinh duy nhất được biết đến có sự sống...", 
+            message: "...và có lẽ chúng ta cũng mới bắt đầu một hành trình nhỏ.", moons: [{ id: 'moon', name: 'Mặt Trăng', texture: assetPaths.moon, size: 1.5, orbitRadius: 15, orbitSpeed: 1.5, spinSpeed: 0.2 }] },
         { id: 'mars', type: 'planet', name: 'Sao Hỏa', texture: assetPaths.mars, size: 5, orbitRadius: 300, orbitSpeed: 0.8, spinSpeed: 0.4,
-            fact: "Sao Hỏa được gọi là 'Hành tinh Đỏ' vì màu sắc của nó...", message: "...giống như những rung động mới mẻ trong tim của mình hehehehe, í là tim nó cứ đỏ rực th =)))) .", 
-            moons: [ { id: 'phobos', name: 'Phobos', texture: assetPaths.phobos, size: 0.8, orbitRadius: 8, orbitSpeed: 3.0, spinSpeed: 0.5 } ] }, 
-        { id: 'jupiter', type: 'planet', name: 'Sao Mộc', texture: assetPaths.jupiter, size: 30, orbitRadius: 450, orbitSpeed: 0.4, spinSpeed: 1.0, 
-            fact: "Sao Mộc là hành tinh lớn nhất...", message: "...giống tớ í là yêu cậu nhiều ấy =)))) ." }, 
-        { id: 'saturn', type: 'planet', name: 'Sao Thổ', texture: assetPaths.saturn, size: 25, orbitRadius: 650, orbitSpeed: 0.3, spinSpeed: 0.9, 
-            fact: "Sao Thổ nổi tiếng với vành đai tuyệt đẹp của nó...", message: "...biết đâu sau này mình cũng có thêm nhiều kỷ niệm vòng quanh nhau ha =)))." }, 
-        { id: 'neptune', type: 'planet', name: 'Sao Hải Vương', texture: assetPaths.neptune, size: 15, orbitRadius: 800, orbitSpeed: 0.2, spinSpeed: 0.6,
-            fact: "Sao Hải Vương là hành tinh xa mặt trời nhất...", message: "...nhưng dù ở xa thế nào thì khoảng cách vẫn chưa bao giờ là vấn đề." }
+            fact: "Sao Hỏa được gọi là 'Hành tinh Đỏ' vì màu sắc của nó...", 
+            message: "...giống như những rung động mới mẻ trong tim của mình hehehehe, í là tim nó cứ đỏ rực th =)))) .", 
+            moons: [{ id: 'phobos', name: 'Phobos', texture: assetPaths.phobos, size: 0.8, orbitRadius: 8, orbitSpeed: 3.0, spinSpeed: 0.5 }] },
+        { id: 'jupiter', type: 'planet', name: 'Sao Mộc', texture: assetPaths.jupiter, size: 30, orbitRadius: 450, orbitSpeed: 0.4, spinSpeed: 1.0,
+            fact: "Sao Mộc là hành tinh lớn nhất...", 
+            message: "...giống tớ í là yêu cậu nhiều ấy =)))) ." },
+        { id: 'saturn', type: 'planet', name: 'Sao Thổ', texture: assetPaths.saturn, size: 25, orbitRadius: 650, orbitSpeed: 0.3, spinSpeed: 0.9,
+            fact: "Sao Thổ nổi tiếng với vành đai tuyệt đẹp của nó...", 
+            message: "...biết đâu sau này mình cũng có thêm nhiều kỷ niệm vòng quanh nhau ha =)))." },
+        { id: 'neptune', type: 'planet', name: 'Sao Hải Vương', texture: assetPaths.neptune, size: 15, orbitRadius: 800, orbitSpeed: 0.2, spinSpeed: 0.6, 
+            fact: "Sao Hải Vương là hành tinh xa mặt trời nhất...", 
+            message: "...nhưng dù ở xa thế nào thì khoảng cách vẫn chưa bao giờ là vấn đề." }
     ];
 
     /* --- CÁC THÔNG ĐIỆP CHỮ RƠI  --- */
-    const messages = [ 
-        "U are the best", 
-        "Cố lên !!!", 
-        "Yêu cậu", 
-        "Love u so much", 
-        "nhớ cậu nhiều", 
-        "tớ luôn bên cạnh cậu", 
-        "💖", "💕", "🌟", "✨", 
-        "You're my angel", 
-        "Đừng bỏ cuộc nhé !!!", 
-        "I'm alws here", 
+    const messages = [
+        "U are the best",
+        "Cố lên !!!",
+        "Yêu cậu",
+        "Love u so much",
+        "nhớ cậu nhiều",
+        "tớ luôn bên cạnh cậu",
+        "💖", "💕", "🌟", "✨",
+        "You're my angel",
+        "Đừng bỏ cuộc nhé !!!",
+        "I'm alws here",
         "😘", "🥰", "❤️", "💘", "💝", "💞"
     ];
     const birthdayMessages = ["Happy Birthday!", "Chúc mừng sinh nhật!", "🎂", "🎉", "Tuổi mới vui vẻ!"];
-    
+
     /* --- CÁC THÔNG ĐIỆP SAO BĂNG CỦA BẠN Ở ĐÂY --- */
-    const shootingStarMessages = [ 
-        "Yêu tổ quốc, yêu đồng bào", 
-        "Học tập tốt, lao động tốt", 
-        "Đoàn kết tốt, kỷ luật tốt", 
-        "Giữ gìn vệ sinh thật tốt", 
+    const shootingStarMessages = [
+        "Yêu tổ quốc, yêu đồng bào",
+        "Học tập tốt, lao động tốt",
+        "Đoàn kết tốt, kỷ luật tốt",
+        "Giữ gìn vệ sinh thật tốt",
         "Khiêm tốn, thật thà, dũng cảm",
     ];
-    
+
 
     // Cấu hình tần suất sự kiện ngẫu nhiên
     const isHighEndDevice = !window.matchMedia("(max-width: 768px)").matches;
-    const config = { 
-        maxParticles: isHighEndDevice ? 70 : 30, 
-        particleInterval: isHighEndDevice ? 150 : 300, 
+    const config = {
+        maxParticles: isHighEndDevice ? 70 : 30,
+        particleInterval: isHighEndDevice ? 150 : 300,
         shootingStarInterval: isHighEndDevice ? 800 : 1500,
         asteroidInterval: isHighEndDevice ? 7000 : 12000,
         cometInterval: isHighEndDevice ? 15000 : 25000
     };
 
-    const heartSymbols = ["♥", "💖", "💕", "🌟", "✨"]; 
-    const textStyles = ['love', 'date', 'special']; 
+    const heartSymbols = ["♥", "💖", "💕", "🌟", "✨"];
+    const textStyles = ['love', 'date', 'special'];
     const activeParticles = new Set();
     let upNextPlaylist = []; let upNextIndex = 0; let isBirthdayMode = false; let isLetterModeActive = false; let typingInterval = null; let wavesurfer; let scene, camera, renderer, controls; let starfield; const celestialObjects = []; const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2(); const textureLoader = new THREE.TextureLoader(); let isAnimatingCamera = false; let followedObject = null; let cameraOffset = new THREE.Vector3(); let activeAsteroids = []; let activeComets = []; let sunEffects = {};
     let spaceStationEffects = {};
@@ -254,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================
     // PHẦN 3: CÁC HÀM TIỆN ÍCH VÀ HIỆU ỨNG
     // =================================================================
-    
+
     function createProceduralTexture(gradientCallback, size = 256) {
         const canvas = document.createElement('canvas');
         canvas.width = size;
@@ -271,21 +277,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const asteroidGroup = new THREE.Group();
-        // TĂNG KÍCH THƯỚC: Lõi thiên thạch giờ sẽ lớn hơn ( 6 đơn vị)
         const size = Math.random() * 4 + 2;
 
         const coreGeometry = new THREE.DodecahedronGeometry(size, 1);
         const coreMaterial = new THREE.MeshStandardMaterial({
             map: textureLoader.load(assetPaths.asteroid),
             emissive: 0xff6a00,
-            // TĂNG ĐỘ SÁNG: Cường độ phát sáng mạnh hơn để trông rực rỡ hơn
             emissiveIntensity: 3.5,
             roughness: 1
         });
         const asteroidCore = new THREE.Mesh(coreGeometry, coreMaterial);
         asteroidGroup.add(asteroidCore);
 
-        // TĂNG SỐ LƯỢNG: Nhiều hạt lửa hơn để tạo ra cái đuôi dày đặc
         const particleCount = 1500;
         const particlesGeometry = new THREE.BufferGeometry();
         const posArray = new Float32Array(particleCount * 3);
@@ -309,7 +312,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const particleMaterial = new THREE.PointsMaterial({
             map: particleTexture,
-            // TĂNG KÍCH THƯỚC HẠT LỬA LÊN ĐÁNG KỂ (từ 0.5 lên 2.0)
             size: 2.0,
             blending: THREE.AdditiveBlending,
             transparent: true,
@@ -319,17 +321,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const fireParticles = new THREE.Points(particlesGeometry, particleMaterial);
         asteroidGroup.add(fireParticles);
 
-        // THAY ĐỔI VỊ TRÍ XUẤT HIỆN ĐỂ DỄ THẤY HƠN
-        const spawnRadius = 1000; // Tăng nhẹ bán kính tổng thể
-        const startX = (Math.random() - 0.5) * spawnRadius * 1.5; // Mở rộng phạm vi ngang
-        const startY = (Math.random() - 0.5) * 200; // Giới hạn độ cao để không bay quá cao hoặc quá thấp
-        const startZ = (Math.random() > 0.5 ? 1 : -1) * (spawnRadius * 0.8); // Đảm bảo nó xuất hiện ở xa hơn trên trục Z
+        const spawnRadius = 1000;
+        const startX = (Math.random() - 0.5) * spawnRadius * 1.5;
+        const startY = (Math.random() - 0.5) * 200;
+        const startZ = (Math.random() > 0.5 ? 1 : -1) * (spawnRadius * 0.8);
         asteroidGroup.position.set(startX, startY, startZ);
         scene.add(asteroidGroup);
 
         const duration = Math.random() * 10 + 10;
         gsap.to(asteroidGroup.position, {
-            x: -startX, y: -startY * 1.5, z: -startZ, // Thêm chút thay đổi Y để có quỹ đạo cong nhẹ
+            x: -startX, y: -startY * 1.5, z: -startZ,
             duration: duration, ease: "none",
             onComplete: () => {
                 scene.remove(asteroidGroup);
@@ -420,7 +421,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const duration = Math.random() * 3000 + 4000;
         star.style.transform = `translate(${startX}px, ${startY}px) rotate(${angle}deg)`;
         const animation = star.animate(
-            [{ transform: `translate(${startX}px, ${startY}px) rotate(${angle}deg)`, opacity: 0 }, { opacity: 1, offset: 0.1 }, { opacity: 0, offset: 0.9 }, { transform: `translate(${endX}px, ${endY}px) rotate(${angle}deg)`, opacity: 0 }], 
+            [{ transform: `translate(${startX}px, ${startY}px) rotate(${angle}deg)`, opacity: 0 }, { opacity: 1, offset: 0.1 }, { opacity: 0, offset: 0.9 }, { transform: `translate(${endX}px, ${endY}px) rotate(${angle}deg)`, opacity: 0 }],
             { duration: duration, easing: 'linear' }
         );
         const onStarCaught = (e) => {
@@ -483,7 +484,7 @@ document.addEventListener('DOMContentLoaded', function() {
         galaxy.appendChild(particle);
         activeParticles.add(particle);
         const animation = particle.animate(
-            [{ transform: `translate3d(0, ${-150}px, ${zPos}px) translateX(-50%)`, opacity: 0 }, { opacity: 0.9, offset: 0.1 }, { opacity: 0.9, offset: 0.9 }, { transform: `translate3d(0, ${window.innerHeight + 150}px, ${zPos}px) translateX(-50%)`, opacity: 0 }], 
+            [{ transform: `translate3d(0, ${-150}px, ${zPos}px) translateX(-50%)`, opacity: 0 }, { opacity: 0.9, offset: 0.1 }, { opacity: 0.9, offset: 0.9 }, { transform: `translate3d(0, ${window.innerHeight + 150}px, ${zPos}px) translateX(-50%)`, opacity: 0 }],
             { duration: duration * 1000, easing: 'linear' }
         );
         animation.onfinish = () => { particle.remove(); activeParticles.delete(particle); };
@@ -510,13 +511,13 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
-    
+
     function checkAndPreloadNightlySong() {
         const now = new Date();
         if (now.getHours() < 22) return;
 
         const dailySongData = dailySongs.find(s => s.day === now.getDate());
-        
+
         if (dailySongData && dailySongData.song.file !== preloadedNightlySong.url) {
             console.log(`Đang tải trước bài hát cho thư tối: ${dailySongData.song.title}`);
             const audioPreloader = new Audio();
@@ -525,12 +526,12 @@ document.addEventListener('DOMContentLoaded', function() {
             preloadedNightlySong = { url: dailySongData.song.file, audio: audioPreloader };
         }
     }
-    
+
     // =================================================================
     // PHẦN 4: LOGIC GIAO DIỆN NGƯỜI DÙNG (UI)
     // =================================================================
-    
-    function typewriterEffect(elementsToType, onComplete = () => {}) {
+
+    function typewriterEffect(elementsToType, onComplete = () => { }) {
         if (typingInterval) clearInterval(typingInterval);
         let elementIndex = 0; let charIndex = 0;
         const type = () => {
@@ -566,7 +567,7 @@ document.addEventListener('DOMContentLoaded', function() {
         elementsToType.forEach(item => item.element.innerHTML = '');
         type();
     }
-    
+
     let fadeInterval = null;
     function stopFade() { if (fadeInterval) { clearInterval(fadeInterval); fadeInterval = null; } }
 
@@ -598,7 +599,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function playTrack(track, isSpecialLetterTrack = false) {
-        // Reset trạng thái tải trước mỗi khi bắt đầu một bài hát mới
         isPreloadingNextSong = false;
 
         if (!track || !track.file) { console.error("Lỗi: Đang cố gắng phát một bài hát không hợp lệ.", track); playNextInMix(); return; }
@@ -612,30 +612,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 isLetterModeActive = false;
                 if (isBirthdayMode && birthdayData) { playTrack(birthdayData.song); } else { playNextInMix(); }
             });
-            
-            // ---- LOGIC TẢI TRƯỚC BÀI HÁT MỚI ----
+
             wavesurfer.on('audioprocess', () => {
                 const currentTime = wavesurfer.getCurrentTime();
                 const duration = wavesurfer.getDuration();
                 currentTimeEl.textContent = formatTime(currentTime);
 
-                // Khi bài hát còn dưới 20 giây và chưa bắt đầu tải trước
                 if (duration > 20 && (duration - currentTime) < 20 && !isPreloadingNextSong) {
-                    isPreloadingNextSong = true; // Đánh dấu đã bắt đầu tải
-                    
-                    // Lấy thông tin bài hát tiếp theo trong danh sách phát
+                    isPreloadingNextSong = true;
                     const nextTrackIndex = upNextIndex % upNextPlaylist.length;
                     const nextTrack = upNextPlaylist[nextTrackIndex];
 
                     if (nextTrack && nextTrack.file) {
                         console.log(`Đang tải trước bài hát tiếp theo: ${nextTrack.title}`);
-                        // Tạo một đối tượng Audio tạm thời để trình duyệt tải file vào cache
                         const preloader = new Audio();
                         preloader.src = nextTrack.file;
                     }
                 }
             });
-            // ---- KẾT THÚC LOGIC TẢI TRƯỚC ----
 
             wavesurfer.on('error', (err) => { console.error(`Lỗi WaveSurfer: ${err}`); songTitleEl.textContent = "Bài hát lỗi, tự chuyển bài..."; setTimeout(playNextInMix, 2000); });
             wavesurfer.on('play', () => playPauseBtn.textContent = '❚❚');
@@ -732,20 +726,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const closeBtn = document.createElement('button');
         closeBtn.id = 'close-letter-btn';
         closeBtn.innerHTML = '×';
-        
+
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = letterData.content;
         const pElements = Array.from(tempDiv.querySelectorAll('p'));
-        
+
         letterContentDiv.append(closeBtn, titleEl, ...pElements, signatureEl);
 
         const signatureText = isBirthday ? 'Yêu cậu nhất luôn,<br>tun' : (specialSong ? 'Yêu cậu rất nhiều,<br>tun' : 'Luôn bên cạnh cậu,<br>tun');
-        const elementsToType = [ { element: titleEl, text: letterData.title }, ...pElements.map(p => ({ element: p, text: p.innerHTML })), { element: signatureEl, text: signatureText } ];
-        
+        const elementsToType = [{ element: titleEl, text: letterData.title }, ...pElements.map(p => ({ element: p, text: p.innerHTML })), { element: signatureEl, text: signatureText }];
+
         letterContainer.classList.remove('hidden');
         typewriterEffect(elementsToType);
         if (specialSong && !isBirthday) fadeToSpecialTrack(specialSong);
-        
+
         closeBtn.addEventListener('click', () => {
             letterContainer.classList.add('hidden');
             if (typingInterval) clearTimeout(typingInterval);
@@ -766,7 +760,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!wavesurfer) {
                 if (isBirthdayMode && birthdayData) { playTrack(birthdayData.song); } else { createDailyMix(); playNextInMix(); }
             } else { wavesurfer.play(); }
-            
+
             overlay.classList.add('hidden-overlay');
             waveformControls.classList.remove('hidden');
             settingsToggleBtn.classList.remove('hidden');
@@ -778,71 +772,63 @@ document.addEventListener('DOMContentLoaded', function() {
             startAudio();
         }, { once: true });
 
-        // TÌM ĐOẠN CODE NÀY TRONG FILE SCRIPT.JS VÀ THAY THẾ NÓ
+        // ========== SỬA LỖI CAMERA TẠI ĐÂY ==========
+        closeInfoBtn.addEventListener('click', () => {
+            if (isAnimatingCamera) return;
 
-    closeInfoBtn.addEventListener('click', () => {
-        if (isAnimatingCamera) return;
+            isAnimatingCamera = true;
+            controls.enabled = false;
+            infoCard.classList.add('hidden');
+            followedObject = null;
 
-        isAnimatingCamera = true;
-        controls.enabled = false;
+            const overviewPosition = new THREE.Vector3(0, 150, 400);
+            const overviewTarget = new THREE.Vector3(0, 0, 0);
+            const planetPosition = controls.target.clone();
 
-        infoCard.classList.add('hidden');
-        followedObject = null;
+            const retreatDirection = planetPosition.clone().normalize();
+            const retreatDistance = planetPosition.length() + 200;
+            const safeRetreatPosition = retreatDirection.multiplyScalar(retreatDistance);
+            safeRetreatPosition.y = 50;
 
-        // Vị trí và mục tiêu nhìn tổng quan cuối cùng
-        const overviewPosition = new THREE.Vector3(0, 150, 400);
-        const overviewTarget = new THREE.Vector3(0, 0, 0);
-        const planetPosition = controls.target.clone(); // Vị trí hành tinh hiện tại
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    controls.minDistance = 20;
+                    controls.maxDistance = 1200;
+                    controls.enablePan = true;
+                    controls.enabled = true;
+                    isAnimatingCamera = false;
+                }
+            });
 
-        // ---- LOGIC CAMERA ----
-        // 1. Tính toán một vị trí "thoát ra" (retreat) an toàn.
-        // Vị trí này nằm trên đường thẳng kéo dài từ tâm (Mặt Trời) qua hành tinh.
-        // Điều này đảm bảo camera luôn di chuyển ra xa khỏi trung tâm.
-        const retreatDirection = planetPosition.clone().normalize();
-        const retreatDistance = planetPosition.length() + 200; // Thêm 200 đơn vị khoảng cách
-        const safeRetreatPosition = retreatDirection.multiplyScalar(retreatDistance);
-        safeRetreatPosition.y = 50; // Giữ camera bay hơi cao lên để tạo vòng cung
-        
-        const tl = gsap.timeline({
-            onComplete: () => {
-                controls.minDistance = 20;
-                controls.maxDistance = 1200;
-                controls.enablePan = true;
-                controls.enabled = true;
-                isAnimatingCamera = false;
-            }
+            // Giai đoạn 1: Bay đến điểm an toàn
+            tl.to(camera.position, {
+                x: safeRetreatPosition.x, // SỬA: Dùng safeRetreatPosition
+                y: safeRetreatPosition.y, // SỬA: Dùng safeRetreatPosition
+                z: safeRetreatPosition.z, // SỬA: Dùng safeRetreatPosition
+                duration: 1.5,
+                ease: 'power2.out'
+            }, 0);
+
+            // Giai đoạn 2: Bay về vị trí tổng quan
+            tl.to(camera.position, {
+                x: overviewPosition.x,
+                y: overviewPosition.y,
+                z: overviewPosition.z,
+                duration: 1.2,
+                ease: 'power2.inOut'
+            }, ">-0.5");
+
+            // Di chuyển điểm nhìn
+            tl.to(controls.target, {
+                x: overviewTarget.x,
+                y: overviewTarget.y,
+                z: overviewTarget.z,
+                duration: 2.5,
+                ease: 'power2.inOut'
+            }, 0);
         });
+        // ========== KẾT THÚC SỬA LỖI ==========
 
-        // 2. Tạo chuỗi chuyển động mượt mà
-        // Giai đoạn 1: Bay từ vị trí hiện tại đến điểm "thoát ra" an toàn.
-        // Trong giai đoạn này, camera vẫn nhìn về phía hành tinh.
-        tl.to(camera.position, {
-            x: pullBackPosition.x,
-            y: pullBackPosition.y,
-            z: pullBackPosition.z,
-            duration: 1.5,
-            ease: 'power2.out'
-        }, 0);
-
-        // Giai đoạn 2: Từ vị trí đó, bay về vị trí tổng quan cuối cùng
-        tl.to(camera.position, {
-            x: overviewPosition.x,
-            y: overviewPosition.y,
-            z: overviewPosition.z,
-            duration: 1.2,
-            ease: 'power2.inOut'
-        }, ">-0.5"); // Bắt đầu trước khi giai đoạn 1 kết thúc 0.5s để chuyển động liền mạch
-
-        // Đồng thời, di chuyển điểm nhìn (target) từ hành tinh về trung tâm (0,0,0) trong suốt quá trình
-        tl.to(controls.target, {
-            x: overviewTarget.x,
-            y: overviewTarget.y,
-            z: overviewTarget.z,
-            duration: 2.5, // Kéo dài để tạo cảm giác mượt mà
-            ease: 'power2.inOut'
-        }, 0);
-    });
-        
         nextBtn.addEventListener('click', playNextInMix);
         prevBtn.addEventListener('click', playPrevInMix);
         playPauseBtn.addEventListener('click', () => wavesurfer?.playPause());
@@ -865,21 +851,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================
     // PHẦN 5: THẾ GIỚI 3D (THREE.JS)
     // =================================================================
-    
+
     function initThreeJS() {
-        scene = new THREE.Scene(); 
+        scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
         camera.position.set(0, 150, 400);
         renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-        renderer.setClearColor(0x000000, 0); 
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
+        renderer.setClearColor(0x000000, 0);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.setSize(window.innerWidth, window.innerHeight);
-        
+
         scene.add(new THREE.AmbientLight(0xffffff, 0.5));
         scene.add(new THREE.PointLight(0xffffff, 1.5));
-        
+
         controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true; controls.dampingFactor = 0.05; 
+        controls.enableDamping = true; controls.dampingFactor = 0.05;
         controls.minDistance = 20; controls.maxDistance = 1200;
 
         controls.enablePan = true;
@@ -888,15 +874,15 @@ document.addEventListener('DOMContentLoaded', function() {
         controls.zoomSpeed = 0.8;
         controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
 
-        createStarfield(); 
-        createSolarSystem(); 
+        createStarfield();
+        createSolarSystem();
         createBackgroundNebulae();
-        
-        window.addEventListener('resize', onWindowResize); 
+
+        window.addEventListener('resize', onWindowResize);
         window.addEventListener('click', onClick);
         animate();
     }
-    
+
     function createSunEffects(sunMesh) {
         const sunCoronaTexture = createProceduralTexture((ctx, size) => {
             const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
@@ -937,7 +923,7 @@ document.addEventListener('DOMContentLoaded', function() {
         for (let i = 0; i < 15; i++) {
             const nebulaTexture = createProceduralTexture((ctx, size) => {
                 const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-                gradient.addColorStop(0.2, `rgba(${Math.floor(Math.random()*100)}, ${Math.floor(Math.random()*100)}, ${Math.floor(Math.random()*155)+100}, 0.2)`);
+                gradient.addColorStop(0.2, `rgba(${Math.floor(Math.random() * 100)}, ${Math.floor(Math.random() * 100)}, ${Math.floor(Math.random() * 155) + 100}, 0.2)`);
                 gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
                 ctx.fillStyle = gradient; ctx.fillRect(0, 0, size, size);
             }, 512);
@@ -955,12 +941,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!earthData) return;
         const issPivot = new THREE.Object3D();
         earthData.pivot.add(issPivot);
-        
+
         const issMaterial = new THREE.SpriteMaterial({ map: textureLoader.load(assetPaths.vetinh), blending: THREE.AdditiveBlending, transparent: true });
         const issSprite = new THREE.Sprite(issMaterial);
         issSprite.scale.set(18, 18, 1);
         issSprite.position.x = earthData.mesh.geometry.parameters.radius + 12;
-        
+
         const stationOrbitPivot = new THREE.Object3D();
         stationOrbitPivot.add(issSprite);
         issPivot.add(stationOrbitPivot);
@@ -984,7 +970,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const positions = []; const colors = [];
         const color = new THREE.Color();
         for (let i = 0; i < starCount; i++) {
-            const vertex = new THREE.Vector3( (Math.random() * 2 - 1), (Math.random() * 2 - 1), (Math.random() * 2 - 1) ).normalize().multiplyScalar(Math.random() * 500 + 1500);
+            const vertex = new THREE.Vector3((Math.random() * 2 - 1), (Math.random() * 2 - 1), (Math.random() * 2 - 1)).normalize().multiplyScalar(Math.random() * 500 + 1500);
             positions.push(vertex.x, vertex.y, vertex.z);
             color.setHSL(Math.random() * 0.1 + 0.5, 0.8, Math.random() * 0.5 + 0.5);
             colors.push(color.r, color.g, color.b);
@@ -1009,7 +995,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const geometry = new THREE.SphereGeometry(data.size, 64, 64);
             const material = data.type === 'star' ? new THREE.MeshBasicMaterial({ map: textureLoader.load(data.texture) })
                 : new THREE.MeshStandardMaterial({ map: textureLoader.load(data.texture), roughness: 0.9, metalness: 0.1 });
-            
+
             const mesh = new THREE.Mesh(geometry, material);
             mesh.position.x = data.orbitRadius;
             const spinPivot = new THREE.Object3D();
@@ -1018,8 +1004,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (data.id === 'sun') createSunEffects(mesh);
             if (data.id === 'saturn') createAsteroidBelt(data.size * 1.5, 15, 2000);
-            
-            mesh.userData = { ...data, mesh, isClickable: true };
+
+            // SỬA LỖI: Không gán lại data.mesh ở đây
+            mesh.userData = { ...data, isClickable: true };
             celestialObjects.push({ mesh, pivot, spinPivot, orbitSpeed: data.orbitSpeed, spinSpeed: data.spinSpeed });
 
             if (data.moons) {
@@ -1037,7 +1024,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         createSpaceStation();
     }
-    
+
     function animate() {
         requestAnimationFrame(animate);
         const elapsedTime = clock.getElapsedTime();
@@ -1053,7 +1040,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         if (sunEffects.corona) sunEffects.corona.material.rotation = elapsedTime * 0.01;
-        
+
         activeAsteroids.forEach(a => {
             const positions = a.particles.geometry.attributes.position.array;
             for (let i = 0; i < a.velocities.length; i++) {
@@ -1062,17 +1049,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 positions[i3 + 1] += a.velocities[i].y;
                 positions[i3 + 2] += a.velocities[i].z;
 
-                const dist = Math.sqrt(positions[i3]**2 + positions[i3+1]**2 + positions[i3+2]**2);
+                const dist = Math.sqrt(positions[i3] ** 2 + positions[i3 + 1] ** 2 + positions[i3 + 2] ** 2);
                 if (dist > a.coreSize * 2.5) {
                     positions[i3] = (Math.random() - 0.5) * a.coreSize;
-                    positions[i3+1] = (Math.random() - 0.5) * a.coreSize;
-                    positions[i3+2] = (Math.random() - 0.5) * a.coreSize;
+                    positions[i3 + 1] = (Math.random() - 0.5) * a.coreSize;
+                    positions[i3 + 2] = (Math.random() - 0.5) * a.coreSize;
                 }
             }
             a.particles.geometry.attributes.position.needsUpdate = true;
             a.group.rotation.y += 0.005;
         });
-        
+
         activeComets.forEach(c => {
             const particles = c.tail.geometry.attributes.position.array;
             for (let i = 0; i < particles.length; i += 3) {
@@ -1102,25 +1089,26 @@ document.addEventListener('DOMContentLoaded', function() {
             camera.position.lerp(desiredCameraPosition, 0.1);
             controls.target.lerp(targetPosition, 0.1);
         }
-        
+
         controls.update();
         renderer.render(scene, camera);
     }
 
-    function onWindowResize() { 
-        camera.aspect = window.innerWidth / window.innerHeight; 
-        camera.updateProjectionMatrix(); 
-        renderer.setSize(window.innerWidth, window.innerHeight); 
+    function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
+    // ========== SỬA LỖI KHI NHẤP VÀO HÀNH TINH TẠI ĐÂY ==========
     function onClick(event) {
-        if (overlay.classList.contains('hidden-overlay') === false || 
+        if (overlay.classList.contains('hidden-overlay') === false ||
             letterContainer.classList.contains('hidden') === false) {
             return;
         }
 
         if (isAnimatingCamera) return;
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1; 
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(mouse, camera);
         const clickableObjects = celestialObjects.map(p => p.mesh).filter(m => m.userData.isClickable);
@@ -1128,23 +1116,25 @@ document.addEventListener('DOMContentLoaded', function() {
         if (intersects.length > 0) {
             if (infoCard.classList.contains('hidden')) {
                 const clickedObject = intersects[0].object;
-                showPlanetInfo(intersects[0].object.userData);
+                // SỬA: Truyền cả userData và chính đối tượng đã được nhấp
+                showPlanetInfo(clickedObject.userData, clickedObject);
             }
         }
     }
 
-    function showPlanetInfo(data, clickedMesh) {
-        if (isAnimatingCamera || followedObject || !clickedMesh) return;
-        
-        controls.enablePan = false; 
-        
+    function showPlanetInfo(data, clickedMesh) { // Nhận thêm tham số 'clickedMesh'
+        if (isAnimatingCamera || followedObject || !clickedMesh) return; // Thêm kiểm tra an toàn
+
+        controls.enablePan = false;
+
         const planetPosition = new THREE.Vector3();
+        // SỬA: Sử dụng trực tiếp 'clickedMesh'
         clickedMesh.getWorldPosition(planetPosition);
-        
+
         const distance = data.size * 4;
         const direction = new THREE.Vector3().subVectors(camera.position, planetPosition).normalize();
         const cameraTargetPosition = planetPosition.clone().add(direction.multiplyScalar(distance));
-        
+
         animateCamera(cameraTargetPosition, planetPosition, 1.5, () => {
             followedObject = clickedMesh;
             controls.minDistance = data.size * 1.5;
@@ -1160,38 +1150,38 @@ document.addEventListener('DOMContentLoaded', function() {
         infoCard.style.bottom = `${playerHeight + 30}px`;
         infoCard.classList.remove('hidden');
     }
+    // ========== KẾT THÚC SỬA LỖI ==========
 
     // =================================================================
     // PHẦN 6: VÒNG LẶP CHÍNH VÀ KHỞI TẠO
     // =================================================================
-    let lastParticleTime = 0; 
-    function mainLoop(timestamp) { 
-        if (timestamp - lastParticleTime > config.particleInterval) { 
-            createTextParticle(); lastParticleTime = timestamp; 
-        } 
-        requestAnimationFrame(mainLoop); 
+    let lastParticleTime = 0;
+    function mainLoop(timestamp) {
+        if (timestamp - lastParticleTime > config.particleInterval) {
+            createTextParticle(); lastParticleTime = timestamp;
+        }
+        requestAnimationFrame(mainLoop);
     }
-    function init() { 
-        runBirthdayCheck(); 
-        setupUIEventListeners(); 
-        initThreeJS(); 
-        
+    function init() {
+        runBirthdayCheck();
+        setupUIEventListeners();
+        initThreeJS();
+
         checkAndPreloadNightlySong();
         setInterval(checkAndPreloadNightlySong, 60000);
 
-        setTimeout(() => setInterval(createShootingStar, config.shootingStarInterval), 3000); 
+        setTimeout(() => setInterval(createShootingStar, config.shootingStarInterval), 3000);
         setTimeout(() => {
             createFieryAsteroid();
             setInterval(createFieryAsteroid, config.asteroidInterval);
         }, 8000);
         setTimeout(() => setInterval(createComet, config.cometInterval), 10000);
-        
-        setupGyroControls(); 
-        setupMouseParallax(); 
-        requestAnimationFrame(mainLoop); 
-        if (isBirthdayMode) { activateBirthdayMode(); } else { checkAndSetupLetterButton(); } 
-        setTimeout(() => loadingScreen.classList.add('loaded'), 3000); 
+
+        setupGyroControls();
+        setupMouseParallax();
+        requestAnimationFrame(mainLoop);
+        if (isBirthdayMode) { activateBirthdayMode(); } else { checkAndSetupLetterButton(); }
+        setTimeout(() => loadingScreen.classList.add('loaded'), 3000);
     }
     init();
 });
-
