@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
         { day: 8, title: "Ê thứ 2 cuối cùng rồi đấy =)) í là t2 cuối ở đây =)) ", content: `<p>Chúc cậu một thứ hai vui vẻ và luôn là kiểu happy, và hehehe luôn có tớ bên cạnh cậu nhaa alws luôn. Tạm gác lại sách vở và yes chuẩn bị thôi nào =)) í là cái thư này cũng cũng bình thường thôi =))) nói lời vẫn cứ akelo hơn =)) </p>` },
         { day: 9, title: "Thứ 3 CUỐI rồi omg nhanh vkl ", content: `<p>Tuần cuối rồi, chúc cậu sang bên đấy mạnh khỏe và cố gắng học hành tốt nhé =)) mặc dù chưa đi đâu nma th kệ di cứ chúc. Cố lên cô gái của tớ =))) </p>` },
         { day: 10, title: "Gửi cậu, ngày giữa tuần cuối ở đây...", content: `<p>dcm sao nhanh thế kbt omg ê nhớ cậu qs đấy buồn vkl sắp di rồi kìa huhuhuhuhuhu buồn nhiều chút nha, nma ksao vẫn còn cậu bên cạnh tớ mà hehehe love u sm</p>` },
-               { day: 11, title: "Gửi cậu, còn mỗi 2 ngày nữa thuii.... ", content: `<p>Ê í là thấy cậu yêu vl, dễ thương quá, ấm từ cái ôm, đến cái nắm tay =)) í là tớ bảo tay cậu là tớ đùa thôi đấy =)) cậu ấm vl, yêu quá, trời oiii. Muốn kiss tiếp, muốn ôm tiếp, muốn nắm tay tiếp, muốn cậu ở lại với tớ cơ không muốn đi đâu buồn vkl ấy chứ. Nma th kệ diii, để tối nay gặp tiếp ha. love bae so much, i love youuuu. đừng buồn vì sắp phải dii nhé, im alws by ur side.</p>` },
+        { day: 11, title: "Gửi cậu, còn mỗi 2 ngày nữa thuii.... ", content: `<p>Ê í là thấy cậu yêu vl, dễ thương quá, ấm từ cái ôm, đến cái nắm tay =)) í là tớ bảo tay cậu là tớ đùa thôi đấy =)) cậu ấm vl, yêu quá, trời oiii. Muốn kiss tiếp, muốn ôm tiếp, muốn nắm tay tiếp, muốn cậu ở lại với tớ cơ không muốn đi đâu buồn vkl ấy chứ. Nma th kệ diii, để tối nay gặp tiếp ha. love bae so much, i love youuuu. đừng buồn vì sắp phải dii nhé, im alws by ur side.</p>` },
         { day: 12, title: "Gửi cậu, ngày thứ mười hai...", content: `<p>Giữa tuần rồi, cố lên nhé. Chỉ một lời nhắn để cậu biết là có người luôn nghĩ về cậu thôi. ^^</p>` },
         { day: 13, title: "Gửi cậu, ngày thứ mười ba...", content: `<p>Hôm nay học hành có thuận lợi không? Tớ tin là có. Chúc cậu một ngày tràn đầy tự tin!</p>` },
         { day: 14, title: "Gửi cậu, ngày thứ mười bốn...", content: `<p>Hai tuần rồi đó! Cố gắng nốt hôm nay rồi mai lại cuối tuần. Fighting!</p>` },
@@ -1257,4 +1257,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     init();
 });
+
 
