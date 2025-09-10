@@ -20,7 +20,8 @@ body {
     background-color: #000;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     cursor: default; touch-action: none; -webkit-tap-highlight-color: transparent; position: relative;
-    background-image: url('images/stars.jpg');
+    /* Ảnh nền tĩnh sẽ không còn cần thiết nếu dùng nền 3D, nhưng giữ lại làm fallback */
+    background-image: url('images/stars.jpg'); 
     background-size: cover;
     background-position: center center;
     background-attachment: fixed;
@@ -91,10 +92,46 @@ body.gyro-active::after { animation: none; }
 .heart-loader { width: 50px; height: 50px; background: #ff6b9d; position: relative; transform: rotate(45deg); animation: beat 1s infinite; margin-top: 20px; }
 .heart-loader:before, .heart-loader:after { content: ""; position: absolute; width: 50px; height: 50px; background: #ff6b9d; border-radius: 50%; }
 .heart-loader:before { top: -25px; left: 0; } .heart-loader:after { top: 0; left: -25px; }
-#music-overlay { z-index: 9999; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); backdrop-filter: blur(10px) saturate(150%); -webkit-backdrop-filter: blur(10px) saturate(150%); cursor: pointer; }
-.overlay-content { text-align: center; color: #fff; padding: 40px; border-radius: 20px; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1); transform: scale(0.95); opacity: 0; animation: fade-in-up 0.8s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+/* === CẬP NHẬT HIỆU ỨNG CHẠM ĐỂ BẮT ĐẦU === */
+#music-overlay { 
+    z-index: 9999; 
+    position: fixed;
+    inset: 0; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    background: rgba(0,0,0,0.3); 
+    backdrop-filter: blur(10px) saturate(150%); 
+    -webkit-backdrop-filter: blur(10px) saturate(150%); 
+    cursor: pointer;
+    transition: opacity 0.8s ease, backdrop-filter 0.8s ease;
+}
+#music-overlay.hidden-overlay {
+    opacity: 0;
+    pointer-events: none;
+    backdrop-filter: blur(0px) saturate(100%);
+}
+.overlay-content { 
+    text-align: center; 
+    color: #fff; 
+    padding: 40px; 
+    border-radius: 20px; 
+    background: rgba(0, 0, 0, 0.2); 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    transform: scale(1);
+    opacity: 1;
+    animation: none;
+    transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.8s ease;
+}
+.hidden-overlay .overlay-content {
+    transform: scale(1.5);
+    opacity: 0;
+}
+/* === KẾT THÚC CẬP NHẬT === */
+
 .overlay-content p { font-size: 1.5rem; letter-spacing: 1px; font-family: 'Orbitron', -apple-system, sans-serif; text-shadow: 0 0 15px rgba(255, 255, 255, 0.5); }
-#birthday-celebration { inset: 0; z-index: 10001; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.5); pointer-events: none; opacity: 0; transition: opacity 1s ease-in-out; }
+#birthday-celebration { position: fixed; inset: 0; z-index: 10001; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.5); pointer-events: none; opacity: 0; transition: opacity 1s ease-in-out; }
 #birthday-celebration h1 { font-size: 5vw; color: white; text-shadow: 0 0 10px #ff6b9d, 0 0 20px #ff6b9d, 0 0 40px #ff6b9d; animation: birthday-pulse 2s infinite; font-family: 'Orbitron', -apple-system, sans-serif; }
 
 /* ======================================================= */
