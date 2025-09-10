@@ -21,18 +21,18 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     cursor: default; touch-action: none; -webkit-tap-highlight-color: transparent; position: relative;
     /* Ảnh nền tĩnh sẽ không còn cần thiết nếu dùng nền 3D, nhưng giữ lại làm fallback */
-    background-image: url('images/stars.jpg'); 
+    background-image: url('images/stars.jpg');
     background-size: cover;
     background-position: center center;
     background-attachment: fixed;
 }
-body::before { 
-    content: ''; position: absolute; inset: 0; 
-    background-image: radial-gradient(1px 1px at 20px 30px, #eee, transparent), radial-gradient(1px 1px at 40px 70px, #fff, transparent), radial-gradient(1px 1px at 50px 160px, #ddd, transparent), radial-gradient(1px 1px at 90px 40px, #fff, transparent), radial-gradient(2px 2px at 150px 120px, #fff, transparent); 
-    background-size: 200px 200px; z-index: -3; 
-    animation: pan-stars-slow 250s linear infinite; 
-    will-change: transform; transform: translateX(var(--parallax-x-far)); 
-    transition: transform 0.2s ease-out; 
+body::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: radial-gradient(1px 1px at 20px 30px, #eee, transparent), radial-gradient(1px 1px at 40px 70px, #fff, transparent), radial-gradient(1px 1px at 50px 160px, #ddd, transparent), radial-gradient(1px 1px at 90px 40px, #fff, transparent), radial-gradient(2px 2px at 150px 120px, #fff, transparent);
+    background-size: 200px 200px; z-index: -3;
+    animation: pan-stars-slow 250s linear infinite;
+    will-change: transform; transform: translateX(var(--parallax-x-far));
+    transition: transform 0.2s ease-out;
 }
 body::after {
     content: ''; position: absolute; inset: -50vmin; z-index: -2;
@@ -43,21 +43,21 @@ body::after {
     transition: transform 0.2s ease-out;
 }
 body.gyro-active::after { animation: none; }
-#background-overlay { 
-    position: absolute; inset: 0; 
-    background-image: radial-gradient(2px 2px at 50px 50px, #fff, transparent), radial-gradient(2px 2px at 100px 200px, #ddd, transparent); 
-    background-size: 250px 250px; z-index: -1; 
-    animation: pan-stars-fast 100s linear infinite; 
-    will-change: transform; transform: translateX(var(--parallax-x-near)); 
-    transition: transform 0.2s ease-out; 
+#background-overlay {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(2px 2px at 50px 50px, #fff, transparent), radial-gradient(2px 2px at 100px 200px, #ddd, transparent);
+    background-size: 250px 250px; z-index: -1;
+    animation: pan-stars-fast 100s linear infinite;
+    will-change: transform; transform: translateX(var(--parallax-x-near));
+    transition: transform 0.2s ease-out;
 }
 
-.shooting-star { 
-    position: fixed; top: 0; left: 0; 
+.shooting-star {
+    position: fixed; top: 0; left: 0;
     width: 250px; height: 3px;
     background: linear-gradient(to left, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
     border-radius: 50%; filter: drop-shadow(0 0 8px white);
-    pointer-events: none; cursor: pointer; 
+    pointer-events: none; cursor: pointer;
     z-index: 999; will-change: transform;
 }
 .shooting-star::after {
@@ -94,16 +94,16 @@ body.gyro-active::after { animation: none; }
 .heart-loader:before { top: -25px; left: 0; } .heart-loader:after { top: 0; left: -25px; }
 
 /* === CẬP NHẬT HIỆU ỨNG CHẠM ĐỂ BẮT ĐẦU === */
-#music-overlay { 
-    z-index: 9999; 
+#music-overlay {
+    z-index: 9999;
     position: fixed;
-    inset: 0; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    background: rgba(0,0,0,0.3); 
-    backdrop-filter: blur(10px) saturate(150%); 
-    -webkit-backdrop-filter: blur(10px) saturate(150%); 
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(10px) saturate(150%);
+    -webkit-backdrop-filter: blur(10px) saturate(150%);
     cursor: pointer;
     transition: opacity 0.8s ease, backdrop-filter 0.8s ease;
 }
@@ -112,13 +112,13 @@ body.gyro-active::after { animation: none; }
     pointer-events: none;
     backdrop-filter: blur(0px) saturate(100%);
 }
-.overlay-content { 
-    text-align: center; 
-    color: #fff; 
-    padding: 40px; 
-    border-radius: 20px; 
-    background: rgba(0, 0, 0, 0.2); 
-    border: 1px solid rgba(255, 255, 255, 0.1); 
+.overlay-content {
+    text-align: center;
+    color: #fff;
+    padding: 40px;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     transform: scale(1);
     opacity: 1;
     animation: none;
@@ -198,4 +198,13 @@ body.gyro-active::after { animation: none; }
     .letter-content p { font-size: 1rem; }
     #planet-info-card { bottom: 10px; padding: 15px; }
     #special-day-btn { bottom: calc(105px + 15px); right: 15px; }
+}
+
+/* TÙY CHỌN: Thêm con trỏ chuột để gợi ý tương tác */
+#webgl-canvas {
+    cursor: grab;
+}
+
+#webgl-canvas:active {
+    cursor: grabbing;
 }
