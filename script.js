@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================
     const bodyEl = document.body;
     const galaxy = document.getElementById('galaxy');
-    const shootingStarsContainer = document.getElementById('shooting-stars');
     const audio = document.getElementById('bg-music');
     const overlay = document.getElementById('music-overlay');
     const songTitleEl = document.getElementById('song-title');
@@ -31,14 +30,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================
     // PHẦN 2: DỮ LIỆU CÁ NHÂN HÓA VÀ CÀI ĐẶT
     // =================================================================
-    // DỮ LIỆU CỦA BẠN SẼ NẰM Ở ĐÂY
     const birthdayData = {
-        day: 9, month: 6,
-        letter: { title: "Gửi em, cô gái tuyệt vời nhất từng được sinh ra =))) nghe hơi sến tí nhưng mà thôi kệ di hehee", content: `<p>Hôm nay là ngày sinh nhật của em, là ngày mà mẹ em đã sinh ra em =))) anh biết nhưng mà ý là kiểu ngày mà mẹ em đẻ ra thiên thần luôn rồi ấy kiểu em tuyệt vời mà xinh xắn lại còn giỏi giang nữa omg</p><p> Có lẽ nếu xét về tình cảm dành cho em chắc anh thua mỗi mẹ em thôi ấy, anh yêu em nhiều lắm luôn í. Thôi anh nhắn v th tại anh viết thư tay cho em rồi mà =)) đọc thư tay nó mới tình cảm hơn chứ <p>Chúc em sinh nhật vui vẻ!</p></p>` },
+        day: 9, 
+        month: 6,
+        letter: { 
+            title: "Gửi em, cô gái tuyệt vời nhất từng được sinh ra =))) nghe hơi sến tí nhưng mà thôi", 
+            content: `<p>Hôm nay là ngày sinh nhật của em, là ngày mà mẹ em đã sinh ra em =))) anh biết nhưng mà ý là kiểu ngày mà mẹ em đẻ ra thiên thần luôn rồi ấy kiểu em tuyệt vời mà xinh xắn lại còn giỏi giang nữa omg</p><p> Có lẽ nếu xét về tình cảm dành cho em chắc anh thua mỗi mẹ em thôi ấy, anh yêu em nhiều lắm luôn í. Thôi anh nhắn v th tại anh viết thư tay cho em rồi mà =)) đọc thư tay nó mới tình cảm hơn chứ <p>Chúc em sinh nhật vui vẻ!</p></p>` 
+        },
         song: { file: "https://treuah.netlify.app/ordinary.mp3", title: "Ordinary - Alex Warren" }
     };
+    
     const mainPlaylist = [
-        { file: "https://treuah.netlify.app/leduong.mp3", title: "Lễ đường - Kai Đinh" }, 
+                { file: "https://treuah.netlify.app/leduong.mp3", title: "Lễ đường - Kai Đinh" }, 
         { file: "https://treuah.netlify.app/dieforyou.mp3", title: "Die For You - The Weeknd" },
         { file: "https://treuah.netlify.app/ordinary.mp3", title: "Ordinary - Alex Warren" },
         { file: "https://treuah.netlify.app/supernatural.mp3", title: "supernatural - Ariana Grande" },
@@ -60,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
         { file: "https://treuah.netlify.app/allthestars.mp3", title: "All The Stars - Kendrick Lamar x SZA" },
     ];
     const dailySongs = [
-        { day: 1, song: { file: "https://treuah.netlify.app/main/fever.mp3", title: "Fever - COLDZY" } },
+          { day: 1, song: { file: "https://treuah.netlify.app/main/fever.mp3", title: "Fever - COLDZY" } },
         { day: 2, song: { file: "https://treuah.netlify.app/main/art.mp3", title: "Art - Tyla" } },
         { day: 3, song: { file: "https://treuah.netlify.app/main/nambenanh.mp3", title: "Nằm bên anh - Minh Đinh" } },
         { day: 4, song: { file: "https://treuah.netlify.app/main/Fantasize.mp3", title: "Fantasize - Ariana Grande" } },
@@ -92,9 +95,8 @@ document.addEventListener('DOMContentLoaded', function() {
         { day: 30, song: { file: "https://treuah.netlify.app/openarms.mp3", title: "Open Arms - SZA" } },
         { day: 31, song: { file: "https://treuah.netlify.app/main/theboyismine.mp3", title: "The boy is mine - Ariana Grande" } }
     ];
-
     const dailyLetters = [
-        { day: 1, title: "hello cậu, ngày học đầu tiên của tháng kết thúc rồi", content: `<p>Vậy là một ngày nữa ở Thành Đô đã qua. Cậu đã vất vả, mệt mỏi rồi. Mọi thứ hôm nay vẫn ổn chứ? Có điều gì cậu muốn kể cho tớ nghe không?</p><p>Tuy là ở xa, nhưng mà tớ vẫn luôn ở đây lắng nghe cậu. Giờ thì nghỉ ngơi thôi nhé </p>` },
+         { day: 1, title: "hello cậu, ngày học đầu tiên của tháng kết thúc rồi", content: `<p>Vậy là một ngày nữa ở Thành Đô đã qua. Cậu đã vất vả, mệt mỏi rồi. Mọi thứ hôm nay vẫn ổn chứ? Có điều gì cậu muốn kể cho tớ nghe không?</p><p>Tuy là ở xa, nhưng mà tớ vẫn luôn ở đây lắng nghe cậu. Giờ thì nghỉ ngơi thôi nhé </p>` },
         { day: 2, title: "xin cả chào nhesee, ngày thứ hai của cậu mệt không?", content: `<p>Tan học rồi, chắc cậu mệt lắm. Đừng ôm hết mọi mệt mỏi một mình nhé, hãy chia sẻ với tớ. Tớ không ở cạnh để chăm sóc cậu được, nên chỉ có thể lắng nghe thôi và an ủi cậu thôi.</p><p>Hôm nay của tớ ở Việt Nam cũng hơi mệt mỏi một chút, nhưng mà kiểu có cậu ấy nên cảm giác thoải mái v =)) Có chuyện thì hãy kể tớ nhé, tớ luôn ở đây ❤️</p>` },
         { day: 3, title: "Gửi cậu, ngày thứ ba, lại một ngày nỗ lực rồi", content: `<p>Tớ biết việc học và thích nghi với môi trường mới, các bạn mới không dễ dàng. Tớ tự hào về cậu nhiều lắm. Mỗi ngày trôi qua, cậu lại càng giỏi giang hơn một chút đấy.</p><p>Hôm nay có gì vui hay có gì khiến cậu mệt mỏi, tức giận không? Kể cho tớ nghe, lov u so much luôn</p>` },
         { day: 4, title: "Ngày thứ 4, tớ lại nhớ khoảng khắc đấy =))) dyeu v", content: `<p>Tối nay, tớ lại nghĩ về chiếc huy chương cậu đưa tớ, kiểu nó làm cảm giác như cậu đang ở gần tớ vô cùng luôn ấy =)) cảm giác nhớ cậu v</p><p>Ngày hôm nay của cậu thế nào thế? Việc học có căng thẳng, khó không thế? Cố lên dii, im alws here </p><p> Có chuyện gì hãy nói với tớ nhé </p>` },
@@ -126,7 +128,6 @@ document.addEventListener('DOMContentLoaded', function() {
         { day: 30, title: "Gửi cậu, tối ngày áp chót của tháng", content: `<p>Ngày mai là hết tháng rồi. Cảm ơn cậu vì đã để tớ đồng hành trong suốt một tháng vừa qua. Mỗi tối nói chuyện với cậu đều là một điều quý giá. Hôm nay cậu đã làm rất tốt. Ngủ ngon nhé.</p>` },
         { day: 31, title: "Gửi cậu, khép lại một tháng xa nhau", content: `<p>Tháng 10 kết thúc rồi. Một tháng qua cậu đã rất kiên cường và giỏi giang. Tớ tự hào về cậu lắm. Cảm ơn vì đã luôn chia sẻ cùng tớ dù chúng ta ở xa. Cùng nhau chào đón tháng 11 nhé. Ngủ thật ngon, cô gái của tớ.</p>` },
     ];
-
     const daytimeLetters = [
         { day: 1, title: "Gửi cậu, ngày đầu tháng tốt lành nhé!", content: `<p>Bắt đầu tháng mới ở Thành Đô, chúc cậu mọi việc đều suôn sẻ. Tớ gửi một chút năng lượng từ Việt Nam qua cho cậu đây. Cố lên nhé!</p>` },
         { day: 2, title: "Gửi cậu, ngày thứ hai...", content: `<p>Chúc cậu một ngày học tập hiệu quả. Đừng quên uống đủ nước và cười thật tươi nha. Tối mình nói chuyện sau.</p>` },
@@ -162,256 +163,687 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
 
     const assetPaths = {
-        sun: 'images/sun.jpg',
-        venus: 'images/venus.jpg',
+        sun: 'images/sun.jpg', 
+        venus: 'images/venus.jpg', 
         earth: 'images/earth.jpg',
-        mars: 'images/mars.jpg',
-        jupiter: 'images/jupiter.jpg',
+        mars: 'images/mars.jpg', 
+        jupiter: 'images/jupiter.jpg', 
         saturn: 'images/saturn.jpg',
-        saturnRing: 'images/saturn-ring.jpg',
-        neptune: 'images/neptune.jpg',
-        stars: 'images/stars.jpg'
+        neptune: 'images/neptune.jpg', 
+        stars: 'images/stars.jpg',
+        moon: 'images/moon.jpg', 
+        phobos: 'images/phobos.jpg',
+        asteroid: 'images/asteroid.jpg',
+        vetinh: 'images/vetinh.jpg'
     };
     
-    const celestialData = [
-        { id: 'sun', type: 'star', name: 'Mặt Trời', texture: assetPaths.sun, size: 50, orbitRadius: 0, spinSpeed: 0.05, fact: "Năng lượng của mặt trời sưởi ấm cả vũ trụ này...", message: "...nhưng nụ cười của cậu mới là thứ sưởi ấm mùa đông này =))) ." },
-        { id: 'venus', type: 'planet', name: 'Sao Kim', texture: assetPaths.venus, size: 4, orbitRadius: 80, orbitSpeed: 1.2, spinSpeed: 0.1, fact: "Sao Kim được đặt theo tên nữ thần tình yêu và sắc đẹp trong thần thoại La Mã...", message: "...điều đó giải thích tại sao tớ lại tìm thấy cậu ở đây hehe." },
-        { id: 'earth', type: 'planet', name: 'Trái Đất', texture: assetPaths.earth, size: 5, orbitRadius: 120, orbitSpeed: 1.0, spinSpeed: 0.5, fact: "Trái Đất là hành tinh duy nhất được biết đến có sự sống...", message: "...và có lẽ chúng ta cũng mới bắt đầu một hành trình nhỏ." },
-        { id: 'mars', type: 'planet', name: 'Sao Hỏa', texture: assetPaths.mars, size: 3, orbitRadius: 160, orbitSpeed: 0.8, spinSpeed: 0.4, fact: "Sao Hỏa được gọi là 'Hành tinh Đỏ' vì màu sắc của nó...", message: "...giống như những rung động mới mẻ trong tim của mình hehehehe, í là tim nó cứ đỏ rực th =)))) ." },
-        { id: 'jupiter', type: 'planet', name: 'Sao Mộc', texture: assetPaths.jupiter, size: 20, orbitRadius: 250, orbitSpeed: 0.4, spinSpeed: 1.0, fact: "Sao Mộc là hành tinh lớn nhất...", message: "...giống tớ í là yêu cậu nhiều ấy =)))) ." },
-        { id: 'saturn', type: 'planet', name: 'Sao Thổ', texture: assetPaths.saturn, ringTexture: assetPaths.saturnRing, size: 15, orbitRadius: 350, orbitSpeed: 0.3, spinSpeed: 0.9, fact: "Sao Thổ nổi tiếng với vành đai tuyệt đẹp của nó...", message: "...biết đâu sau này mình cũng có thêm nhiều kỷ niệm vòng quanh nhau ha =)))." },
-        { id: 'neptune', type: 'planet', name: 'Sao Hải Vương', texture: assetPaths.neptune, size: 8, orbitRadius: 450, orbitSpeed: 0.2, spinSpeed: 0.6, fact: "Sao Hải Vương là hành tinh xa mặt trời nhất...", message: "...nhưng dù ở xa thế nào thì khoảng cách vẫn chưa bao giờ là vấn đề." }
-        ];
+    const celestialData = [ 
+        { id: 'sun', type: 'star', name: 'Mặt Trời', texture: assetPaths.sun, size: 80, orbitRadius: 0, spinSpeed: 0.05, 
+            fact: "Năng lượng của mặt trời sưởi ấm cả vũ trụ này...", message: "...nhưng nụ cười của cậu mới là thứ sưởi ấm mùa đông này =))) ." }, 
+        { id: 'venus', type: 'planet', name: 'Sao Kim', texture: assetPaths.venus, size: 6, orbitRadius: 150, orbitSpeed: 1.2, spinSpeed: 0.1, 
+            fact: "Sao Kim được đặt theo tên nữ thần tình yêu và sắc đẹp trong thần thoại La Mã...", message: "...điều đó giải thích tại sao tớ lại tìm thấy cậu ở đây hehe." },
+        { id: 'earth', type: 'planet', name: 'Trái Đất', texture: assetPaths.earth, size: 7, orbitRadius: 220, orbitSpeed: 1.0, spinSpeed: 0.5, 
+            fact: "Trái Đất là hành tinh duy nhất được biết đến có sự sống...", message: "...và có lẽ chúng ta cũng mới bắt đầu một hành trình nhỏ.", 
+            moons: [ { id: 'moon', name: 'Mặt Trăng', texture: assetPaths.moon, size: 1.5, orbitRadius: 15, orbitSpeed: 1.5, spinSpeed: 0.2 } ] }, 
+        { id: 'mars', type: 'planet', name: 'Sao Hỏa', texture: assetPaths.mars, size: 5, orbitRadius: 300, orbitSpeed: 0.8, spinSpeed: 0.4,
+            fact: "Sao Hỏa được gọi là 'Hành tinh Đỏ' vì màu sắc của nó...", message: "...giống như những rung động mới mẻ trong tim của mình hehehehe, í là tim nó cứ đỏ rực th =)))) .", 
+            moons: [ { id: 'phobos', name: 'Phobos', texture: assetPaths.phobos, size: 0.8, orbitRadius: 8, orbitSpeed: 3.0, spinSpeed: 0.5 } ] }, 
+        { id: 'jupiter', type: 'planet', name: 'Sao Mộc', texture: assetPaths.jupiter, size: 30, orbitRadius: 450, orbitSpeed: 0.4, spinSpeed: 1.0, 
+            fact: "Sao Mộc là hành tinh lớn nhất...", message: "...giống tớ í là yêu cậu nhiều ấy =)))) ." }, 
+        { id: 'saturn', type: 'planet', name: 'Sao Thổ', texture: assetPaths.saturn, size: 25, orbitRadius: 650, orbitSpeed: 0.3, spinSpeed: 0.9, 
+            fact: "Sao Thổ nổi tiếng với vành đai tuyệt đẹp của nó...", message: "...biết đâu sau này mình cũng có thêm nhiều kỷ niệm vòng quanh nhau ha =)))." }, 
+        { id: 'neptune', type: 'planet', name: 'Sao Hải Vương', texture: assetPaths.neptune, size: 15, orbitRadius: 800, orbitSpeed: 0.2, spinSpeed: 0.6,
+            fact: "Sao Hải Vương là hành tinh xa mặt trời nhất...", message: "...nhưng dù ở xa thế nào thì khoảng cách vẫn chưa bao giờ là vấn đề." } ];
         
-    const isMobile = window.innerWidth <= 768;
-    const config = { maxParticles: isMobile ? 30 : 50, particleInterval: isMobile ? 300 : 200 };
-    const messages = ["U are the best", "Cố lên !!!", "Yêu cậu", "Love u so much", "nhớ cậu nhiều", "tớ luôn bên cạnh cậu", "💖", "💕", "🌟", "✨", "You're my angel", "Đừng bỏ cuộc nhé !!!", "I'm alws here", "😘", "🥰", "❤️", "💘", "💝", "💞"];
-    const birthdayMessages = ["Happy Birthday!", "Chúc mừng sinh nhật!", "🎂", "🎉", "Tuổi mới vui vẻ!"];
-    const heartSymbols = ["♥", "💖", "💕", "🌟", "✨"];
-    const textStyles = ['love', 'date', 'special'];
-    const activeParticles = new Set();
-    
-    let upNextPlaylist = []; let upNextIndex = 0;
-    let isBirthdayMode = false; let isLetterModeActive = false; let typingInterval = null;
-    let wavesurfer;
-    let scene, camera, renderer, controls;
-    let starfield;
-    const planetObjects = [];
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    const textureLoader = new THREE.TextureLoader();
-    let isAnimatingCamera = false;
-    let previousCameraState = null;
+    const isHighEndDevice = !window.matchMedia("(max-width: 768px)").matches;
+    const config = { maxParticles: isHighEndDevice ? 70 : 30, particleInterval: isHighEndDevice ? 150 : 300, shootingStarInterval: isHighEndDevice ? 1200 : 2500, asteroidInterval: isHighEndDevice ? 9000 : 16000, cometInterval: isHighEndDevice ? 20000 : 35000 };
+    const messages = ["U are the best", "Cố lên !!!", "Yêu cậu", "Love u so much", "nhớ cậu nhiều", "tớ luôn bên cạnh cậu", "💖", "💕", "🌟", "✨", "You're my angel", "Đừng bỏ cuộc nhé !!!", "I'm alws here", "😘", "🥰", "❤️", "💘", "💝", "💞"]; const birthdayMessages = ["Happy Birthday!", "Chúc mừng sinh nhật!", "🎂", "🎉", "Tuổi mới vui vẻ!"]; const heartSymbols = ["♥", "💖", "💕", "🌟", "✨"]; const textStyles = ['love', 'date', 'special']; const activeParticles = new Set();
+    let upNextPlaylist = []; let upNextIndex = 0; let isBirthdayMode = false; let isLetterModeActive = false; let typingInterval = null; let wavesurfer; let scene, camera, renderer, controls; let starfield; const celestialObjects = []; const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2(); const textureLoader = new THREE.TextureLoader(); let isAnimatingCamera = false; let previousCameraState = null; let followedObject = null; let cameraOffset = new THREE.Vector3(); let activeAsteroids = []; let activeComets = []; let sunEffects = {};
+    let spaceStationEffects = {}; // Object quản lý trạm vũ trụ
 
     // =================================================================
     // PHẦN 3: CÁC HÀM TIỆN ÍCH VÀ HIỆU ỨNG
     // =================================================================
-    
-    function shuffleArray(array) { let currentIndex = array.length, randomIndex; while (currentIndex != 0) { randomIndex = Math.floor(Math.random() * currentIndex); currentIndex--;[array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]]; } return array; }
-    function formatTime(seconds) { const minutes = Math.floor(seconds / 60); const secs = Math.floor(seconds % 60); return `${minutes}:${secs < 10 ? '0' : ''}${secs}`; }
-    function getRandomItem(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-    function createShootingStars(count = 4) {
-        for (let i = 0; i < count; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            star.style.top = `${Math.random() * 80}%`;
-            star.style.left = `${Math.random() * 100}%`;
-            star.style.animationDelay = `${Math.random() * 7}s`;
-            star.style.transform = `rotate(${Math.random() * 60 - 75}deg)`;
-            shootingStarsContainer.appendChild(star);
-        }
+    function createProceduralTexture(gradientCallback, size = 256) {
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const context = canvas.getContext('2d');
+        gradientCallback(context, size);
+        return new THREE.CanvasTexture(canvas);
     }
-    
+
+    function createFieryAsteroid() {
+        const size = Math.random() * 2 + 1;
+        const geometry = new THREE.DodecahedronGeometry(size, 1);
+        const positionAttribute = geometry.getAttribute('position');
+        for (let i = 0; i < positionAttribute.count; i++) {
+            const vertex = new THREE.Vector3().fromBufferAttribute(positionAttribute, i);
+            vertex.x += (Math.random() - 0.5) * 0.5;
+            vertex.y += (Math.random() - 0.5) * 0.5;
+            vertex.z += (Math.random() - 0.5) * 0.5;
+            positionAttribute.setXYZ(i, vertex.x, vertex.y, vertex.z);
+        }
+        const material = new THREE.MeshStandardMaterial({
+            map: textureLoader.load(assetPaths.asteroid),
+            emissive: 0xff6a00,
+            emissiveIntensity: 1.5
+        });
+        const asteroid = new THREE.Mesh(geometry, material);
+        const particleCount = 700;
+        const particlesGeometry = new THREE.BufferGeometry();
+        const posArray = new Float32Array(particleCount * 3);
+        const colorArray = new Float32Array(particleCount * 3);
+        const velocities = [];
+        const colorInside = new THREE.Color(0xffff00);
+        const colorOutside = new THREE.Color(0xff4500);
+        for (let i = 0; i < particleCount; i++) {
+            const i3 = i * 3;
+            posArray[i3] = (Math.random() - 0.5) * size;
+            posArray[i3 + 1] = (Math.random() - 0.5) * size;
+            posArray[i3 + 2] = (Math.random() - 0.5) * size;
+            velocities.push((Math.random() - 0.5) * 0.1, (Math.random() - 0.5) * 0.1, (Math.random() - 0.5) * 0.1);
+            const mixedColor = colorInside.clone();
+            mixedColor.lerp(colorOutside, Math.random());
+            colorArray[i3] = mixedColor.r;
+            colorArray[i3 + 1] = mixedColor.g;
+            colorArray[i3 + 2] = mixedColor.b;
+        }
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+        const particleMaterial = new THREE.PointsMaterial({
+            size: 0.15,
+            blending: THREE.AdditiveBlending,
+            transparent: true,
+            depthWrite: false,
+            sizeAttenuation: true,
+            vertexColors: true
+        });
+        const fireParticles = new THREE.Points(particlesGeometry, particleMaterial);
+        asteroid.add(fireParticles);
+        const spawnRadius = 800;
+        const startX = (Math.random() - 0.5) * spawnRadius * 2;
+        const startY = (Math.random() - 0.5) * spawnRadius;
+        const startZ = (Math.random() - 0.5) * spawnRadius * 2;
+        asteroid.position.set(startX, startY, startZ);
+        scene.add(asteroid);
+        const duration = Math.random() * 10 + 10;
+        gsap.to(asteroid.position, {
+            x: -startX,
+            y: -startY,
+            z: -startZ,
+            duration: duration,
+            ease: "none",
+            onComplete: () => {
+                scene.remove(asteroid);
+                activeAsteroids = activeAsteroids.filter(a => a.asteroid !== asteroid);
+            }
+        });
+        activeAsteroids.push({
+            asteroid,
+            fireParticles,
+            velocities
+        });
+    }
+
+    function createComet() {
+        const headGeometry = new THREE.SphereGeometry(2, 32, 32);
+        const headMaterial = new THREE.MeshBasicMaterial({
+            color: 0x87ceeb
+        });
+        const cometHead = new THREE.Mesh(headGeometry, headMaterial);
+
+        const particleCount = 1000;
+        const particlesGeometry = new THREE.BufferGeometry();
+        const posArray = new Float32Array(particleCount * 3);
+        for (let i = 0; i < particleCount; i++) {
+            posArray[i * 3] = 0;
+            posArray[i * 3 + 1] = 0;
+            posArray[i * 3 + 2] = 0;
+        }
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+        const cometParticleTexture = createProceduralTexture((ctx, size) => {
+            const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+            gradient.addColorStop(0, 'rgba(173, 216, 230, 1)');
+            gradient.addColorStop(0.4, 'rgba(135, 206, 250, 0.5)');
+            gradient.addColorStop(1, 'rgba(0, 191, 255, 0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+        });
+
+        const particleMaterial = new THREE.PointsMaterial({
+            map: cometParticleTexture,
+            size: 2.5,
+            blending: THREE.AdditiveBlending,
+            transparent: true,
+            depthWrite: false,
+            sizeAttenuation: true
+        });
+        const cometTail = new THREE.Points(particlesGeometry, particleMaterial);
+        cometHead.add(cometTail);
+
+        const spawnRadius = 900;
+        const startX = (Math.random() > 0.5 ? 1 : -1) * spawnRadius;
+        const startY = (Math.random() - 0.5) * 400;
+        const startZ = (Math.random() - 0.5) * spawnRadius * 2;
+        cometHead.position.set(startX, startY, startZ);
+        scene.add(cometHead);
+
+        const duration = Math.random() * 15 + 20;
+        gsap.to(cometHead.position, {
+            x: -startX,
+            z: -startZ,
+            duration: duration,
+            ease: "power1.in",
+            onComplete: () => {
+                scene.remove(cometHead);
+                activeComets = activeComets.filter(c => c.head !== cometHead);
+            }
+        });
+        activeComets.push({
+            head: cometHead,
+            tail: cometTail
+        });
+    }
+    const shootingStarMessages = [
+        "Yêu tổ quốc, yêu đồng bào", 
+        "Học tập tốt, lao động tốt", 
+        "Đoàn kết tốt, kỷ luật tốt", 
+        "Giữ gìn vệ sinh thật tốt", 
+        "Khiêm tốn, thật thà, dũng cảm",
+    ];
+
+    function shuffleArray(array) {
+        let currentIndex = array.length,
+            randomIndex;
+        while (currentIndex != 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function createShootingStar() {
+        const star = document.createElement('div');
+        star.className = 'shooting-star';
+        const clickableArea = star.appendChild(document.createElement('div'));
+        clickableArea.className = 'hitbox';
+        document.body.appendChild(star);
+        const startX = Math.random() * window.innerWidth * 1.5 - window.innerWidth * 0.25;
+        const startY = Math.random() * window.innerHeight * 1.5 - window.innerHeight * 0.25;
+        const angle = Math.random() * 360;
+        const distance = window.innerWidth * 1.2;
+        const endX = startX + Math.cos(angle * Math.PI / 180) * distance;
+        const endY = startY + Math.sin(angle * Math.PI / 180) * distance;
+        const duration = Math.random() * 3000 + 2000;
+        star.style.transform = `translate(${startX}px, ${startY}px) rotate(${angle}deg)`;
+        const animation = star.animate(
+            [{
+                transform: `translate(${startX}px, ${startY}px) rotate(${angle}deg)`,
+                opacity: 0
+            }, {
+                opacity: 1,
+                offset: 0.1
+            }, {
+                opacity: 0,
+                offset: 0.9
+            }, {
+                transform: `translate(${endX}px, ${endY}px) rotate(${angle}deg)`,
+                opacity: 0
+            }], {
+                duration: duration,
+                easing: 'linear'
+            }
+        );
+        const onStarCaught = (e) => {
+            e.stopPropagation();
+            const messageEl = document.createElement('div');
+            messageEl.className = 'star-message';
+            messageEl.textContent = getRandomItem(shootingStarMessages);
+            messageEl.style.left = `${e.clientX}px`;
+            messageEl.style.top = `${e.clientY}px`;
+            document.body.appendChild(messageEl);
+            setTimeout(() => {
+                messageEl.remove();
+            }, 2500);
+            animation.cancel();
+            star.remove();
+        };
+        star.addEventListener('click', onStarCaught, {
+            once: true
+        });
+        animation.onfinish = () => star.remove();
+    }
+
     function animateCamera(targetPosition, targetLookAt, duration = 1500, onComplete = null) {
         if (isAnimatingCamera) return;
         isAnimatingCamera = true;
         const startPosition = camera.position.clone();
         const startLookAt = controls.target.clone();
         const clock = new THREE.Clock();
+
         function animate() {
             const elapsedTime = clock.getElapsedTime();
             const progress = Math.min(elapsedTime * 1000 / duration, 1);
             const easeProgress = 0.5 - 0.5 * Math.cos(progress * Math.PI);
             camera.position.lerpVectors(startPosition, targetPosition, easeProgress);
             controls.target.lerpVectors(startLookAt, targetLookAt, easeProgress);
-            if (progress < 1) { requestAnimationFrame(animate); } else { isAnimatingCamera = false; if (onComplete) onComplete(); }
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                isAnimatingCamera = false;
+                if (onComplete) onComplete();
+            }
         }
         animate();
     }
-    
+
     function createTextParticle() {
         if (!galaxy || activeParticles.size >= config.maxParticles) return;
         const messagesToUse = isBirthdayMode ? birthdayMessages : messages;
         const isHeart = isBirthdayMode ? Math.random() > 0.5 : Math.random() > 0.7;
         const particle = document.createElement('div');
-        if (isHeart) { particle.className = 'text-particle heart'; particle.textContent = isBirthdayMode ? getRandomItem(["🎉", "🎂", "💖"]) : getRandomItem(heartSymbols); } 
-        else { const message = getRandomItem(messagesToUse); const style = isBirthdayMode ? 'birthday' : getRandomItem(textStyles); particle.className = `text-particle ${style}`; particle.textContent = message; }
-        const xPos = Math.random() * 100; const zPos = (Math.random() - 0.5) * 500; const duration = Math.random() * 2 + 3;
-        const size = isMobile ? 10 : 12; const variation = isMobile ? 5 : 6;
-        particle.style.left = `${xPos}%`; particle.style.fontSize = `${Math.random() * variation + size}px`;
-        galaxy.appendChild(particle); activeParticles.add(particle);
-        const startY = -150; const endY = window.innerHeight + 150;
-        const animation = particle.animate([
-            { transform: `translate3d(0, ${startY}px, ${zPos}px) translateX(-50%)`, opacity: 0 },
-            { opacity: 0.9, offset: 0.1 }, { opacity: 0.9, offset: 0.9 },
-            { transform: `translate3d(0, ${endY}px, ${zPos}px) translateX(-50%)`, opacity: 0 }
-        ], { duration: duration * 1000, easing: 'linear' });
-        animation.onfinish = () => { particle.remove(); activeParticles.delete(particle); };
+        if (isHeart) {
+            particle.className = 'text-particle heart';
+            particle.textContent = isBirthdayMode ? getRandomItem(["🎉", "🎂", "💖"]) : getRandomItem(heartSymbols);
+        } else {
+            const message = getRandomItem(messagesToUse);
+            const style = isBirthdayMode ? 'birthday' : getRandomItem(textStyles);
+            particle.className = `text-particle ${style}`;
+            particle.textContent = message;
+        }
+        const xPos = Math.random() * 100;
+        const zPos = (Math.random() - 0.5) * 500;
+        const duration = Math.random() * 2 + 3;
+        const size = isHighEndDevice ? 12 : 10;
+        const variation = isHighEndDevice ? 6 : 5;
+        particle.style.left = `${xPos}%`;
+        particle.style.fontSize = `${Math.random() * variation + size}px`;
+        galaxy.appendChild(particle);
+        activeParticles.add(particle);
+        const startY = -150;
+        const endY = window.innerHeight + 150;
+        const animation = particle.animate(
+            [{
+                transform: `translate3d(0, ${startY}px, ${zPos}px) translateX(-50%)`,
+                opacity: 0
+            }, {
+                opacity: 0.9,
+                offset: 0.1
+            }, {
+                opacity: 0.9,
+                offset: 0.9
+            }, {
+                transform: `translate3d(0, ${endY}px, ${zPos}px) translateX(-50%)`,
+                opacity: 0
+            }], {
+                duration: duration * 1000,
+                easing: 'linear'
+            }
+        );
+        animation.onfinish = () => {
+            particle.remove();
+            activeParticles.delete(particle);
+        };
     }
 
     function setupGyroControls() {
         if (window.DeviceOrientationEvent && 'ontouchstart' in window) {
             window.addEventListener('deviceorientation', (event) => {
-                const { beta, gamma } = event; bodyEl.classList.add('gyro-active');
-                const clampedBeta = Math.max(-45, Math.min(45, beta)); const clampedGamma = Math.max(-45, Math.min(45, gamma));
-                bodyEl.style.setProperty('--gyro-rotate-x', `${clampedBeta * -0.3}deg`); bodyEl.style.setProperty('--gyro-rotate-y', `${clampedGamma * 0.3}deg`);
+                const {
+                    beta,
+                    gamma
+                } = event;
+                bodyEl.classList.add('gyro-active');
+                const clampedBeta = Math.max(-45, Math.min(45, beta));
+                const clampedGamma = Math.max(-45, Math.min(45, gamma));
+                bodyEl.style.setProperty('--gyro-rotate-x', `${clampedBeta * -0.3}deg`);
+                bodyEl.style.setProperty('--gyro-rotate-y', `${clampedGamma * 0.3}deg`);
             });
         }
     }
+
     function setupMouseParallax() {
         if (!('ontouchstart' in window)) {
             window.addEventListener('mousemove', (event) => {
-                const { clientX } = event; const width = window.innerWidth;
+                const {
+                    clientX
+                } = event;
+                const width = window.innerWidth;
                 const xPercent = (clientX / width - 0.5) * 2;
-                bodyEl.style.setProperty('--parallax-x-far', `${xPercent * -5}px`); bodyEl.style.setProperty('--parallax-x-mid', `${xPercent * -15}px`); bodyEl.style.setProperty('--parallax-x-near', `${xPercent * -25}px`);
+                bodyEl.style.setProperty('--parallax-x-far', `${xPercent * -5}px`);
+                bodyEl.style.setProperty('--parallax-x-mid', `${xPercent * -15}px`);
+                bodyEl.style.setProperty('--parallax-x-near', `${xPercent * -25}px`);
             });
         }
     }
-    
     // =================================================================
     // PHẦN 4: LOGIC GIAO DIỆN NGƯỜI DÙNG (UI)
     // =================================================================
-    
     function typewriterEffect(elementsToType, onComplete = () => {}) {
         if (typingInterval) clearInterval(typingInterval);
-        let elementIndex = 0; let charIndex = 0;
+        let elementIndex = 0;
+        let charIndex = 0;
         const type = () => {
-            if (elementIndex >= elementsToType.length) { if (onComplete) onComplete(); return; }
-            const currentItem = elementsToType[elementIndex]; const fullText = currentItem.text;
+            if (elementIndex >= elementsToType.length) {
+                if (onComplete) onComplete();
+                return;
+            }
+            const currentItem = elementsToType[elementIndex];
+            const fullText = currentItem.text;
             if (fullText.charAt(charIndex) === '<') {
                 const closingTagIndex = fullText.indexOf('>', charIndex);
-                if (closingTagIndex !== -1) { currentItem.element.innerHTML += fullText.substring(charIndex, closingTagIndex + 1); charIndex = closingTagIndex + 1; }
+                if (closingTagIndex !== -1) {
+                    currentItem.element.innerHTML += fullText.substring(charIndex, closingTagIndex + 1);
+                    charIndex = closingTagIndex + 1;
+                }
             }
             if (charIndex < fullText.length) {
-                const char = fullText.charAt(charIndex); currentItem.element.innerHTML += char; charIndex++;
+                const char = fullText.charAt(charIndex);
+                currentItem.element.innerHTML += char;
+                charIndex++;
                 let speed = 50;
                 if (char === '.' || char === '!') speed = 500;
                 if (char === ',') speed = 250;
                 typingInterval = setTimeout(type, speed);
-            } else { elementIndex++; charIndex = 0; setTimeout(type, 500); }
+            } else {
+                elementIndex++;
+                charIndex = 0;
+                setTimeout(type, 500);
+            }
         };
         const skipTyping = () => {
             clearTimeout(typingInterval);
-            elementsToType.forEach(item => { item.element.innerHTML = item.text; });
+            elementsToType.forEach(item => {
+                item.element.innerHTML = item.text;
+            });
             letterContainer.removeEventListener('click', skipTyping);
             if (onComplete) onComplete();
         };
-        letterContainer.addEventListener('click', skipTyping, { once: true });
+        letterContainer.addEventListener('click', skipTyping, {
+            once: true
+        });
         elementsToType.forEach(item => item.element.innerHTML = '');
         type();
     }
-
     let fadeInterval = null;
-    function stopFade() { if (fadeInterval) { clearInterval(fadeInterval); fadeInterval = null; } }
+
+    function stopFade() {
+        if (fadeInterval) {
+            clearInterval(fadeInterval);
+            fadeInterval = null;
+        }
+    }
+
     function fadeOut(callback) {
-        stopFade(); if (!wavesurfer) { if (callback) callback(); return; }
-        const currentVolume = wavesurfer.getVolume(); if (currentVolume === 0) { wavesurfer.pause(); if (callback) callback(); return; }
+        stopFade();
+        if (!wavesurfer) {
+            if (callback) callback();
+            return;
+        }
+        const currentVolume = wavesurfer.getVolume();
+        if (currentVolume === 0) {
+            wavesurfer.pause();
+            if (callback) callback();
+            return;
+        }
         fadeInterval = setInterval(() => {
             let newVolume = wavesurfer.getVolume() - 0.1;
-            if (newVolume <= 0) { newVolume = 0; stopFade(); wavesurfer.pause(); if (callback) callback(); }
+            if (newVolume <= 0) {
+                newVolume = 0;
+                stopFade();
+                wavesurfer.pause();
+                if (callback) callback();
+            }
             wavesurfer.setVolume(newVolume);
         }, 50);
     }
+
     function fadeIn() {
-        stopFade(); if (!wavesurfer) return;
-        const targetVolume = parseFloat(volumeSlider.value); wavesurfer.setVolume(0); wavesurfer.play();
+        stopFade();
+        if (!wavesurfer) return;
+        const targetVolume = parseFloat(volumeSlider.value);
+        wavesurfer.setVolume(0);
+        wavesurfer.play();
         fadeInterval = setInterval(() => {
             let newVolume = wavesurfer.getVolume() + 0.1;
-            if (newVolume >= targetVolume) { newVolume = targetVolume; stopFade(); }
+            if (newVolume >= targetVolume) {
+                newVolume = targetVolume;
+                stopFade();
+            }
             wavesurfer.setVolume(newVolume);
         }, 50);
     }
-    
+
     function playTrack(track, isSpecialLetterTrack = false) {
-        if (!track || !track.file) { console.error("Lỗi: Đang cố gắng phát một bài hát không hợp lệ.", track); playNextInMix(); return; }
+        if (!track || !track.file) {
+            console.error("Lỗi: Đang cố gắng phát một bài hát không hợp lệ.", track);
+            playNextInMix();
+            return;
+        }
         if (!wavesurfer) {
-            wavesurfer = WaveSurfer.create({ container: waveformContainer, waveColor: 'rgba(200, 200, 200, 0.5)', progressColor: '#ff6b9d', height: 50, barWidth: 2, barRadius: 3, cursorWidth: 0, responsive: true, hideScrollbar: true, media: audio, });
-            wavesurfer.on('finish', () => { if (isLetterModeActive) { isLetterModeActive = false; } if (isBirthdayMode && birthdayData) { playTrack(birthdayData.song); } else { playNextInMix(); } });
-            wavesurfer.on('audioprocess', () => { currentTimeEl.textContent = formatTime(wavesurfer.getCurrentTime()); });
-            wavesurfer.on('error', (err) => { console.error(`Lỗi WaveSurfer: ${err}`); songTitleEl.textContent = "Bài hát lỗi, tự chuyển bài..."; setTimeout(playNextInMix, 2000); });
+            wavesurfer = WaveSurfer.create({
+                container: waveformContainer,
+                waveColor: 'rgba(200, 200, 200, 0.5)',
+                progressColor: '#ff6b9d',
+                height: 50,
+                barWidth: 2,
+                barRadius: 3,
+                cursorWidth: 0,
+                responsive: true,
+                hideScrollbar: true,
+                media: audio,
+            });
+            wavesurfer.on('finish', () => {
+                if (isLetterModeActive) {
+                    isLetterModeActive = false;
+                }
+                if (isBirthdayMode && birthdayData) {
+                    playTrack(birthdayData.song);
+                } else {
+                    playNextInMix();
+                }
+            });
+            wavesurfer.on('audioprocess', () => {
+                currentTimeEl.textContent = formatTime(wavesurfer.getCurrentTime());
+            });
+            wavesurfer.on('error', (err) => {
+                console.error(`Lỗi WaveSurfer: ${err}`);
+                songTitleEl.textContent = "Bài hát lỗi, tự chuyển bài...";
+                setTimeout(playNextInMix, 2000);
+            });
             wavesurfer.on('play', () => playPauseBtn.textContent = '❚❚');
             wavesurfer.on('pause', () => playPauseBtn.textContent = '▶');
         }
-        stopFade(); wavesurfer.pause();
-        songTitleEl.textContent = "Đang tải bài hát..."; currentTimeEl.textContent = "0:00"; durationEl.textContent = "0:00";
-        wavesurfer.load(track.file); updateFavoriteButton(track.file);
+        stopFade();
+        wavesurfer.pause();
+        songTitleEl.textContent = "Đang tải bài hát...";
+        currentTimeEl.textContent = "0:00";
+        durationEl.textContent = "0:00";
+        wavesurfer.load(track.file);
+        updateFavoriteButton(track.file);
         wavesurfer.once('ready', () => {
-            songTitleEl.textContent = track.title; durationEl.textContent = formatTime(wavesurfer.getDuration());
-            if (isSpecialLetterTrack) { fadeIn(); } else { wavesurfer.play(); }
+            songTitleEl.textContent = track.title;
+            durationEl.textContent = formatTime(wavesurfer.getDuration());
+            if (isSpecialLetterTrack) {
+                fadeIn();
+            } else {
+                wavesurfer.play();
+            }
         });
     }
 
-    function createDailyMix() { if (!mainPlaylist || mainPlaylist.length === 0) return; const playlistToShuffle = [...mainPlaylist]; upNextPlaylist = shuffleArray(playlistToShuffle); upNextIndex = 0; }
-    function playNextInMix() { if (upNextPlaylist.length === 0) createDailyMix(); if (upNextPlaylist.length > 0) { playTrack(upNextPlaylist[upNextIndex]); upNextIndex = (upNextIndex + 1) % upNextPlaylist.length; } }
-    function playPrevInMix() { if (upNextPlaylist.length === 0) return; upNextIndex -= 2; if (upNextIndex < 0) upNextIndex = upNextPlaylist.length + upNextIndex; playTrack(upNextPlaylist[upNextIndex]); upNextIndex = (upNextIndex + 1) % upNextPlaylist.length; }
-    function fadeToSpecialTrack(specialSong) { isLetterModeActive = true; fadeOut(() => { playTrack(specialSong, true); }); }
-    function getFavorites() { return JSON.parse(localStorage.getItem('favoriteSongs')) || []; }
-    function saveFavorites(favorites) { localStorage.setItem('favoriteSongs', JSON.stringify(favorites)); }
-    function updateFavoriteButton(file) { const favorites = getFavorites(); if (favorites.includes(file)) { favoriteBtn.classList.add('favorited'); } else { favoriteBtn.classList.remove('favorited'); } }
-    function runBirthdayCheck() { if (!birthdayData) return false; const now = new Date(); if (now.getDate() === birthdayData.day && now.getMonth() + 1 === birthdayData.month) { isBirthdayMode = true; return true; } return false; }
-    
+    function createDailyMix() {
+        if (!mainPlaylist || mainPlaylist.length === 0) return;
+        const playlistToShuffle = [...mainPlaylist];
+        upNextPlaylist = shuffleArray(playlistToShuffle);
+        upNextIndex = 0;
+    }
+
+    function playNextInMix() {
+        if (upNextPlaylist.length === 0) createDailyMix();
+        if (upNextPlaylist.length > 0) {
+            playTrack(upNextPlaylist[upNextIndex]);
+            upNextIndex = (upNextIndex + 1) % upNextPlaylist.length;
+        }
+    }
+
+    function playPrevInMix() {
+        if (upNextPlaylist.length === 0) return;
+        upNextIndex -= 2;
+        if (upNextIndex < 0) upNextIndex = upNextPlaylist.length + upNextIndex;
+        playTrack(upNextPlaylist[upNextIndex]);
+        upNextIndex = (upNextIndex + 1) % upNextPlaylist.length;
+    }
+
+    function fadeToSpecialTrack(specialSong) {
+        isLetterModeActive = true;
+        fadeOut(() => {
+            playTrack(specialSong, true);
+        });
+    }
+
+    function getFavorites() {
+        return JSON.parse(localStorage.getItem('favoriteSongs')) || [];
+    }
+
+    function saveFavorites(favorites) {
+        localStorage.setItem('favoriteSongs', JSON.stringify(favorites));
+    }
+
+    function updateFavoriteButton(file) {
+        const favorites = getFavorites();
+        if (favorites.includes(file)) {
+            favoriteBtn.classList.add('favorited');
+        } else {
+            favoriteBtn.classList.remove('favorited');
+        }
+    }
+
+    function runBirthdayCheck() {
+        if (!birthdayData) return false;
+        const now = new Date();
+        if (now.getDate() === birthdayData.day && now.getMonth() + 1 === birthdayData.month) {
+            isBirthdayMode = true;
+            return true;
+        }
+        return false;
+    }
+
     function activateBirthdayMode() {
-        const btn = document.getElementById('special-day-btn'); btn.classList.remove('hidden');
+        const btn = document.getElementById('special-day-btn');
+        btn.classList.remove('hidden');
         const celebrationOverlay = document.getElementById('birthday-celebration');
-        setTimeout(() => { celebrationOverlay.classList.remove('hidden'); celebrationOverlay.style.opacity = '1'; }, 1000);
-        setTimeout(() => { celebrationOverlay.style.opacity = '0'; setTimeout(() => celebrationOverlay.classList.add('hidden'), 1000); }, 5000);
+        setTimeout(() => {
+            celebrationOverlay.classList.remove('hidden');
+            celebrationOverlay.style.opacity = '1';
+        }, 1000);
+        setTimeout(() => {
+            celebrationOverlay.style.opacity = '0';
+            setTimeout(() => celebrationOverlay.classList.add('hidden'), 1000);
+        }, 5000);
         btn.addEventListener('click', () => openLetter(birthdayData.letter, birthdayData.song, true));
     }
 
     function getLetterForCurrentTime() {
         if (!dailyLetters || !dailySongs || !daytimeLetters) return null;
-        const now = new Date(); const hour = now.getHours(); const day = now.getDate();
+        const now = new Date();
+        const hour = now.getHours();
+        const day = now.getDate();
         const daytimeLetterData = daytimeLetters.find(l => l.day === day);
-        if (daytimeLetterData && hour >= 0 && hour < 22) { return { letter: daytimeLetterData, song: null }; }
+        if (daytimeLetterData && hour >= 0 && hour < 22) {
+            return {
+                letter: daytimeLetterData,
+                song: null
+            };
+        }
         const dailyLetterData = dailyLetters.find(l => l.day === day);
         const dailySongData = dailySongs.find(s => s.day === day);
-        if (dailyLetterData && dailySongData && hour >= 22) { return { letter: dailyLetterData, song: dailySongData.song }; }
+        if (dailyLetterData && dailySongData && hour >= 22) {
+            return {
+                letter: dailyLetterData,
+                song: dailySongData.song
+            };
+        }
         return null;
     }
 
     function checkAndSetupLetterButton() {
         const btn = document.getElementById('special-day-btn');
         const letterInfo = getLetterForCurrentTime();
-        if (letterInfo) { btn.classList.remove('hidden'); btn.addEventListener('click', () => openLetter(letterInfo.letter, letterInfo.song)); }
+        if (letterInfo) {
+            btn.classList.remove('hidden');
+            btn.addEventListener('click', () => openLetter(letterInfo.letter, letterInfo.song));
+        }
     }
 
     function openLetter(letterData, specialSong = null, isBirthday = false) {
         if (!letterContainer || !letterContainer.classList.contains('hidden')) return;
         const letterContentDiv = document.querySelector('.letter-content');
-        const titleEl = document.createElement('h1'); const signatureEl = document.createElement('p'); signatureEl.className = 'signature';
-        const closeBtn = document.createElement('button'); closeBtn.id = 'close-letter-btn'; closeBtn.innerHTML = '×';
-        const tempDiv = document.createElement('div'); tempDiv.innerHTML = letterData.content;
+        const titleEl = document.createElement('h1');
+        const signatureEl = document.createElement('p');
+        signatureEl.className = 'signature';
+        const closeBtn = document.createElement('button');
+        closeBtn.id = 'close-letter-btn';
+        closeBtn.innerHTML = '×';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = letterData.content;
         const pElements = Array.from(tempDiv.querySelectorAll('p'));
-        letterContentDiv.innerHTML = ''; letterContentDiv.append(closeBtn, titleEl, ...pElements, signatureEl);
+        letterContentDiv.innerHTML = '';
+        letterContentDiv.append(closeBtn, titleEl, ...pElements, signatureEl);
         const signatureText = isBirthday ? 'Yêu cậu nhất luôn,<br>tun' : (specialSong ? 'Yêu cậu rất nhiều,<br>tun' : 'Luôn bên cạnh cậu,<br>tun');
-        const elementsToType = [{ element: titleEl, text: letterData.title }];
-        pElements.forEach(p => { elementsToType.push({ element: p, text: p.innerHTML }); });
-        elementsToType.push({ element: signatureEl, text: signatureText });
+        const elementsToType = [{
+            element: titleEl,
+            text: letterData.title
+        }];
+        pElements.forEach(p => {
+            elementsToType.push({
+                element: p,
+                text: p.innerHTML
+            });
+        });
+        elementsToType.push({
+            element: signatureEl,
+            text: signatureText
+        });
         letterContainer.classList.remove('hidden');
         typewriterEffect(elementsToType);
-        if (specialSong && !isBirthday) { fadeToSpecialTrack(specialSong); }
+        if (specialSong && !isBirthday) {
+            fadeToSpecialTrack(specialSong);
+        }
         closeBtn.addEventListener('click', () => {
             letterContainer.classList.add('hidden');
             if (typingInterval) clearTimeout(typingInterval);
-            if (isLetterModeActive) { isLetterModeActive = false; fadeOut(() => { playNextInMix(); }); }
-        }, { once: true });
+            if (isLetterModeActive) {
+                isLetterModeActive = false;
+                fadeOut(() => {
+                    playNextInMix();
+                });
+            }
+        }, {
+            once: true
+        });
     }
 
     function adjustLetterButtonPosition() {
         const btn = document.getElementById('special-day-btn');
         if (btn && waveformControls && !waveformControls.classList.contains('hidden')) {
-            const playerHeight = waveformControls.offsetHeight; const bottomMargin = 15; const desiredGap = 20;
+            const playerHeight = waveformControls.offsetHeight;
+            const bottomMargin = 15;
+            const desiredGap = 20;
             btn.style.bottom = `${playerHeight + bottomMargin + desiredGap}px`;
         }
     }
@@ -419,118 +851,298 @@ document.addEventListener('DOMContentLoaded', function() {
     function setupUIEventListeners() {
         const startAudio = () => {
             if (wavesurfer && wavesurfer.isPlaying()) return;
-            if (!wavesurfer) { if (isBirthdayMode && birthdayData) { playTrack(birthdayData.song); } else { createDailyMix(); playNextInMix(); } } 
-            else { wavesurfer.play(); }
+            if (!wavesurfer) {
+                if (isBirthdayMode && birthdayData) {
+                    playTrack(birthdayData.song);
+                } else {
+                    createDailyMix();
+                    playNextInMix();
+                }
+            } else {
+                wavesurfer.play();
+            }
             overlay.style.display = 'none';
-            waveformControls.classList.remove('hidden'); settingsToggleBtn.classList.remove('hidden');
+            waveformControls.classList.remove('hidden');
+            settingsToggleBtn.classList.remove('hidden');
             adjustLetterButtonPosition();
         };
-        overlay.addEventListener('click', startAudio, { once: true });
+        overlay.addEventListener('click', startAudio, {
+            once: true
+        });
         closeInfoBtn.addEventListener('click', () => {
             infoCard.classList.add('hidden');
+            followedObject = null;
             if (previousCameraState && !isAnimatingCamera) {
                 animateCamera(previousCameraState.position, previousCameraState.target, 1200, () => {
-                    previousCameraState = null; controls.minDistance = 50;
+                    previousCameraState = null;
+                    controls.minDistance = 20;
+                    controls.maxDistance = 1200;
                 });
             }
         });
-        nextBtn.addEventListener('click', playNextInMix); prevBtn.addEventListener('click', playPrevInMix);
-        playPauseBtn.addEventListener('click', () => { if (wavesurfer) wavesurfer.playPause(); });
-        favoriteBtn.addEventListener('click', () => { if (!wavesurfer || !wavesurfer.getMediaElement().src) return; let favorites = getFavorites(); const currentUrl = wavesurfer.getMediaElement().src; if (favorites.includes(currentUrl)) { favorites = favorites.filter(song => song !== currentUrl); } else { favorites.push(currentUrl); } saveFavorites(favorites); updateFavoriteButton(currentUrl); });
+        nextBtn.addEventListener('click', playNextInMix);
+        prevBtn.addEventListener('click', playPrevInMix);
+        playPauseBtn.addEventListener('click', () => {
+            if (wavesurfer) wavesurfer.playPause();
+        });
+        favoriteBtn.addEventListener('click', () => {
+            if (!wavesurfer || !wavesurfer.getMediaElement().src) return;
+            let favorites = getFavorites();
+            const currentUrl = wavesurfer.getMediaElement().src;
+            if (favorites.includes(currentUrl)) {
+                favorites = favorites.filter(song => song !== currentUrl);
+            } else {
+                favorites.push(currentUrl);
+            }
+            saveFavorites(favorites);
+            updateFavoriteButton(currentUrl);
+        });
         settingsToggleBtn.addEventListener('click', () => settingsPanel.classList.toggle('hidden'));
-        volumeSlider.addEventListener('input', e => { if (wavesurfer) wavesurfer.setVolume(e.target.value); });
+        volumeSlider.addEventListener('input', e => {
+            if (wavesurfer) wavesurfer.setVolume(e.target.value);
+        });
     }
-
     // =================================================================
     // PHẦN 5: THẾ GIỚI 3D (THREE.JS)
     // =================================================================
-
     function initThreeJS() {
-        scene = new THREE.Scene(); camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
-        camera.position.z = 200; renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.3); scene.add(ambientLight);
-        const pointLight = new THREE.PointLight(0xffffff, 2); scene.add(pointLight);
+        scene = new THREE.Scene(); camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
+        camera.position.z = 350;
+        renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); renderer.setSize(window.innerWidth, window.innerHeight);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); scene.add(ambientLight);
+        const pointLight = new THREE.PointLight(0xffffff, 1.5); scene.add(pointLight);
         controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true; controls.minDistance = 50; controls.maxDistance = 500;
-        createStarfield(); createSolarSystem();
+        controls.enableDamping = true; controls.dampingFactor = 0.05; controls.minDistance = 20; controls.maxDistance = 1200;
+        controls.enableZoom = true;
+        createStarfield(); createSolarSystem(); createBackgroundNebulae(); createSpaceStation();
         window.addEventListener('resize', onWindowResize); window.addEventListener('click', onClick);
         animate();
     }
     
-    function createStarfield() { const starGeometry = new THREE.SphereGeometry(1000, 64, 64); const starMaterial = new THREE.MeshBasicMaterial({ map: textureLoader.load(assetPaths.stars), side: THREE.BackSide }); starfield = new THREE.Mesh(starGeometry, starMaterial); scene.add(starfield); }
-    
-    function createSolarSystem() {
-        celestialData.forEach(data => {
-            const pivot = new THREE.Object3D(); scene.add(pivot);
-            const geometry = new THREE.SphereGeometry(data.size, 32, 32); let material;
-            if (data.type === 'star') { material = new THREE.MeshBasicMaterial({ map: textureLoader.load(data.texture) }); } 
-            else { material = new THREE.MeshStandardMaterial({ map: textureLoader.load(data.texture) }); }
-            const mesh = new THREE.Mesh(geometry, material); mesh.position.x = data.orbitRadius;
-            mesh.userData = { ...data, mesh: mesh }; pivot.add(mesh);
-            planetObjects.push({ mesh, pivot, orbitSpeed: data.orbitSpeed, spinSpeed: data.spinSpeed });
-            if (data.ringTexture) {
-                const ringGeometry = new THREE.RingGeometry(data.size * 1.2, data.size * 2, 64);
-                const ringMaterial = new THREE.MeshBasicMaterial({ map: textureLoader.load(data.ringTexture), side: THREE.DoubleSide, transparent: true });
-                const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial); ringMesh.rotation.x = -0.5 * Math.PI; mesh.add(ringMesh);
-            }
+    function createSunEffects(sunMesh) {
+        const sunCoronaTexture = createProceduralTexture((ctx, size) => {
+            const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+            gradient.addColorStop(0.2, 'rgba(255, 215, 0, 0.5)');
+            gradient.addColorStop(0.5, 'rgba(255, 140, 0, 0.1)');
+            gradient.addColorStop(1, 'rgba(255, 69, 0, 0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
         });
+        const coronaMaterial = new THREE.SpriteMaterial({ map: sunCoronaTexture, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.8 });
+        const corona = new THREE.Sprite(coronaMaterial);
+        const sunSize = sunMesh.geometry.parameters.radius;
+        corona.scale.set(sunSize * 4, sunSize * 4, 1);
+        sunMesh.add(corona);
+        sunEffects.corona = corona;
+
+        const particleCount = 2000;
+        const particlesGeometry = new THREE.BufferGeometry();
+        const posArray = new Float32Array(particleCount * 3);
+        const velocities = [];
+        for (let i = 0; i < particleCount; i++) {
+            const vertex = new THREE.Vector3( (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2 );
+            vertex.normalize().multiplyScalar(sunSize + Math.random() * 5);
+            posArray[i * 3] = vertex.x;
+            posArray[i * 3 + 1] = vertex.y;
+            posArray[i * 3 + 2] = vertex.z;
+            velocities.push(vertex.x, vertex.y, vertex.z);
+        }
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particleMaterial = new THREE.PointsMaterial({ color: 0xff8c00, size: 0.8, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, sizeAttenuation: true });
+        const solarFlares = new THREE.Points(particlesGeometry, particleMaterial);
+        sunMesh.add(solarFlares);
+        sunEffects.flares = solarFlares;
+        sunEffects.velocities = velocities;
     }
 
+    function createAsteroidBelt(radius, width, count) {
+        const belt = new THREE.Group();
+        const geometry = new THREE.DodecahedronGeometry(0.5, 0);
+        const material = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 1 });
+        for (let i = 0; i < count; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const r = radius + (Math.random() - 0.5) * width;
+            const x = Math.cos(angle) * r;
+            const z = Math.sin(angle) * r;
+            const y = (Math.random() - 0.5) * 5;
+            const rock = new THREE.Mesh(geometry, material);
+            rock.position.set(x, y, z);
+            rock.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+            rock.scale.setScalar(Math.random() * 0.5 + 0.5);
+            belt.add(rock);
+        }
+        scene.add(belt);
+        return belt;
+    }
+
+    function createBackgroundNebulae() {
+        for (let i = 0; i < 15; i++) {
+            const nebulaTexture = createProceduralTexture((ctx, size) => {
+                const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+                gradient.addColorStop(0, 'rgba(0, 0, 0, 0.7)');
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, size, size);
+            }, 512);
+            const material = new THREE.SpriteMaterial({
+                map: nebulaTexture,
+                blending: THREE.NormalBlending,
+                transparent: true,
+                opacity: Math.random() * 0.3 + 0.2
+            });
+            const nebula = new THREE.Sprite(material);
+            nebula.position.set( (Math.random() - 0.5) * 2500, (Math.random() - 0.5) * 500, (Math.random() - 0.5) * 2500 );
+            const scale = Math.random() * 500 + 400;
+            nebula.scale.set(scale, scale, 1);
+            scene.add(nebula);
+        }
+    }
+
+    function createSpaceStation() {
+        const earthData = celestialObjects.find(obj => obj.mesh.userData.id === 'earth');
+        if (!earthData) return;
+
+        const issPivot = new THREE.Object3D();
+        earthData.mesh.add(issPivot); // Bay quanh Trái Đất
+
+        const issMaterial = new THREE.SpriteMaterial({
+            map: textureLoader.load(assetPaths.vetinh),
+            blending: THREE.AdditiveBlending, // Làm cho nền đen của JPG trong suốt
+            transparent: true
+        });
+        const issSprite = new THREE.Sprite(issMaterial);
+        issSprite.scale.set(10, 10, 1); // Điều chỉnh kích thước
+        issSprite.position.x = earthData.mesh.geometry.parameters.radius + 12; // Quỹ đạo gần Trái Đất
+        issPivot.add(issSprite);
+
+        const lightTexture = createProceduralTexture((ctx, size) => {
+            const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+        });
+
+        const redLight = new THREE.Sprite(new THREE.SpriteMaterial({ map: lightTexture, color: 0xff0000, blending: THREE.AdditiveBlending }));
+        redLight.scale.set(0.5, 0.5, 1);
+        redLight.position.set(2, 1, 0.1);
+        issSprite.add(redLight);
+        
+        const whiteLight = new THREE.Sprite(new THREE.SpriteMaterial({ map: lightTexture, color: 0xffffff, blending: THREE.AdditiveBlending }));
+        whiteLight.scale.set(0.5, 0.5, 1);
+        whiteLight.position.set(-2, -1, 0.1);
+        issSprite.add(whiteLight);
+
+        spaceStationEffects = { pivot: issPivot, lights: [redLight, whiteLight] };
+    }
+
+    function createStarfield() { const starGeometry = new THREE.SphereGeometry(2000, 64, 64); const starMaterial = new THREE.MeshBasicMaterial({ map: textureLoader.load(assetPaths.stars), side: THREE.BackSide }); starfield = new THREE.Mesh(starGeometry, starMaterial); scene.add(starfield); }
+    function createSolarSystem() { celestialData.forEach(data => { const pivot = new THREE.Object3D(); scene.add(pivot); const geometry = new THREE.SphereGeometry(data.size, 64, 64); let material; if (data.type === 'star') { material = new THREE.MeshBasicMaterial({ map: textureLoader.load(data.texture) }); } else { material = new THREE.MeshStandardMaterial({ map: textureLoader.load(data.texture), roughness: 0.9, metalness: 0.1 }); } const mesh = new THREE.Mesh(geometry, material); mesh.position.x = data.orbitRadius; const spinPivot = new THREE.Object3D(); spinPivot.add(mesh); pivot.add(spinPivot); if (data.id === 'sun') { createSunEffects(mesh); } if (data.id === 'saturn') { createAsteroidBelt(data.size * 1.5, 15, 2000); } if (data.type === 'planet' || data.type === 'star') { mesh.userData = { ...data, mesh: mesh, isClickable: true }; } else { mesh.userData = { ...data, mesh: mesh, isClickable: false }; } celestialObjects.push({ mesh, pivot, spinPivot, orbitSpeed: data.orbitSpeed, spinSpeed: data.spinSpeed }); if (data.moons && data.moons.length > 0) { data.moons.forEach(moonData => { const moonPivot = new THREE.Object3D(); mesh.add(moonPivot); const moonGeometry = new THREE.SphereGeometry(moonData.size, 32, 32); const moonMaterial = new THREE.MeshStandardMaterial({ map: textureLoader.load(moonData.texture), roughness: 0.9, metalness: 0.1 }); const moonMesh = new THREE.Mesh(moonGeometry, moonMaterial); moonMesh.position.x = moonData.orbitRadius; moonMesh.userData = { ...moonData, isClickable: false }; const moonSpinPivot = new THREE.Object3D(); moonSpinPivot.add(moonMesh); moonPivot.add(moonSpinPivot); celestialObjects.push({ mesh: moonMesh, pivot: moonPivot, spinPivot: moonSpinPivot, orbitSpeed: moonData.orbitSpeed, spinSpeed: moonData.spinSpeed }); }); } }); }
+    
     function animate() {
-        requestAnimationFrame(animate); const delta = 0.01;
-        planetObjects.forEach(obj => { obj.mesh.rotation.y += obj.spinSpeed * delta; obj.pivot.rotation.y += obj.orbitSpeed * delta; });
+        requestAnimationFrame(animate);
+        const delta = 0.01;
+        const time = Date.now() * 0.001;
+
+        celestialObjects.forEach(obj => {
+            obj.pivot.rotation.y += (obj.orbitSpeed || 0) * delta;
+            obj.spinPivot.rotation.y += (obj.spinSpeed || 0) * delta;
+        });
+
+        if (sunEffects.corona) {
+            sunEffects.corona.material.rotation = time * 0.01;
+            const sunSize = celestialObjects[0].mesh.geometry.parameters.radius;
+            const flaresPositions = sunEffects.flares.geometry.attributes.position.array;
+            for (let i = 0; i < flaresPositions.length; i += 3) {
+                const vector = new THREE.Vector3(sunEffects.velocities[i], sunEffects.velocities[i+1], sunEffects.velocities[i+2]);
+                flaresPositions[i] += vector.x * 0.1;
+                flaresPositions[i+1] += vector.y * 0.1;
+                flaresPositions[i+2] += vector.z * 0.1;
+                const dist = new THREE.Vector3(flaresPositions[i], flaresPositions[i+1], flaresPositions[i+2]).length();
+                if (dist > sunSize * 1.5) {
+                    flaresPositions[i] = vector.x * (sunSize + Math.random() * 5);
+                    flaresPositions[i+1] = vector.y * (sunSize + Math.random() * 5);
+                    flaresPositions[i+2] = vector.z * (sunSize + Math.random() * 5);
+                }
+            }
+            sunEffects.flares.geometry.attributes.position.needsUpdate = true;
+        }
+
+        activeAsteroids.forEach(a => {
+            const positions = a.fireParticles.geometry.attributes.position.array;
+            const size = a.asteroid.geometry.parameters.radius;
+            for (let i = 0; i < positions.length; i += 3) {
+                positions[i] += a.velocities[i] * 0.1;
+                positions[i+1] += a.velocities[i+1] * 0.1;
+                positions[i+2] += a.velocities[i+2] * 0.1;
+                const dist = Math.sqrt(positions[i]**2 + positions[i+1]**2 + positions[i+2]**2);
+                if (dist > size * 2.5) {
+                    positions[i] = (Math.random() - 0.5) * size;
+                    positions[i+1] = (Math.random() - 0.5) * size;
+                    positions[i+2] = (Math.random() - 0.5) * size;
+                }
+            }
+            a.fireParticles.geometry.attributes.position.needsUpdate = true;
+        });
+        
+        activeComets.forEach(c => {
+            const particles = c.tail.geometry.attributes.position.array;
+            for (let i = 0; i < particles.length; i += 3) {
+                particles[i+2] -= Math.random() * 0.5;
+                if (particles[i+2] < -50) {
+                    particles[i] = (Math.random() - 0.5) * 2;
+                    particles[i+1] = (Math.random() - 0.5) * 2;
+                    particles[i+2] = Math.random() * 5;
+                }
+            }
+            c.tail.geometry.attributes.position.needsUpdate = true;
+        });
+
+        if (spaceStationEffects.pivot) {
+            spaceStationEffects.pivot.rotation.y += 0.005; // Tốc độ bay của trạm
+            spaceStationEffects.lights[0].visible = Math.sin(time * 5) > 0.5; // Đèn đỏ nháy chậm
+            spaceStationEffects.lights[1].visible = Math.sin(time * 10) > 0.5; // Đèn trắng nháy nhanh
+        }
+
         if (starfield) starfield.rotation.y -= 0.0001;
-        controls.update(); renderer.render(scene, camera);
+        if (followedObject) {
+            const targetPosition = new THREE.Vector3();
+            followedObject.getWorldPosition(targetPosition);
+            const desiredCameraPosition = targetPosition.clone().add(cameraOffset);
+            camera.position.lerp(desiredCameraPosition, 0.1);
+            controls.target.copy(targetPosition);
+        }
+        controls.update();
+        renderer.render(scene, camera);
     }
-
     function onWindowResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
-
-    function onClick(event) {
-        if (!infoCard.classList.contains('hidden') || !letterContainer.classList.contains('hidden') || isAnimatingCamera) return;
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1; mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(planetObjects.map(p => p.mesh));
-        if (intersects.length > 0) { showPlanetInfo(intersects[0].object.userData); }
-    }
-
-    function showPlanetInfo(data) {
-        if (isAnimatingCamera) return;
-        previousCameraState = { position: camera.position.clone(), target: controls.target.clone() };
-        const planetPosition = new THREE.Vector3(); data.mesh.getWorldPosition(planetPosition);
-        const direction = new THREE.Vector3().subVectors(camera.position, planetPosition).normalize();
-        const distance = data.size * 4;
-        const cameraTargetPosition = planetPosition.clone().add(direction.multiplyScalar(distance));
-        controls.minDistance = data.size * 2;
-        animateCamera(cameraTargetPosition, planetPosition);
-        infoCardTitle.textContent = data.name; infoCardFact.textContent = data.fact; infoCardMessage.textContent = data.message;
-        infoCard.style.setProperty('--glow-color', data.glowColor || '#fff');
-        const playerHeight = waveformControls.classList.contains('hidden') ? 0 : waveformControls.offsetHeight;
-        infoCard.style.bottom = `${playerHeight + 30}px`;
-        infoCard.classList.remove('hidden');
-    }
+    function onClick(event) { if (!infoCard.classList.contains('hidden') || !letterContainer.classList.contains('hidden') || isAnimatingCamera) return; mouse.x = (event.clientX / window.innerWidth) * 2 - 1; mouse.y = -(event.clientY / window.innerHeight) * 2 + 1; raycaster.setFromCamera(mouse, camera); const clickableObjects = celestialObjects.map(p => p.mesh).filter(m => m.userData.isClickable); const intersects = raycaster.intersectObjects(clickableObjects); if (intersects.length > 0) { showPlanetInfo(intersects[0].object.userData); } }
+    function showPlanetInfo(data) { if (isAnimatingCamera || followedObject) return; previousCameraState = { position: camera.position.clone(), target: controls.target.clone() }; const planetPosition = new THREE.Vector3(); data.mesh.getWorldPosition(planetPosition); const distance = data.size * 4; const direction = new THREE.Vector3().subVectors(camera.position, planetPosition).normalize(); const cameraTargetPosition = planetPosition.clone().add(direction.multiplyScalar(distance)); animateCamera(cameraTargetPosition, planetPosition, 1500, () => { followedObject = data.mesh; controls.minDistance = data.size * 1.5; controls.maxDistance = data.size * 10; cameraOffset.subVectors(camera.position, planetPosition); }); infoCardTitle.textContent = data.name; infoCardFact.textContent = data.fact; infoCardMessage.textContent = data.message; infoCard.style.setProperty('--glow-color', data.glowColor || '#fff'); const playerHeight = waveformControls.classList.contains('hidden') ? 0 : waveformControls.offsetHeight; infoCard.style.bottom = `${playerHeight + 30}px`; infoCard.classList.remove('hidden'); }
 
     // =================================================================
     // PHẦN 6: VÒNG LẶP CHÍNH VÀ KHỞI TẠO
     // =================================================================
-
-    let lastParticleTime = 0;
-    function mainLoop(timestamp) {
-        if (timestamp - lastParticleTime > config.particleInterval) { createTextParticle(); lastParticleTime = timestamp; }
-        requestAnimationFrame(mainLoop);
+    let lastParticleTime = 0; 
+    function mainLoop(timestamp) { 
+        if (timestamp - lastParticleTime > config.particleInterval) { 
+            createTextParticle(); 
+            lastParticleTime = timestamp; 
+        } 
+        requestAnimationFrame(mainLoop); 
     }
-
-    function init() {
-        runBirthdayCheck();
-        setupUIEventListeners();
-        initThreeJS();
-        createShootingStars(isMobile ? 3 : 5);
-        setupGyroControls();
-        setupMouseParallax();
-        requestAnimationFrame(mainLoop);
-        if (isBirthdayMode) { activateBirthdayMode(); } else { checkAndSetupLetterButton(); }
-        setTimeout(() => { loadingScreen.classList.add('loaded'); }, 3000);
+    function init() { 
+        runBirthdayCheck(); 
+        setupUIEventListeners(); 
+        initThreeJS(); 
+        setTimeout(() => { setInterval(createShootingStar, config.shootingStarInterval); }, 3000); 
+        setTimeout(() => { setInterval(createFieryAsteroid, config.asteroidInterval); }, 5000); 
+        setTimeout(() => { setInterval(createComet, config.cometInterval); }, 10000);
+        setupGyroControls(); 
+        setupMouseParallax(); 
+        requestAnimationFrame(mainLoop); 
+        if (isBirthdayMode) { activateBirthdayMode(); } else { checkAndSetupLetterButton(); } 
+        setTimeout(() => { loadingScreen.classList.add('loaded'); }, 3000); 
     }
-
     init();
 });
