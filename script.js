@@ -1140,7 +1140,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const planetPosition = new THREE.Vector3();
         clickedMesh.getWorldPosition(planetPosition);
-        data.mesh.getWorldPosition(planetPosition);
         
         const distance = data.size * 4;
         const direction = new THREE.Vector3().subVectors(camera.position, planetPosition).normalize();
@@ -1195,3 +1194,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     init();
 });
+
