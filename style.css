@@ -78,8 +78,8 @@ body.gyro-active::after { animation: none; }
 /* ======================================================= */
 /* 3. HIỆU ỨNG CHỮ RƠI "GALAXY" & CANVAS 3D              */
 /* ======================================================= */
-#webgl-canvas { position: fixed; top: 0; left: 0; outline: none; z-index: -10; }
-.galaxy-container { position: fixed; inset: 0; z-index: 1; pointer-events: none; perspective: 800px; transform-style: preserve-3d; }
+#webgl-canvas { position: fixed; top: 0; left: 0; outline: none; z-index: 1; }
+.galaxy-container { position: fixed; inset: 0; z-index: 0; pointer-events: none; perspective: 800px; transform-style: preserve-3d; }
 .text-particle { position: absolute; top: 0; color: #fff; font-size: 0.875rem; font-weight: 600; transform: translateX(-50%); width: max-content; text-align: center; padding: 8px 12px; border-radius: 8px; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(2px); text-shadow: 0 0 10px currentColor, 0 0 20px currentColor; pointer-events: auto; transition: transform 0.3s ease, text-shadow 0.3s ease; will-change: transform, opacity; cursor: default; }
 .text-particle:hover { transform: translateX(-50%) scale(1.1); text-shadow: 0 0 15px currentColor, 0 0 30px #fff; }
 .text-particle.love { color: #ff6b9d; } .text-particle.date { color: #c534ed; } .text-particle.special { color: #a8e6cf; } .text-particle.heart { color: #ff69b4; } .text-particle.birthday { color: #4ecdc4; }
