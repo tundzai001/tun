@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeInfoBtn = document.getElementById('close-info-btn');
     const canvas = document.getElementById('webgl-canvas');
     const letterContainer = document.getElementById('letter-container');
+    let preloadedNightlySong = { url: null, audio: null };
 
     // =================================================================
     // PHẦN 2: DỮ LIỆU CÁ NHÂN HÓA VÀ CÀI ĐẶT
@@ -239,7 +240,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================
     // PHẦN 3: CÁC HÀM TIỆN ÍCH VÀ HIỆU ỨNG
     // =================================================================
+    function checkAndPreloadNightlySong() {
+        const now = new Date();
+        // Chỉ thực hiện khi đến buổi tối (sau 10 giờ tối)
+        if (now.getHours() < 22) {
+            return;
+        }
 
+        const dailySongData = dailySongs.find(s => s.day === now.getDate());
+        
+        // Nếu có bài hát cho hôm nay và nó chưa được tải trước
+        if (dailySongData && dailySongData.song.file !== preloadedNightlySong.url) {
+            console.log(`Đang tải trước bài hát cho thư tối: ${dailySongData.song.title}`);
+            
+            const audioPreloader = new Audio();
+            audioPreloader.src = dailySongData.song.file;
+            audioPreloader.preload = 'auto'; // Yêu cầu trình duyệt tải về
+            
+            // Lưu lại thông tin bài hát đã được đưa vào hàng đợi tải
+            preloadedNightlySong = {
+                url: dailySongData.song.file,
+                audio: audioPreloader
+            };
+        }
+    }
     // --- SHADER CHO HIỆU ỨNG LỬA CỦA THIÊN THẠCH ---
     const fireVertexShader = `
         uniform float uTime;
@@ -645,8 +669,17 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!track || !track.file) { console.error("Lỗi: Đang cố gắng phát một bài hát không hợp lệ.", track); playNextInMix(); return; }
         if (!wavesurfer) {
             wavesurfer = WaveSurfer.create({
-                container: waveformContainer, waveColor: 'rgba(200, 200, 200, 0.5)', progressColor: '#ff6b9d',
-                height: 50, barWidth: 2, barRadius: 3, cursorWidth: 0, responsive: true, hideScrollbar: true, media: audio,
+                container: waveformContainer, 
+                waveColor: 'rgba(200, 200, 200, 0.5)', 
+                progressColor: '#ff6b9d',
+                height: 50, 
+                barWidth: 2, 
+                barRadius: 3, 
+                cursorWidth: 0, 
+                responsive: true, 
+                hideScrollbar: true, 
+                media: audio,
+                backend: 'MediaElement'
             });
             wavesurfer.on('finish', () => {
                 isLetterModeActive = false;
@@ -1040,6 +1073,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     function onWindowResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
     function onClick(event) {
+        if (!overlay.classList.contains('hidden-overlay')) return; 
         if (!infoCard.classList.contains('hidden') || !letterContainer.classList.contains('hidden') || isAnimatingCamera) return;
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1; 
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -1089,7 +1123,10 @@ document.addEventListener('DOMContentLoaded', function() {
         runBirthdayCheck(); 
         setupUIEventListeners(); 
         initThreeJS(); 
-        setTimeout(() => setInterval(createShootingStar, config.shootingStarInterval), 3000); 
+        checkAndPreloadNightlySong(); // Chạy 1 lần ngay lúc đầu
+        setInterval(checkAndPreloadNightlySong, 60000); // Lặp lại mỗi phút
+
+        setTimeout(() => setInterval(createShootingStar, 4000 + Math.random() * 3000), 3000); 
         setTimeout(() => setInterval(createFieryAsteroid, config.asteroidInterval), 5000); 
         setTimeout(() => setInterval(createComet, config.cometInterval), 10000);
         setupGyroControls(); 
