@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================
     // PHẦN 2: DỮ LIỆU CÁ NHÂN HÓA VÀ CÀI ĐẶT
     // =================================================================
-
     /* --- DỮ LIỆU SINH NHẬT --- */
     const birthdayData = { 
         day: 9, 
@@ -225,117 +224,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const birthdayMessages = ["Happy Birthday!", "Chúc mừng sinh nhật!", "🎂", "🎉", "Tuổi mới vui vẻ!"];
     
     /* --- CÁC THÔNG ĐIỆP SAO BĂNG CỦA BẠN Ở ĐÂY --- */
-    const shootingStarMessages = [ /* ... */ ];
+    const shootingStarMessages = [ 
+        "Yêu tổ quốc, yêu đồng bào", 
+        "Học tập tốt, lao động tốt", 
+        "Đoàn kết tốt, kỷ luật tốt", 
+        "Giữ gìn vệ sinh thật tốt", 
+        "Khiêm tốn, thật thà, dũng cảm",
+    ];
     
-    // Cấu hình và các biến trạng thái khác
+
+    // Cấu hình tần suất sự kiện ngẫu nhiên
     const isHighEndDevice = !window.matchMedia("(max-width: 768px)").matches;
-    const config = { maxParticles: isHighEndDevice ? 70 : 30, particleInterval: isHighEndDevice ? 150 : 300, shootingStarInterval: isHighEndDevice ? 1200 : 2500, asteroidInterval: isHighEndDevice ? 9000 : 16000, cometInterval: isHighEndDevice ? 20000 : 35000 };
+    const config = { 
+        maxParticles: isHighEndDevice ? 70 : 30, 
+        particleInterval: isHighEndDevice ? 150 : 300, 
+        shootingStarInterval: isHighEndDevice ? 800 : 1500,
+        asteroidInterval: isHighEndDevice ? 7000 : 12000,
+        cometInterval: isHighEndDevice ? 15000 : 25000
+    };
+
     const heartSymbols = ["♥", "💖", "💕", "🌟", "✨"]; 
     const textStyles = ['love', 'date', 'special']; 
     const activeParticles = new Set();
-    let upNextPlaylist = []; let upNextIndex = 0; let isBirthdayMode = false; let isLetterModeActive = false; let typingInterval = null; let wavesurfer; let scene, camera, renderer, controls; let starfield; const celestialObjects = []; const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2(); const textureLoader = new THREE.TextureLoader(); let isAnimatingCamera = false; let previousCameraState = null; let followedObject = null; let cameraOffset = new THREE.Vector3(); let activeAsteroids = []; let activeComets = []; let sunEffects = {};
+    let upNextPlaylist = []; let upNextIndex = 0; let isBirthdayMode = false; let isLetterModeActive = false; let typingInterval = null; let wavesurfer; let scene, camera, renderer, controls; let starfield; const celestialObjects = []; const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2(); const textureLoader = new THREE.TextureLoader(); let isAnimatingCamera = false; let followedObject = null; let cameraOffset = new THREE.Vector3(); let activeAsteroids = []; let activeComets = []; let sunEffects = {};
     let spaceStationEffects = {};
     const clock = new THREE.Clock();
 
     // =================================================================
     // PHẦN 3: CÁC HÀM TIỆN ÍCH VÀ HIỆU ỨNG
     // =================================================================
-    function checkAndPreloadNightlySong() {
-        const now = new Date();
-        // Chỉ thực hiện khi đến buổi tối (sau 10 giờ tối)
-        if (now.getHours() < 22) {
-            return;
-        }
-
-        const dailySongData = dailySongs.find(s => s.day === now.getDate());
-        
-        // Nếu có bài hát cho hôm nay và nó chưa được tải trước
-        if (dailySongData && dailySongData.song.file !== preloadedNightlySong.url) {
-            console.log(`Đang tải trước bài hát cho thư tối: ${dailySongData.song.title}`);
-            
-            const audioPreloader = new Audio();
-            audioPreloader.src = dailySongData.song.file;
-            audioPreloader.preload = 'auto'; // Yêu cầu trình duyệt tải về
-            
-            // Lưu lại thông tin bài hát đã được đưa vào hàng đợi tải
-            preloadedNightlySong = {
-                url: dailySongData.song.file,
-                audio: audioPreloader
-            };
-        }
-    }
-    // --- SHADER CHO HIỆU ỨNG LỬA CỦA THIÊN THẠCH ---
-    const fireVertexShader = `
-        uniform float uTime;
-        attribute float aSize;
-        attribute vec3 aColor; // Màu cơ bản (không dùng trực tiếp, nhưng giữ lại)
-        attribute float aLifetime;
-
-        varying vec3 vColor;
-        varying float vLifetimeRatio;
-
-        // Hàm giả lập nhiễu 3D đơn giản để tạo sự hỗn loạn
-        float pseudoNoise(vec3 p) {
-            return sin(p.x * 5.0 + uTime * 2.0) * cos(p.y * 5.0 + uTime * 2.0) * sin(p.z * 5.0 + uTime * 2.0);
-        }
-
-        void main() {
-            // Tính toán vòng đời của hạt, tương tự như trước
-            float lifeProgress = mod(uTime * 0.8, aLifetime) / aLifetime;
-            vLifetimeRatio = 1.0 - lifeProgress;
-
-            vec3 newPosition = position;
-            
-            // 1. Thêm nhiễu loạn (turbulence) để di chuyển tự nhiên hơn
-            // Hạt sẽ bị đẩy theo một hướng ngẫu nhiên, uốn lượn thay vì đi thẳng
-            float noise = pseudoNoise(position) * 0.8;
-            vec3 turbulence = vec3(
-                sin(position.y * 2.0 + uTime),
-                cos(position.x * 2.0 + uTime),
-                sin(position.z * 2.0 + uTime)
-            ) * noise;
-
-            // 2. Kết hợp di chuyển ra ngoài, lực nhiễu loạn và một chút trọng lực giả
-            newPosition += (normalize(position) * 1.5 + turbulence) * lifeProgress * 5.0;
-
-            vec4 modelPosition = modelMatrix * vec4(newPosition, 1.0);
-            vec4 viewPosition = viewMatrix * modelPosition;
-            vec4 projectionPosition = projectionMatrix * viewPosition;
-
-            gl_Position = projectionPosition;
-
-            // 3. Kích thước hạt lấp lánh và nhỏ dần khi chết
-            float flicker = 1.0 + sin(uTime * 25.0 + position.x * 10.0) * 0.1; // Hiệu ứng lấp lánh
-            gl_PointSize = aSize * vLifetimeRatio * flicker * 400.0 / -viewPosition.z;
-        }
-    `;
-
-    const fireFragmentShader = `
-        varying float vLifetimeRatio; // Chỉ cần tỉ lệ vòng đời, màu sẽ được tính toán ở đây
-
-        void main() {
-            // 1. Tạo hình dạng hạt giống tia lửa (sắc nét ở tâm, mờ dần ra ngoài)
-            float dist = distance(gl_PointCoord, vec2(0.5));
-            // Dùng hàm pow để tạo ra một điểm sáng gắt ở trung tâm
-            float mask = 1.0 - pow(dist * 2.0, 3.0); 
-            if (mask < 0.0) discard; // Bỏ qua các pixel bên ngoài vòng tròn
-
-            // 2. Màu sắc thay đổi theo vòng đời
-            // Bắt đầu từ màu vàng trắng nóng bỏng (khi vLifetimeRatio ~ 1.0)
-            // Chuyển dần sang màu cam/đỏ nguội (khi vLifetimeRatio ~ 0.0)
-            vec3 hotColor = vec3(1.0, 0.9, 0.5); // Vàng trắng
-            vec3 coolColor = vec3(0.9, 0.2, 0.0); // Đỏ cam
-            vec3 finalColor = mix(coolColor, hotColor, vLifetimeRatio);
-
-            // 3. Độ trong suốt mờ dần nhanh hơn ở cuối đời
-            // Dùng pow để alpha giảm không đều, tạo cảm giác "phụt tắt"
-            float alpha = pow(vLifetimeRatio, 2.0) * mask;
-            
-            // Kết hợp màu sắc và độ trong suốt
-            gl_FragColor = vec4(finalColor, alpha);
-        }
-    `;
-
+    
     function createProceduralTexture(gradientCallback, size = 256) {
         const canvas = document.createElement('canvas');
         canvas.width = size;
@@ -346,87 +264,79 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function createFieryAsteroid() {
+        if (!assetPaths || !assetPaths.asteroid) {
+            console.error("Lỗi: assetPaths.asteroid chưa được định nghĩa!");
+            return;
+        }
+
+        const asteroidGroup = new THREE.Group();
         const size = Math.random() * 2 + 1;
-        const geometry = new THREE.DodecahedronGeometry(size, 1);
-        
-        // Tạo lõi thiên thạch
+
+        const coreGeometry = new THREE.DodecahedronGeometry(size, 1);
         const coreMaterial = new THREE.MeshStandardMaterial({
             map: textureLoader.load(assetPaths.asteroid),
             emissive: 0xff6a00,
-            emissiveIntensity: 1.5
+            emissiveIntensity: 1.5,
+            roughness: 1
         });
-        const asteroid = new THREE.Mesh(geometry, coreMaterial);
+        const asteroidCore = new THREE.Mesh(coreGeometry, coreMaterial);
+        asteroidGroup.add(asteroidCore);
 
-        // Tạo các hạt lửa bằng ShaderMaterial
-        const particleCount = 1000;
+        const particleCount = 700;
         const particlesGeometry = new THREE.BufferGeometry();
         const posArray = new Float32Array(particleCount * 3);
-        const colorArray = new Float32Array(particleCount * 3);
-        const sizeArray = new Float32Array(particleCount);
-        const lifetimeArray = new Float32Array(particleCount);
-
-        const colorInside = new THREE.Color(0xffff00);
-        const colorOutside = new THREE.Color(0xff4500);
+        const particleVelocities = [];
 
         for (let i = 0; i < particleCount; i++) {
-            const i3 = i * 3;
-            // Vị trí ban đầu của hạt trên bề mặt thiên thạch
-            const vertex = new THREE.Vector3(
-                (Math.random() - 0.5),
-                (Math.random() - 0.5),
-                (Math.random() - 0.5)
-            ).normalize().multiplyScalar(size * (Math.random() * 0.2 + 0.9));
-
-            posArray[i3] = vertex.x;
-            posArray[i3 + 1] = vertex.y;
-            posArray[i3 + 2] = vertex.z;
-            
-            const mixedColor = colorInside.clone().lerp(colorOutside, Math.random());
-            colorArray[i3] = mixedColor.r;
-            colorArray[i3 + 1] = mixedColor.g;
-            colorArray[i3 + 2] = mixedColor.b;
-
-            sizeArray[i] = Math.random() * 0.1 + 0.05;
-            lifetimeArray[i] = Math.random() * 1.5 + 0.5; // Mỗi hạt có vòng đời khác nhau
+            const vertex = new THREE.Vector3((Math.random() - 0.5) * size, (Math.random() - 0.5) * size, (Math.random() - 0.5) * size);
+            vertex.toArray(posArray, i * 3);
+            particleVelocities.push(new THREE.Vector3((Math.random() - 0.5) * 0.1, (Math.random() - 0.5) * 0.1, (Math.random() - 0.5) * 0.1));
         }
-
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        particlesGeometry.setAttribute('aColor', new THREE.BufferAttribute(colorArray, 3));
-        particlesGeometry.setAttribute('aSize', new THREE.BufferAttribute(sizeArray, 1));
-        particlesGeometry.setAttribute('aLifetime', new THREE.BufferAttribute(lifetimeArray, 1));
 
-        const fireMaterial = new THREE.ShaderMaterial({
-            vertexShader: fireVertexShader,
-            fragmentShader: fireFragmentShader,
+        const particleTexture = createProceduralTexture((ctx, canvasSize) => {
+            const gradient = ctx.createRadialGradient(canvasSize / 2, canvasSize / 2, 0, canvasSize / 2, canvasSize / 2, canvasSize / 2);
+            gradient.addColorStop(0, 'rgba(255, 220, 150, 1)');
+            gradient.addColorStop(0.3, 'rgba(255, 150, 0, 0.8)');
+            gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvasSize, canvasSize);
+        });
+
+        const particleMaterial = new THREE.PointsMaterial({
+            map: particleTexture,
+            size: 0.5,
             blending: THREE.AdditiveBlending,
             transparent: true,
             depthWrite: false,
-            uniforms: {
-                uTime: { value: 0.0 }
-            }
         });
 
-        const fireParticles = new THREE.Points(particlesGeometry, fireMaterial);
-        asteroid.add(fireParticles);
+        const fireParticles = new THREE.Points(particlesGeometry, particleMaterial);
+        asteroidGroup.add(fireParticles);
 
         const spawnRadius = 800;
         const startX = (Math.random() - 0.5) * spawnRadius * 2;
         const startY = (Math.random() - 0.5) * spawnRadius;
         const startZ = (Math.random() - 0.5) * spawnRadius * 2;
-        asteroid.position.set(startX, startY, startZ);
-        scene.add(asteroid);
+        asteroidGroup.position.set(startX, startY, startZ);
+        scene.add(asteroidGroup);
 
         const duration = Math.random() * 10 + 10;
-        gsap.to(asteroid.position, {
+        gsap.to(asteroidGroup.position, {
             x: -startX, y: -startY, z: -startZ,
             duration: duration, ease: "none",
             onComplete: () => {
-                scene.remove(asteroid);
-                activeAsteroids = activeAsteroids.filter(a => a.asteroid !== asteroid);
+                scene.remove(asteroidGroup);
+                activeAsteroids = activeAsteroids.filter(a => a.group !== asteroidGroup);
             }
         });
 
-        activeAsteroids.push({ asteroid, fireMaterial });
+        activeAsteroids.push({
+            group: asteroidGroup,
+            particles: fireParticles,
+            velocities: particleVelocities,
+            coreSize: size
+        });
     }
 
     function createComet() {
@@ -437,9 +347,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const particleCount = 1000;
         const particlesGeometry = new THREE.BufferGeometry();
         const posArray = new Float32Array(particleCount * 3);
-        for (let i = 0; i < particleCount; i++) {
-            posArray[i * 3] = 0; posArray[i * 3 + 1] = 0; posArray[i * 3 + 2] = 0;
-        }
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
 
         const cometParticleTexture = createProceduralTexture((ctx, size) => {
@@ -504,7 +411,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const distance = window.innerWidth * 1.2;
         const endX = startX + Math.cos(angle * Math.PI / 180) * distance;
         const endY = startY + Math.sin(angle * Math.PI / 180) * distance;
-        const duration = Math.random() * 3000 + 2000;
+        const duration = Math.random() * 3000 + 4000;
         star.style.transform = `translate(${startX}px, ${startY}px) rotate(${angle}deg)`;
         const animation = star.animate(
             [{ transform: `translate(${startX}px, ${startY}px) rotate(${angle}deg)`, opacity: 0 }, { opacity: 1, offset: 0.1 }, { opacity: 0, offset: 0.9 }, { transform: `translate(${endX}px, ${endY}px) rotate(${angle}deg)`, opacity: 0 }], 
@@ -527,22 +434,25 @@ document.addEventListener('DOMContentLoaded', function() {
     function animateCamera(targetPosition, targetLookAt, duration = 1.5, onComplete = null) {
         if (isAnimatingCamera) return;
         isAnimatingCamera = true;
-        
-        gsap.to(camera.position, {
-            x: targetPosition.x, y: targetPosition.y, z: targetPosition.z,
-            duration: duration, ease: "power3.inOut",
-            onUpdate: () => controls.target.lerp(targetLookAt, 0.1),
+        controls.enabled = false;
+
+        const tl = gsap.timeline({
             onComplete: () => {
-                controls.target.copy(targetLookAt);
                 isAnimatingCamera = false;
+                controls.enabled = true;
                 if (onComplete) onComplete();
             }
         });
 
-        gsap.to(controls.target, {
+        tl.to(camera.position, {
+            x: targetPosition.x, y: targetPosition.y, z: targetPosition.z,
+            duration: duration, ease: "power3.inOut"
+        }, 0);
+
+        tl.to(controls.target, {
             x: targetLookAt.x, y: targetLookAt.y, z: targetLookAt.z,
             duration: duration, ease: "power3.inOut"
-        });
+        }, 0);
     }
 
     function createTextParticle() {
@@ -594,10 +504,26 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
+    
+    function checkAndPreloadNightlySong() {
+        const now = new Date();
+        if (now.getHours() < 22) return;
 
+        const dailySongData = dailySongs.find(s => s.day === now.getDate());
+        
+        if (dailySongData && dailySongData.song.file !== preloadedNightlySong.url) {
+            console.log(`Đang tải trước bài hát cho thư tối: ${dailySongData.song.title}`);
+            const audioPreloader = new Audio();
+            audioPreloader.src = dailySongData.song.file;
+            audioPreloader.preload = 'auto';
+            preloadedNightlySong = { url: dailySongData.song.file, audio: audioPreloader };
+        }
+    }
+    
     // =================================================================
     // PHẦN 4: LOGIC GIAO DIỆN NGƯỜI DÙNG (UI)
     // =================================================================
+    
     function typewriterEffect(elementsToType, onComplete = () => {}) {
         if (typingInterval) clearInterval(typingInterval);
         let elementIndex = 0; let charIndex = 0;
@@ -669,17 +595,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!track || !track.file) { console.error("Lỗi: Đang cố gắng phát một bài hát không hợp lệ.", track); playNextInMix(); return; }
         if (!wavesurfer) {
             wavesurfer = WaveSurfer.create({
-                container: waveformContainer, 
-                waveColor: 'rgba(200, 200, 200, 0.5)', 
-                progressColor: '#ff6b9d',
-                height: 50, 
-                barWidth: 2, 
-                barRadius: 3, 
-                cursorWidth: 0, 
-                responsive: true, 
-                hideScrollbar: true, 
-                media: audio,
-                backend: 'MediaElement'
+                container: waveformContainer, waveColor: 'rgba(200, 200, 200, 0.5)', progressColor: '#ff6b9d',
+                height: 50, barWidth: 2, barRadius: 3, cursorWidth: 0, responsive: true, hideScrollbar: true, media: audio, backend: 'MediaElement'
             });
             wavesurfer.on('finish', () => {
                 isLetterModeActive = false;
@@ -821,17 +738,26 @@ document.addEventListener('DOMContentLoaded', function() {
             settingsToggleBtn.classList.remove('hidden');
             adjustLetterButtonPosition();
         };
-        overlay.addEventListener('click', startAudio, { once: true });
+
+        overlay.addEventListener('click', (event) => {
+            event.stopPropagation();
+            startAudio();
+        }, { once: true });
+
         closeInfoBtn.addEventListener('click', () => {
             infoCard.classList.add('hidden');
             followedObject = null;
-            if (previousCameraState && !isAnimatingCamera) {
-                animateCamera(previousCameraState.position, previousCameraState.target, 1.2, () => {
-                    previousCameraState = null;
-                    controls.minDistance = 20; controls.maxDistance = 1200;
-                });
-            }
+            controls.enablePan = true;
+
+            const overviewPosition = new THREE.Vector3(0, 150, 350); 
+            const overviewTarget = new THREE.Vector3(0, 0, 0);
+
+            animateCamera(overviewPosition, overviewTarget, 1.5, () => {
+                 controls.minDistance = 20;
+                 controls.maxDistance = 1200;
+            });
         });
+
         nextBtn.addEventListener('click', playNextInMix);
         prevBtn.addEventListener('click', playPrevInMix);
         playPauseBtn.addEventListener('click', () => wavesurfer?.playPause());
@@ -850,9 +776,11 @@ document.addEventListener('DOMContentLoaded', function() {
         settingsToggleBtn.addEventListener('click', () => settingsPanel.classList.toggle('hidden'));
         volumeSlider.addEventListener('input', e => wavesurfer?.setVolume(e.target.value));
     }
+
     // =================================================================
     // PHẦN 5: THẾ GIỚI 3D (THREE.JS)
     // =================================================================
+    
     function initThreeJS() {
         scene = new THREE.Scene(); 
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
@@ -867,6 +795,12 @@ document.addEventListener('DOMContentLoaded', function() {
         controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true; controls.dampingFactor = 0.05; 
         controls.minDistance = 20; controls.maxDistance = 1200;
+
+        controls.enablePan = true;
+        controls.panSpeed = 0.8;
+        controls.enableZoom = true;
+        controls.zoomSpeed = 0.8;
+        controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
 
         createStarfield(); 
         createSolarSystem(); 
@@ -934,14 +868,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const earthData = celestialObjects.find(obj => obj.mesh.userData.id === 'earth');
         if (!earthData) return;
         const issPivot = new THREE.Object3D();
-        earthData.pivot.add(issPivot); // Bay quanh tâm hệ mặt trời cùng Trái Đất
+        earthData.pivot.add(issPivot);
         
         const issMaterial = new THREE.SpriteMaterial({ map: textureLoader.load(assetPaths.vetinh), blending: THREE.AdditiveBlending, transparent: true });
         const issSprite = new THREE.Sprite(issMaterial);
-        issSprite.scale.set(10, 10, 1);
+        issSprite.scale.set(18, 18, 1);
         issSprite.position.x = earthData.mesh.geometry.parameters.radius + 12;
         
-        const stationOrbitPivot = new THREE.Object3D(); // Pivot để trạm tự quay quanh TĐ
+        const stationOrbitPivot = new THREE.Object3D();
         stationOrbitPivot.add(issSprite);
         issPivot.add(stationOrbitPivot);
 
@@ -991,6 +925,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 : new THREE.MeshStandardMaterial({ map: textureLoader.load(data.texture), roughness: 0.9, metalness: 0.1 });
             
             const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.x = data.orbitRadius;
             const spinPivot = new THREE.Object3D();
             spinPivot.add(mesh);
             pivot.add(spinPivot);
@@ -1007,13 +942,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     const moonGeometry = new THREE.SphereGeometry(moonData.size, 32, 32);
                     const moonMaterial = new THREE.MeshStandardMaterial({ map: textureLoader.load(moonData.texture), roughness: 0.9 });
                     const moonMesh = new THREE.Mesh(moonGeometry, moonMaterial);
+                    moonMesh.position.x = moonData.orbitRadius;
                     moonMesh.userData = { ...moonData, isClickable: false };
                     const moonSpinPivot = new THREE.Object3D(); moonSpinPivot.add(moonMesh); moonPivot.add(moonSpinPivot);
                     celestialObjects.push({ mesh: moonMesh, pivot: moonPivot, spinPivot: moonSpinPivot, orbitSpeed: moonData.orbitSpeed, spinSpeed: moonData.spinSpeed });
                 });
             }
         });
-        createSpaceStation(); // Gọi sau khi Trái Đất đã được tạo
+        createSpaceStation();
     }
     
     function animate() {
@@ -1022,20 +958,33 @@ document.addEventListener('DOMContentLoaded', function() {
         const delta = clock.getDelta();
 
         celestialObjects.forEach(obj => {
-            obj.spinPivot.rotation.y += (obj.spinSpeed || 0) * delta;
-            if (obj.mesh.userData.orbitRadius > 0 && obj.orbitSpeed) {
-                const time = elapsedTime * 0.1 * obj.orbitSpeed;
-                const radius = obj.mesh.userData.orbitRadius;
-                const positionOnPivot = new THREE.Vector3(Math.cos(time) * radius, 0, Math.sin(time) * radius * 1.1);
-                obj.spinPivot.position.copy(positionOnPivot);
+            if (obj.pivot) {
+                obj.pivot.rotation.y += (obj.orbitSpeed || 0) * 0.1 * delta;
+            }
+            if (obj.spinPivot) {
+                obj.spinPivot.rotation.y += (obj.spinSpeed || 0) * delta;
             }
         });
 
         if (sunEffects.corona) sunEffects.corona.material.rotation = elapsedTime * 0.01;
         
         activeAsteroids.forEach(a => {
-            a.fireMaterial.uniforms.uTime.value = elapsedTime;
-            a.asteroid.rotation.y += 0.01;
+            const positions = a.particles.geometry.attributes.position.array;
+            for (let i = 0; i < a.velocities.length; i++) {
+                const i3 = i * 3;
+                positions[i3] += a.velocities[i].x;
+                positions[i3 + 1] += a.velocities[i].y;
+                positions[i3 + 2] += a.velocities[i].z;
+
+                const dist = Math.sqrt(positions[i3]**2 + positions[i3+1]**2 + positions[i3+2]**2);
+                if (dist > a.coreSize * 2.5) {
+                    positions[i3] = (Math.random() - 0.5) * a.coreSize;
+                    positions[i3+1] = (Math.random() - 0.5) * a.coreSize;
+                    positions[i3+2] = (Math.random() - 0.5) * a.coreSize;
+                }
+            }
+            a.particles.geometry.attributes.position.needsUpdate = true;
+            a.group.rotation.y += 0.005;
         });
         
         activeComets.forEach(c => {
@@ -1071,20 +1020,27 @@ document.addEventListener('DOMContentLoaded', function() {
         controls.update();
         renderer.render(scene, camera);
     }
-    function onWindowResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
+
+    function onWindowResize() { 
+        camera.aspect = window.innerWidth / window.innerHeight; 
+        camera.updateProjectionMatrix(); 
+        renderer.setSize(window.innerWidth, window.innerHeight); 
+    }
+
     function onClick(event) {
-        if (!overlay.classList.contains('hidden-overlay')) return; 
         if (!infoCard.classList.contains('hidden') || !letterContainer.classList.contains('hidden') || isAnimatingCamera) return;
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1; 
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(mouse, camera);
         const clickableObjects = celestialObjects.map(p => p.mesh).filter(m => m.userData.isClickable);
-        const intersects = raycaster.intersectObjects(clickableObjects, true); // true để kiểm tra cả children
+        const intersects = raycaster.intersectObjects(clickableObjects, true);
         if (intersects.length > 0) showPlanetInfo(intersects[0].object.userData);
     }
+
     function showPlanetInfo(data) {
         if (isAnimatingCamera || followedObject) return;
-        previousCameraState = { position: camera.position.clone(), target: controls.target.clone() };
+        
+        controls.enablePan = false; 
         
         const planetPosition = new THREE.Vector3();
         data.mesh.getWorldPosition(planetPosition);
@@ -1123,12 +1079,17 @@ document.addEventListener('DOMContentLoaded', function() {
         runBirthdayCheck(); 
         setupUIEventListeners(); 
         initThreeJS(); 
-        checkAndPreloadNightlySong(); // Chạy 1 lần ngay lúc đầu
-        setInterval(checkAndPreloadNightlySong, 60000); // Lặp lại mỗi phút
+        
+        checkAndPreloadNightlySong();
+        setInterval(checkAndPreloadNightlySong, 60000);
 
-        setTimeout(() => setInterval(createShootingStar, 4000 + Math.random() * 3000), 3000); 
-        setTimeout(() => setInterval(createFieryAsteroid, config.asteroidInterval), 5000); 
+        setTimeout(() => setInterval(createShootingStar, config.shootingStarInterval), 3000); 
+        setTimeout(() => {
+            createFieryAsteroid();
+            setInterval(createFieryAsteroid, config.asteroidInterval);
+        }, 8000);
         setTimeout(() => setInterval(createComet, config.cometInterval), 10000);
+        
         setupGyroControls(); 
         setupMouseParallax(); 
         requestAnimationFrame(mainLoop); 
