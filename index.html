@@ -2,60 +2,32 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Our Universe</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Our Little Galaxy</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-
-    <!-- Màn hình chờ -->
-    <div id="loading-screen">
-        <p>Đang tải đến vũ trụ của chúng ta...</p>
-        <div class="heart-loader"></div>
-    </div>
-
-    <!-- Lớp phủ yêu cầu bật nhạc -->
-    <div id="music-overlay">
-        <div class="overlay-content">
-            <p> chạm để bắt đầu </p>
-        </div>
-    </div>
-    
     <!-- Canvas cho thế giới 3D -->
     <canvas id="webgl-canvas"></canvas>
 
-    <!-- Lớp chứa các hiệu ứng chữ rơi -->
-    <div class="galaxy-container" id="galaxy"></div>
-    
-    <!-- Lớp phủ chúc mừng sinh nhật -->
-    <div id="birthday-celebration" class="hidden">
-        <h1>Happy Birthday!</h1>
+    <!-- Container cho hiệu ứng chữ rơi 2D -->
+    <div id="galaxy" class="galaxy-container"></div>
+
+    <!-- Màn hình chờ & tải tài nguyên -->
+    <div id="loading-screen">
+        <p>Đang tải vũ trụ của chúng mình...</p>
+        <div class="heart-loader"></div>
     </div>
 
-    <!-- Thẻ thông tin hành tinh -->
-    <div id="planet-info-card" class="hidden">
-        <button id="close-info-btn">&times;</button>
-        <h2 id="info-card-title"></h2>
-        <p id="info-card-fact"></p>
-        <p id="info-card-message"></p>
-    </div>
-
-    <!-- Nút mở thư/sự kiện đặc biệt -->
-    <button id="special-day-btn" class="hidden">
-        <span class="sparkle-icon">✨</span>
-    </button>
-    
-    <!-- Khung hiển thị thư -->
-    <div id="letter-container" class="hidden">
-        <div class="letter-content">
-            <!-- Nội dung thư sẽ được JS chèn vào đây -->
+    <!-- Lớp phủ yêu cầu tương tác để bật nhạc -->
+    <div id="music-overlay" class="">
+        <div class="overlay-content">
+            <p>Chạm để lắng nghe...</p>
         </div>
     </div>
 
-    <!-- Bảng điều khiển trình phát nhạc -->
+    <!-- Giao diện trình phát nhạc -->
     <div id="waveform-controls" class="hidden">
         <div id="waveform"></div>
         <div class="timing">
@@ -65,31 +37,56 @@
         <div class="song-info">
             <span id="song-title"></span>
             <div class="controls-buttons">
-                <button id="prev-btn">⏮</button>
-                <button id="play-pause-btn">▶</button>
-                <button id="next-btn">⏭</button>
+                <button id="prev-btn" title="Bài trước">«</button>
+                <button id="play-pause-btn" title="Phát/Tạm dừng">▶</button>
+                <button id="next-btn" title="Bài kế tiếp">»</button>
+                <button id="favorite-btn" title="Yêu thích">♥</button>
             </div>
-            <button id="favorite-btn">❤</button>
         </div>
     </div>
+    
+    <!-- Nút mở thư / sự kiện đặc biệt -->
+    <button id="special-day-btn" class="hidden">
+        <span class="sparkle-icon"></span>
+    </button>
+    
+    <!-- Lớp phủ chúc mừng sinh nhật -->
+    <div id="birthday-celebration" class="hidden">
+        <h1>Happy Birthday!</h1>
+    </div>
 
+    <!-- Bảng thông tin hành tinh -->
+    <div id="planet-info-card" class="hidden">
+        <button id="close-info-btn">×</button>
+        <h2 id="info-card-title"></h2>
+        <p id="info-card-fact"></p>
+        <p id="info-card-message"></p>
+    </div>
+
+    <!-- Container hiển thị thư -->
+    <div id="letter-container" class="hidden">
+        <div class="letter-content">
+            <!-- Nội dung thư sẽ được JS chèn vào đây -->
+        </div>
+    </div>
+    
     <!-- Nút và bảng cài đặt -->
     <button id="settings-toggle-btn" class="hidden">⚙️</button>
     <div id="settings-panel" class="hidden">
         <div class="setting-item">
             <label for="volume-slider">Âm lượng</label>
-            <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.5">
+            <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.8">
         </div>
     </div>
 
-    <!-- Thẻ audio ẩn -->
-    <audio id="bg-music" crossOrigin="anonymous"></audio>
-    
-    <!-- CÁC THƯ VIỆN JAVASCRIPT -->
-    <script src="https://unpkg.com/wavesurfer.js@7"></script>
+    <!-- Element âm thanh -->
+    <audio id="bg-music" crossorigin="anonymous"></audio>
+
+    <!-- Thư viện của bên thứ ba -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/5.2.0/wavesurfer.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
 
     <!-- Tệp script chính của bạn -->
     <script src="script.js"></script>
