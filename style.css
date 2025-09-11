@@ -1,99 +1,152 @@
 /* ======================================================= */
-/* 1. THIẾT LẬP CHUNG VÀ RESET                            */
+/* 1. THIẾT LẬP CHUNG & RESET                            */
 /* ======================================================= */
 :root {
-    --parallax-x-far: 0px; --parallax-x-mid: 0px; --parallax-x-near: 0px;
-    --gyro-rotate-x: 0deg; --gyro-rotate-y: 0deg;
+    /* Biến cho hiệu ứng parallax khi di chuột */
+    --parallax-x-far: 0px;
+    --parallax-x-mid: 0px;
+    --parallax-x-near: 0px;
+    /* Biến cho hiệu ứng con quay hồi chuyển trên điện thoại */
+    --gyro-rotate-x: 0deg;
+    --gyro-rotate-y: 0deg;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html, body {
-    width: 100%; height: 100%; position: fixed; overflow: hidden;
-    -webkit-overflow-scrolling: touch; overscroll-behavior: none;
-    -webkit-user-select: none; user-select: none;
-}
-body .hidden, [hidden] { display: none !important; }
 
-/* ======================================================= */
-/* 2. CÁC LỚP NỀN VŨ TRỤ & SAO BĂNG                      */
-/* ======================================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    position: fixed; /* Ngăn cuộn trang */
+    overflow: hidden;
+    -webkit-user-select: none; /* Chặn chọn văn bản */
+    user-select: none;
+    touch-action: none; /* Tối ưu hóa cho cảm ứng */
+    -webkit-tap-highlight-color: transparent;
+}
+
 body {
     background-color: #000;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-    cursor: default; touch-action: none; -webkit-tap-highlight-color: transparent; position: relative;
-    /* Ảnh nền tĩnh sẽ không còn cần thiết nếu dùng nền 3D, nhưng giữ lại làm fallback */
-    background-image: url('images/stars.jpg');
-    background-size: cover;
-    background-position: center center;
-    background-attachment: fixed;
-}
-body::before {
-    content: ''; position: absolute; inset: 0;
-    background-image: radial-gradient(1px 1px at 20px 30px, #eee, transparent), radial-gradient(1px 1px at 40px 70px, #fff, transparent), radial-gradient(1px 1px at 50px 160px, #ddd, transparent), radial-gradient(1px 1px at 90px 40px, #fff, transparent), radial-gradient(2px 2px at 150px 120px, #fff, transparent);
-    background-size: 200px 200px; z-index: -3;
-    animation: pan-stars-slow 250s linear infinite;
-    will-change: transform; transform: translateX(var(--parallax-x-far));
-    transition: transform 0.2s ease-out;
-}
-body::after {
-    content: ''; position: absolute; inset: -50vmin; z-index: -2;
-    background: radial-gradient(ellipse at 70% 30%, rgba(0,0,0,0.9) 0%, transparent 50%), radial-gradient(ellipse at 30% 70%, rgba(0,0,0,0.8) 0%, transparent 40%);
-    animation: rotate-nebula 180s linear infinite alternate;
-    will-change: transform; opacity: 1;
-    transform: translateX(var(--parallax-x-mid)) rotateX(var(--gyro-rotate-x)) rotateY(var(--gyro-rotate-y));
-    transition: transform 0.2s ease-out;
-}
-body.gyro-active::after { animation: none; }
-#background-overlay {
-    position: absolute; inset: 0;
-    background-image: radial-gradient(2px 2px at 50px 50px, #fff, transparent), radial-gradient(2px 2px at 100px 200px, #ddd, transparent);
-    background-size: 250px 250px; z-index: -1;
-    animation: pan-stars-fast 100s linear infinite;
-    will-change: transform; transform: translateX(var(--parallax-x-near));
-    transition: transform 0.2s ease-out;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    cursor: default;
 }
 
-.shooting-star {
-    position: fixed; top: 0; left: 0;
-    width: 250px; height: 3px;
-    background: linear-gradient(to left, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
-    border-radius: 50%; filter: drop-shadow(0 0 8px white);
-    pointer-events: none; cursor: pointer;
-    z-index: 999; will-change: transform;
-}
-.shooting-star::after {
-    content: ''; position: absolute;
-    top: -10px; left: 0; right: 0; bottom: -10px;
-    pointer-events: auto;
-}
-.star-message {
-    position: fixed; transform: translate(-50%, -50%);
-    background: rgba(255, 105, 180, 0.85);
-    color: white; padding: 8px 15px; border-radius: 20px;
-    font-size: 14px; font-family: 'Orbitron', monospace;
-    z-index: 9999; pointer-events: none;
-    animation: fade-in-out 2.5s ease-in-out forwards;
-    text-shadow: 0 0 5px black;
+.hidden {
+    display: none !important;
 }
 
-/* ======================================================= */
-/* 3. HIỆU ỨNG CHỮ RƠI "GALAXY" & CANVAS 3D              */
-/* ======================================================= */
-#webgl-canvas { position: fixed; top: 0; left: 0; outline: none; z-index: 1; }
-.galaxy-container { position: fixed; inset: 0; z-index: 0; pointer-events: none; perspective: 800px; transform-style: preserve-3d; }
-.text-particle { position: absolute; top: 0; color: #fff; font-size: 0.875rem; font-weight: 600; transform: translateX(-50%); width: max-content; text-align: center; padding: 8px 12px; border-radius: 8px; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(2px); text-shadow: 0 0 10px currentColor, 0 0 20px currentColor; pointer-events: auto; transition: transform 0.3s ease, text-shadow 0.3s ease; will-change: transform, opacity; cursor: default; }
-.text-particle:hover { transform: translateX(-50%) scale(1.1); text-shadow: 0 0 15px currentColor, 0 0 30px #fff; }
-.text-particle.love { color: #ff6b9d; } .text-particle.date { color: #c534ed; } .text-particle.special { color: #a8e6cf; } .text-particle.heart { color: #ff69b4; } .text-particle.birthday { color: #4ecdc4; }
 
 /* ======================================================= */
-/* 4. MÀN HÌNH CHỜ VÀ CÁC LỚP PHỦ                        */
+/* 2. CANVAS 3D & CÁC LỚP NỀN (BACKGROUND LAYERS)       */
 /* ======================================================= */
-#loading-screen { position: fixed; inset: 0; z-index: 99999; background: #000; color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 1s ease-out; }
-#loading-screen.loaded { opacity: 0; pointer-events: none; }
-.heart-loader { width: 50px; height: 50px; background: #ff6b9d; position: relative; transform: rotate(45deg); animation: beat 1s infinite; margin-top: 20px; }
-.heart-loader:before, .heart-loader:after { content: ""; position: absolute; width: 50px; height: 50px; background: #ff6b9d; border-radius: 50%; }
-.heart-loader:before { top: -25px; left: 0; } .heart-loader:after { top: 0; left: -25px; }
 
-/* === CẬP NHẬT HIỆU ỨNG CHẠM ĐỂ BẮT ĐẦU === */
+/* 
+   FIX LỖI QUAN TRỌNG NHẤT:
+   Đặt canvas chiếm toàn bộ màn hình và nằm ở lớp dưới cùng.
+*/
+#webgl-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    outline: none;
+    z-index: 1; /* Lớp nền 3D chính */
+    cursor: grab;
+}
+#webgl-canvas:active {
+    cursor: grabbing;
+}
+
+/* Lớp chứa các hiệu ứng chữ rơi */
+#galaxy {
+    position: fixed;
+    inset: 0;
+    z-index: 2; /* Nằm trên canvas 3D */
+    pointer-events: none;
+    perspective: 800px;
+}
+
+
+/* ======================================================= */
+/* 3. MÀN HÌNH CHỜ VÀ CÁC LỚP PHỦ                        */
+/* ======================================================= */
+#loading-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: #000;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 1s ease-out;
+}
+#loading-screen.loaded {
+    opacity: 0;
+    pointer-events: none;
+}
+.loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+.loading-content p {
+    font-size: 1rem;
+    color: #ccc;
+}
+.loading-heart {
+    width: 50px;
+    height: 50px;
+    background: #ff6b9d;
+    position: relative;
+    transform: rotate(45deg);
+    animation: beat 1.2s infinite cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.loading-heart:before, .loading-heart:after {
+    content: "";
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: #ff6b9d;
+    border-radius: 50%;
+}
+
+.loading-heart:before {
+    top: -25px;
+    left: 0;
+}
+
+.loading-heart:after {
+    top: 0;
+    left: -25px;
+}
+
+.progress-container {
+    width: 200px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+}
+#progress-bar {
+    width: 0%;
+    height: 100%;
+    background: #ff6b9d;
+    border-radius: 4px;
+    transition: width 0.4s ease-out;
+}
+#progress-text {
+    font-family: monospace;
+    font-size: 14px;
+    color: #ccc;
+}
+
 #music-overlay {
     z-index: 9999;
     position: fixed;
@@ -101,84 +154,307 @@ body.gyro-active::after { animation: none; }
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0,0,0,0.3);
-    backdrop-filter: blur(10px) saturate(150%);
-    -webkit-backdrop-filter: blur(10px) saturate(150%);
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     cursor: pointer;
     transition: opacity 0.8s ease, backdrop-filter 0.8s ease;
 }
 #music-overlay.hidden-overlay {
     opacity: 0;
     pointer-events: none;
-    backdrop-filter: blur(0px) saturate(100%);
+    backdrop-filter: blur(0px);
 }
-.overlay-content {
+.start-prompt {
     text-align: center;
     color: #fff;
-    padding: 40px;
-    border-radius: 20px;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transform: scale(1);
     opacity: 1;
-    animation: none;
+    transform: scale(1);
     transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.8s ease;
 }
-.hidden-overlay .overlay-content {
+.hidden-overlay .start-prompt {
     transform: scale(1.5);
     opacity: 0;
 }
-/* === KẾT THÚC CẬP NHẬT === */
+.start-prompt h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem); /* Responsive font size */
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+.start-prompt p {
+    font-size: clamp(0.9rem, 2vw, 1.2rem);
+    color: #ccc;
+    margin-top: 10px;
+    letter-spacing: 1px;
+}
 
-.overlay-content p { font-size: 1.5rem; letter-spacing: 1px; font-family: 'Orbitron', -apple-system, sans-serif; text-shadow: 0 0 15px rgba(255, 255, 255, 0.5); }
-#birthday-celebration { position: fixed; inset: 0; z-index: 10001; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.5); pointer-events: none; opacity: 0; transition: opacity 1s ease-in-out; }
-#birthday-celebration h1 { font-size: 5vw; color: white; text-shadow: 0 0 10px #ff6b9d, 0 0 20px #ff6b9d, 0 0 40px #ff6b9d; animation: birthday-pulse 2s infinite; font-family: 'Orbitron', -apple-system, sans-serif; }
+#birthday-celebration {
+    position: fixed; inset: 0; z-index: 10001;
+    display: none; /* Dùng JS để flex */
+    justify-content: center; align-items: center;
+    background: rgba(0,0,0,0.5); pointer-events: none;
+    opacity: 0; transition: opacity 1s ease-in-out;
+}
+#birthday-celebration p {
+    font-size: clamp(3rem, 8vw, 6rem);
+    color: white;
+    text-shadow: 0 0 10px #ff6b9d, 0 0 20px #ff6b9d, 0 0 40px #ff6b9d;
+    animation: birthday-pulse 2s infinite;
+}
 
 /* ======================================================= */
-/* 5. CÁC THÀNH PHẦN GIAO DIỆN (UI COMPONENTS)            */
+/* 4. CÁC THÀNH PHẦN GIAO DIỆN (UI COMPONENTS)            */
 /* ======================================================= */
-#waveform-controls { position: fixed; bottom: 15px; left: 15px; right: 15px; z-index: 1000; max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; color: #fff; padding: 8px 12px; background: rgba(20, 20, 25, 0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); }
-#waveform { width: 100%; height: 50px; margin: 5px 0; }
-.song-info { width: 100%; display: flex; align-items: center; gap: 10px; }
-.song-info #song-title { font-size: 0.8125rem; font-family: 'Orbitron', sans-serif; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.controls-buttons { display: flex; gap: 25px; align-items: center; }
-.controls-buttons button, #favorite-btn { background: none; border: none; color: white; cursor: pointer; transition: color 0.2s; }
-.controls-buttons button:hover, #favorite-btn:hover { color: #ff6b9d; }
-#prev-btn, #next-btn { font-size: 1.125rem; } #play-pause-btn { font-size: 1.5rem; } #favorite-btn { font-size: 1.375rem; } #favorite-btn.favorited { color: #ff6b9d; }
-.timing { display: flex; justify-content: space-between; width: 100%; font-size: 0.6875rem; font-family: monospace; color: #ccc; margin-top: -5px; margin-bottom: 5px; padding: 0 5px; }
-#planet-info-card { position: fixed; left: 50%; width: 90%; max-width: 450px; background: rgba(25, 25, 35, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 12px; padding: 20px; color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); opacity: 0; transform: translate(-50%, 20px) scale(0.95); transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.5s ease; pointer-events: none; z-index: 1002; }
-#planet-info-card:not(.hidden) { opacity: 1; transform: translate(-50%, 0) scale(1); pointer-events: auto; }
-#close-info-btn { position: absolute; top: 8px; right: 12px; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
-#info-card-title { color: var(--glow-color, #ff6b9d); font-family: 'Orbitron', sans-serif; margin-bottom: 10px; text-shadow: 0 0 10px var(--glow-color, #ff6b9d); }
-#info-card-fact { font-style: italic; color: #ccc; margin-bottom: 15px; font-size: 0.9rem; }
+#waveform-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 90%;
+    max-width: 450px;
+    color: #fff;
+    padding: 10px 15px;
+    background: rgba(20, 20, 25, 0.65);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: opacity 0.5s, transform 0.5s;
+}
+#waveform-controls.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 20px);
+}
+#waveform { width: 100%; }
+.player-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+}
+#song-title {
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    text-align: center;
+}
+.player-buttons {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+.player-buttons button {
+    background: none; border: none; color: #eee;
+    font-size: 1.5rem; cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+}
+.player-buttons button:hover { color: #ff6b9d; transform: scale(1.1); }
+#prev-btn, #next-btn { font-size: 1.2rem; }
+#favorite-btn { font-size: 1.2rem; }
+#favorite-btn.favorited { color: #ff6b9d; }
+#current-time, #duration { font-family: monospace; font-size: 0.8rem; color: #ccc; }
+
+#planet-info-card {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    width: 90%;
+    max-width: 450px;
+    background: rgba(25, 25, 35, 0.7);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 12px;
+    padding: 20px;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transform: translate(-50%, 20px);
+    transition: opacity 0.4s ease, transform 0.4s ease, bottom 0.5s ease;
+    pointer-events: none;
+    z-index: 1002;
+}
+#planet-info-card:not(.hidden) {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    pointer-events: auto;
+}
+#close-info-btn {
+    position: absolute; top: 8px; right: 12px;
+    background: none; border: none; color: #fff;
+    font-size: 1.5rem; cursor: pointer;
+}
+#info-card-title {
+    color: #ff6b9d;
+    margin-bottom: 10px;
+    text-shadow: 0 0 10px #ff6b9d;
+}
+#info-card-fact {
+    font-style: italic; color: #ccc;
+    margin-bottom: 15px; font-size: 0.9rem;
+}
 #info-card-message { font-size: 1rem; line-height: 1.5; }
-#letter-container { position: fixed; inset: 0; z-index: 10000; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); padding: 20px; opacity: 0; transform: scale(0.95); transition: opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; }
-#letter-container:not(.hidden) { display: flex; justify-content: center; align-items: center; opacity: 1; transform: scale(1); pointer-events: auto; }
-.letter-content { background: rgba(20, 20, 30, 0.9); color: #eee; padding: 30px 40px; border-radius: 10px; border: 1px solid #ff6b9d; max-width: 90%; width: 600px; max-height: 80vh; overflow-y: auto; position: relative; }
-.letter-content h1 { color: #ff6b9d; font-size: 1.5rem; margin-bottom: 20px; font-family: 'Orbitron', sans-serif; }
-.letter-content p { font-size: 1.125rem; line-height: 1.6; margin-bottom: 15px; }
+
+#letter-container {
+    position: fixed; inset: 0; z-index: 10000;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    display: flex; /* Thay vì dùng JS */
+    justify-content: center; align-items: center;
+    padding: 20px;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
+}
+#letter-container:not(.hidden) {
+    opacity: 1; transform: scale(1); pointer-events: auto;
+}
+.letter-content {
+    background: rgba(20, 20, 30, 0.9);
+    color: #eee;
+    padding: 30px 40px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 107, 157, 0.5);
+    max-width: 90%; width: 600px;
+    max-height: 80vh; overflow-y: auto;
+    position: relative;
+}
+.letter-content h1 { color: #ff6b9d; font-size: 1.5rem; margin-bottom: 20px; }
+.letter-content p { font-size: 1.1rem; line-height: 1.7; margin-bottom: 15px; }
 .letter-content .signature { text-align: right; margin-top: 30px; font-style: italic; }
-#close-letter-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; color: #fff; font-size: 1.875rem; cursor: pointer; }
-#settings-toggle-btn { position: fixed; top: 20px; right: 20px; z-index: 1001; background: rgba(0,0,0,0.5); color: #fff; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.25rem; cursor: pointer; }
-#settings-panel { position: fixed; top: 70px; right: 20px; z-index: 1001; background: rgba(25, 25, 35, 0.6); backdrop-filter: blur(12px); border-radius: 12px; padding: 15px; color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; gap: 15px; }
-.setting-item { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
-#special-day-btn { position: fixed; bottom: calc(115px + 20px); right: 20px; z-index: 1000; width: 55px; height: 55px; border-radius: 50%; cursor: pointer; background: linear-gradient(145deg, #ff6b9d, #c534ed); box-shadow: 0 0 15px #ff6b9d, 0 0 25px #c534ed; border: 1px solid rgba(255, 255, 255, 0.3); animation: pulse 2s infinite; transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; justify-content: center; align-items: center; padding: 0; }
-#special-day-btn:hover { transform: scale(1.1); box-shadow: 0 0 25px #ff6b9d, 0 0 40px #c534ed; }
-.sparkle-icon { width: 24px; height: 24px; position: relative; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; }
-.sparkle-icon::before, .sparkle-icon::after { content: '✨'; position: absolute; animation: sparkle-anim 2s infinite; opacity: 0; }
-.sparkle-icon::after { animation-delay: 1s; }
+#close-letter-btn {
+    position: absolute; top: 10px; right: 15px;
+    background: none; border: none; color: #fff;
+    font-size: 1.875rem; cursor: pointer;
+}
 
 /* ======================================================= */
-/* 6. ANIMATIONS                                         */
+/* 5. CÁC NÚT ĐIỀU KHIỂN NỔI (FLOATING CONTROLS)         */
+/* ======================================================= */
+.floating-controls button {
+    position: fixed;
+    z-index: 1001;
+    background: rgba(25, 25, 35, 0.6);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    transition: background-color 0.3s, transform 0.3s;
+}
+.floating-controls button:hover {
+    background-color: rgba(45, 45, 55, 0.8);
+    transform: scale(1.1);
+}
+
+#settings-toggle-btn { top: 20px; right: 20px; }
+#fly-mode-btn { top: 75px; right: 20px; }
+#special-day-btn { bottom: 20px; right: 20px; background: linear-gradient(145deg, #ff6b9d, #c534ed); border: none; animation: pulse 2s infinite; font-size: 1.5rem; }
+
+#fly-mode-btn.fly-mode-active {
+    border-color: #ff6b9d;
+    background-color: rgba(255, 107, 157, 0.3);
+    box-shadow: 0 0 10px rgba(255, 107, 157, 0.5);
+}
+#fly-mode-btn span {
+    margin-left: 8px;
+    font-size: 0.8rem;
+}
+
+#settings-panel {
+    position: fixed; top: 75px; right: 20px; z-index: 1001;
+    background: rgba(25, 25, 35, 0.7);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+#settings-panel input[type="range"] {
+    width: 120px;
+}
+
+/* ======================================================= */
+/* 6. HIỆU ỨNG ĐẶC BIỆT (SPECIAL EFFECTS)                 */
+/* ======================================================= */
+.text-particle {
+    position: absolute;
+    top: 0;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 500;
+    transform: translateX(-50%);
+    width: max-content;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.1);
+    text-shadow: 0 0 8px currentColor;
+    pointer-events: auto;
+    will-change: transform, opacity;
+}
+.text-particle.love { color: #ff6b9d; }
+.text-particle.date { color: #c534ed; }
+.text-particle.special { color: #a8e6cf; }
+.text-particle.heart { background: none; font-size: 1.5rem; }
+.text-particle.birthday { color: #4ecdc4; }
+
+.shooting-star {
+    position: fixed; top: -50px; /* Bắt đầu ngoài màn hình */
+    width: 250px; height: 2px;
+    background: linear-gradient(to left, rgba(255, 255, 255, 0.6), transparent);
+    border-radius: 50%;
+    filter: drop-shadow(0 0 6px white);
+    z-index: 3;
+    pointer-events: auto; /* Cho phép click */
+    cursor: pointer;
+}
+.star-message {
+    position: fixed;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 105, 180, 0.85);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    z-index: 9999;
+    pointer-events: none;
+    animation: fade-in-out 2.5s ease-in-out forwards;
+}
+
+#fly-mode-overlay {
+    position: fixed; inset: 0; z-index: 10002;
+    display: flex; justify-content: center; align-items: center;
+    background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(8px);
+    opacity: 0; transition: opacity 0.5s ease; pointer-events: none;
+}
+#fly-mode-overlay:not(.hidden) { opacity: 1; }
+#fly-mode-overlay p {
+    color: white; font-size: 1.8rem;
+    padding: 20px 40px; background: rgba(20, 20, 25, 0.7);
+    border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);
+    text-shadow: 0 0 10px #fff;
+}
+
+
+/* ======================================================= */
+/* 7. ANIMATIONS                                         */
 /* ======================================================= */
 @keyframes beat { 0%, 100% { transform: scale(1) rotate(45deg); } 50% { transform: scale(1.1) rotate(45deg); } }
-@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes pulse { 0%, 100% { box-shadow: 0 0 15px #ff6b9d, 0 0 25px #c534ed; } 50% { box-shadow: 0 0 25px #ff6b9d, 0 0 40px #c534ed; } }
 @keyframes birthday-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-@keyframes pan-stars-slow { from { background-position: 0 0; } to { background-position: -200px -200px; } }
-@keyframes pan-stars-fast { from { background-position: 0 0; } to { background-position: -250px -250px; } }
-@keyframes rotate-nebula { from { transform: rotate(0deg) scale(1.5); } to { transform: rotate(360deg) scale(1.5); } }
-@keyframes fade-in-up { to { transform: scale(1); opacity: 1; } }
-@keyframes sparkle-anim { 0%, 100% { transform: scale(0.5); opacity: 0; } 50% { transform: scale(1.2) rotate(15deg); opacity: 1; } }
 @keyframes fade-in-out {
     0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
     20% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
@@ -186,25 +462,18 @@ body.gyro-active::after { animation: none; }
     100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
 }
 
+
 /* ======================================================= */
-/* 7. MEDIA QUERIES (RESPONSIVE DESIGN)                  */
+/* 8. MEDIA QUERIES (RESPONSIVE DESIGN)                  */
 /* ======================================================= */
 @media (max-width: 480px) {
     #waveform-controls { left: 10px; right: 10px; bottom: 10px; padding: 6px 10px; }
-    .controls-buttons { gap: 20px; }
-    .song-info #song-title { font-size: 0.75rem; }
+    .player-buttons { gap: 15px; }
+    #song-title { font-size: 0.75rem; }
     .letter-content { padding: 20px; }
-    .letter-content h1 { font-size: 1.25rem; }
-    .letter-content p { font-size: 1rem; }
     #planet-info-card { bottom: 10px; padding: 15px; }
-    #special-day-btn { bottom: calc(105px + 15px); right: 15px; }
-}
-
-/* TÙY CHỌN: Thêm con trỏ chuột để gợi ý tương tác */
-#webgl-canvas {
-    cursor: grab;
-}
-
-#webgl-canvas:active {
-    cursor: grabbing;
+    #special-day-btn { bottom: 15px; right: 15px; }
+    .floating-controls button { width: 40px; height: 40px; }
+    #settings-toggle-btn { top: 15px; right: 15px; }
+    #fly-mode-btn { top: 65px; right: 15px; }
 }
