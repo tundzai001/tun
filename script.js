@@ -26,15 +26,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeInfoBtn = document.getElementById('close-info-btn');
     const canvas = document.getElementById('webgl-canvas');
     const letterContainer = document.getElementById('letter-container');
+    
     let preloadedNightlySong = { url: null, audio: null };
+    let activeSatellites = [];
+    let activePeakRockets = [];
 
+    let isAutoRotating = false;
+    let autoRotateAngle = 0;
+    const cameraSettings = {
+        autoRotateSpeed: 0.002,
+        verticalArcAmount: 1.5,
+        lookAtHeightOffset: 0.15
+    };
     // =================================================================
     // PHẦN 2: DỮ LIỆU CÁ NHÂN HÓA VÀ CÀI ĐẶT
     // =================================================================
     /* --- DỮ LIỆU SINH NHẬT --- */
     const birthdayData = {
-        day: 9,
-        month: 6,
+        day: 9, month: 6,
         letter: {
             title: "Gửi em, cô gái tuyệt vời nhất từng được sinh ra =))) nghe hơi sến tí nhưng mà thôi",
             content: `<p>Hôm nay là ngày sinh nhật của em, là ngày mà mẹ em đã sinh ra em =))) anh biết nhưng mà ý là kiểu ngày mà mẹ em đẻ ra thiên thần luôn rồi ấy kiểu em tuyệt vời mà xinh xắn lại còn giỏi giang nữa omg</p><p> Có lẽ nếu xét về tình cảm dành cho em chắc anh thua mỗi mẹ em thôi ấy, anh yêu em nhiều lắm luôn í. Thôi anh nhắn v th tại anh viết thư tay cho em rồi mà =)) đọc thư tay nó mới tình cảm hơn chứ <p>Chúc em sinh nhật vui vẻ!</p></p>`
@@ -43,8 +52,8 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     /* --- PLAYLIST CHÍNH  --- */
-    const mainPlaylist = [
-        { file: "https://treuah.netlify.app/leduong.mp3", title: "Lễ đường - Kai Đinh" },
+    const mainPlaylist = [ 
+        { file: "https://treuah.netlify.app/leduong.mp3", title: "Lễ đường - Kai Đinh" }, 
         { file: "https://treuah.netlify.app/dieforyou.mp3", title: "Die For You - The Weeknd" },
         { file: "https://treuah.netlify.app/ordinary.mp3", title: "Ordinary - Alex Warren" },
         { file: "https://treuah.netlify.app/supernatural.mp3", title: "supernatural - Ariana Grande" },
@@ -67,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
 
     /* --- DANH SÁCH BÀI HÁT HÀNG NGÀY --- */
-    const dailySongs = [
+    const dailySongs = [ 
         { day: 1, song: { file: "https://treuah.netlify.app/main/fever.mp3", title: "Fever - COLDZY" } },
         { day: 2, song: { file: "https://treuah.netlify.app/main/art.mp3", title: "Art - Tyla" } },
         { day: 3, song: { file: "https://treuah.netlify.app/main/nambenanh.mp3", title: "Nằm bên anh - Minh Đinh" } },
@@ -77,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
         { day: 7, song: { file: "https://treuah.netlify.app/main/khobaudanhroi.mp3", title: "Kho báu đánh rơi - tlinh" } },
         { day: 8, song: { file: "https://treuah.netlify.app/main/babyonemoretime.mp3", title: "Baby One More Time - Britney Spears" } },
         { day: 9, song: { file: "https://treuah.netlify.app/main/Snooze.mp3", title: "snooze - SZA" } },
-        { day: 10, song: { file: "https://treuah.netlify.app/main/earnedit.mp3", title: "Earned It - The Weeknd" } },
+        { day: 10, song: { file: "https://treuah.netlify.app/main/earnedit.mp3", title: "Earned It - The Weeknd" } }, 
         { day: 11, song: { file: "https://treuah.netlify.app/main/dearfuturehusband.mp3", title: "Dear Future Husband - Meghan Trainor" } },
         { day: 12, song: { file: "https://treuah.netlify.app/main/luther.mp3", title: "Luther - Kendrick Lamar & SZA" } },
         { day: 13, song: { file: "https://treuah.netlify.app/main/thegioithantien.mp3", title: "Thế giới thần tiên - tlinh" } },
@@ -98,11 +107,11 @@ document.addEventListener('DOMContentLoaded', function() {
         { day: 28, song: { file: "https://treuah.netlify.app/main/chamhoa.mp3", title: "Chăm Hoa - Mono" } },
         { day: 29, song: { file: "https://treuah.netlify.app/main/freakydeaky.mp3", title: "Freaky Deaky - Tyga x Doja Cat" } },
         { day: 30, song: { file: "https://treuah.netlify.app/openarms.mp3", title: "Open Arms - SZA" } },
-        { day: 31, song: { file: "https://treuah.netlify.app/main/theboyismine.mp3", title: "The boy is mine - Ariana Grande" } }
+        { day: 31, song: { file: "https://treuah.netlify.app/main/theboyismine.mp3", title: "The boy is mine - Ariana Grande" } } 
     ];
 
-    /* --- DANH SÁCH THƯ BUỔI TỐI --- */
-    const dailyLetters = [
+ /* --- DANH SÁCH THƯ BUỔI TỐI --- */
+    const dailyLetters = [ 
         { day: 1, title: "hello cậu, ngày học đầu tiên của tháng kết thúc rồi", content: `<p>Vậy là một ngày nữa ở Thành Đô đã qua. Cậu đã vất vả, mệt mỏi rồi. Mọi thứ hôm nay vẫn ổn chứ? Có điều gì cậu muốn kể cho tớ nghe không?</p><p>Tuy là ở xa, nhưng mà tớ vẫn luôn ở đây lắng nghe cậu. Giờ thì nghỉ ngơi thôi nhé </p>` },
         { day: 2, title: "xin cả chào nhesee, ngày thứ hai của cậu mệt không?", content: `<p>Tan học rồi, chắc cậu mệt lắm. Đừng ôm hết mọi mệt mỏi một mình nhé, hãy chia sẻ với tớ. Tớ không ở cạnh để chăm sóc cậu được, nên chỉ có thể lắng nghe thôi và an ủi cậu thôi.</p><p>Hôm nay của tớ ở Việt Nam cũng hơi mệt mỏi một chút, nhưng mà kiểu có cậu ấy nên cảm giác thoải mái v =)) Có chuyện thì hãy kể tớ nhé, tớ luôn ở đây ❤️</p>` },
         { day: 3, title: "Gửi cậu, ngày thứ ba, lại một ngày nỗ lực rồi", content: `<p>Tớ biết việc học và thích nghi với môi trường mới, các bạn mới không dễ dàng. Tớ tự hào về cậu nhiều lắm. Mỗi ngày trôi qua, cậu lại càng giỏi giang hơn một chút đấy.</p><p>Hôm nay có gì vui hay có gì khiến cậu mệt mỏi, tức giận không? Kể cho tớ nghe, lov u so much luôn</p>` },
@@ -112,8 +121,8 @@ document.addEventListener('DOMContentLoaded', function() {
         { day: 7, title: "Gửi cậu, tối thứ bảy ở Thành Đô...", content: `<p>Ngày nghỉ đầu tiên của cậu thế nào? Có đi đâu chơi hay khám phá được món gì ngon không? Tớ tò mò về cuộc sống của cậu ở bên đó lắm.</p><p>Dù chúng ta xa nhau, nhưng được nghe cậu kể về một ngày của mình làm tớ cảm thấy khoảng cách như ngắn lại. Chúc cậu ngủ ngon.</p>` },
         { day: 8, title: "helo bae, ê í là cậu yêu vkl =)) ", content: `<p>Thế là đầu tuần cuối cùng ở Việt Nam =))) nghe cứ hụt hẫng tdn ấy cậu ơi nma tớ hy vọng cậu đừng khóc nhé =)) nhớ lời tớ dặn về khóc khi nào rồi đấy =))) .</p><p>Đừng lo lắng quá nhé, Bên cạnh cậu còn gia đình, còn tớ nữa. Tớ luôn tin ở cậu. Mạnh mẽ lên !!! love u so much luôn </p>` },
         { day: 9, title: "Hê và lô cậu =))) ê nma cậu yêu vl ", content: `<p>Hoa đẹp chứ? Ê ý là thấy tone màu đấy hợp cả cậu vl =)) kiểu xinh xinh lại còn dịu dàng nữa omg tuyệt. Cậu alws phải vui vẻ, same cái vibe với bông hoa nhé =)) kiểu là luôn tươi cười, vui vẻ như cách bông hoa nở rộ nhé. Tớ yêu cậu nhiều lắm luôn ý </p>` },
-        { day: 10, title: "Gửi cậu, còn 3 ngày nữa là cậu lên đường rùi", content: `<p>Công nhận thời gian trôi nhanh thật =))) mới ngày nào còn mới nói chuyện vậy mà đã chuẩn bị đi rồi huhu không phải buồn 1 chút nữa rồi mà buồn nhiều nhiều chút. Nhưng mà trộm vía mỗi tối được nói chuyện với bae là kiểu vui vl ấy =)) bae dyeu vl  Love you so so so so so.... much luôn.</p>` },
-        { day: 11, title: "Còn 2 ngày nữa, ối giời ơi...", content: `<p>ê sao trôi nhanh thế dcm , nhớ ơi nhớ, nhớ b hà nhiều chút =))) chắc không phải bạn nữa rồi khả năng giờ phải lên wife luôn, chứ yêu quá rồi đấy =)))) Nhớ nhiều nhiều chút =)) ước được bên cạnh suốt ngày =))))))))))))) </p>` },
+        { day: 10, title: "Gửi cậu, còn 3 ngày nữa là cậu lên đường rùi", content: `<p>Công nhận thời gian trôi nhanh thật =))) mới ngày nào còn mới nói chuyện vậy mà đã chuẩn bị đi rồi huhu không phải buồn 1 chút nữa rồi mà buồn nhiều nhiều chút. Nhưng mà trộm vía mỗi tối được nói chuyện với cậu là kiểu vui vl ấy =))  Love you so so so so so.... much luôn.</p>` },
+        { day: 11, title: "Còn 2 ngày nữa, ối giời ơi...", content: `<p>ê sao trôi nhanh thế dcm , nhớ ơi nhớ, nhớ b hà nhiều chút =))) chắc khả năng không cho đi nữa thật chứ nhớ ơi nhớ, muốn ôm tiếp =)))) thích qs, thích ôm, thích gn kiss, thích nắm tay, omg tuyệt tóm lại là Nhớ nhiều nhiều chút =)) ước được bên cạnh suốt ngày =))))))))))))) </p>` },
         { day: 12, title: "Nhanh thật chưa gì còn hơn 20 tiếng nữa...", content: `<p>Cố lên, không buồn tớ vẫn luôn ở đây với cậu mà, cố lên nào, không được khóc nhé. Tớ thương cậu nhiều lắm luôn í, nhớ lời tớ dặn không được khóc khi không có tớ ở bên, mạnh mẽ lên!!!!</p>` },
         { day: 13, title: "Thế là bay rùi, omg sao dcm nhanh thế", content: `<p>Buồn quá, vợ đi rồi buồn vl, không dám nói tại sao không gặp sớm hơn, nhưng mà biết đâu số phận sắp đặt để lần này có thể tiến xa idk =))) but i want to say that  i love u so much, i miss u. Nhưng mà sang đấy phải cố gắng lên nhé, tớ luôn ở bên cạnh cậu mà</p>` },
         { day: 14, title: "Chắc cậu đến rùi nhỉ?", content: `<p>Mới hôm qua còn gặp, mà giờ đã bên nước khác rồi omg sao mà nhanh v trời ơi, ê í là bị buồn í, cảm giác hụt hẫng vl =)) bị nhớ nhiều chút vợ ơi... i miss u so much luôn, sang bên đấy nhớ ăn uống đầy đủ nhé đặc biệt là nhớ phải uống nước đầy đủ nhé tại vợ bị đau dạ dày đấy !!! nhớ nhee, yêu lắm í .</p>` },
@@ -137,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
 
     /* --- DANH SÁCH THƯ BAN NGÀY  --- */
-    const daytimeLetters = [
+    const daytimeLetters = [ 
         { day: 1, title: "Gửi cậu, ngày đầu tháng tốt lành nhé!", content: `<p>Bắt đầu tháng mới ở Thành Đô, chúc cậu mọi việc đều suôn sẻ. Tớ gửi một chút năng lượng từ Việt Nam qua cho cậu đây. Cố lên nhé!</p>` },
         { day: 2, title: "Gửi cậu, ngày thứ hai...", content: `<p>Chúc cậu một ngày học tập hiệu quả. Đừng quên uống đủ nước và cười thật tươi nha. Tối mình nói chuyện sau.</p>` },
         { day: 3, title: "Gửi cậu, ngày thứ ba...", content: `<p>Hôm nay cậu có môn gì khó không? Cứ bình tĩnh xử lý từng chút một nhé, tớ tin cậu làm được. Fighting!</p>` },
@@ -148,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
         { day: 8, title: "Ê thứ 2 cuối cùng rồi đấy =)) í là t2 cuối ở đây =)) ", content: `<p>Chúc cậu một thứ hai vui vẻ và luôn là kiểu happy, và hehehe luôn có tớ bên cạnh cậu nhaa alws luôn. Tạm gác lại sách vở và yes chuẩn bị thôi nào =)) í là cái thư này cũng cũng bình thường thôi =))) nói lời vẫn cứ akelo hơn =)) </p>` },
         { day: 9, title: "Thứ 3 CUỐI rồi omg nhanh vkl ", content: `<p>Tuần cuối rồi, chúc cậu sang bên đấy mạnh khỏe và cố gắng học hành tốt nhé =)) mặc dù chưa đi đâu nma th kệ di cứ chúc. Cố lên cô gái của tớ =))) </p>` },
         { day: 10, title: "Gửi cậu, ngày giữa tuần cuối ở đây...", content: `<p>dcm sao nhanh thế kbt omg ê nhớ cậu qs đấy buồn vkl sắp di rồi kìa huhuhuhuhuhu buồn nhiều chút nha, nma ksao vẫn còn cậu bên cạnh tớ mà hehehe love u sm</p>` },
-        { day: 11, title: "Gửi cậu, còn mỗi 2 ngày nữa thuii.... ", content: `<p>Ê í là thấy cậu yêu vl, dễ thương quá, ấm từ cái ôm, đến cái nắm tay =)) í là tớ bảo tay cậu nóng là tớ đùa thôi đấy =)) cậu ấm vl, yêu quá, trời oiii. Muốn kiss tiếp, muốn ôm tiếp, muốn nắm tay tiếp, muốn cậu ở lại với tớ cơ không muốn đi đâu buồn vkl ấy chứ. Nma th kệ diii, để tối nay gặp tiếp ha. love bae so much, i love youuuu. đừng buồn vì sắp phải dii nhé, im alws by ur side.</p>` },
+        { day: 11, title: "Gửi cậu, còn mỗi 2 ngày nữa thuii...", content: `<p>Ê í là thấy cậu yêu vl, dễ thương quá, ấm từ cái ôm, đến cái nắm tay =)) í là tớ bảo tay cậu nóng là tớ đùa thôi đấy =)) cậu ấm vl, yêu qu, trời oiiii. Muốn kiss tiếp, muốn ôm tiếp, muốn nắm tay tiếp, muốn cậu ở lại với tớ cơ không muốn đi đâu buồn bkl ấy chứ. Nma th kệ diii, để tối nay gặp tiếp ha. love bae so much, i love youuu. đừng buồn vì sắp phải di nhé, im alws by ur side.</p>` },
         { day: 12, title: "Gửi cậu, ngày thứ mười hai...", content: `<p>Giữa tuần rồi, cố lên nhé. Chỉ một lời nhắn để cậu biết là có người luôn nghĩ về cậu thôi. ^^</p>` },
         { day: 13, title: "Gửi cậu, ngày thứ mười ba...", content: `<p>Hôm nay học hành có thuận lợi không? Tớ tin là có. Chúc cậu một ngày tràn đầy tự tin!</p>` },
         { day: 14, title: "Gửi cậu, ngày thứ mười bốn...", content: `<p>Hai tuần rồi đó! Cố gắng nốt hôm nay rồi mai lại cuối tuần. Fighting!</p>` },
@@ -172,72 +181,76 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
 
     /* --- ĐƯỜNG DẪN ẢNH (ASSETS)  --- */
-    const assetPaths = {
-        sun: 'images/sun.jpg',
-        venus: 'images/venus.jpg',
+    const assetPaths = { 
+        sun: 'images/sun.jpg', 
+        venus: 'images/venus.jpg', 
         earth: 'images/earth.jpg',
-        mars: 'images/mars.jpg',
-        jupiter: 'images/jupiter.jpg',
+        mars: 'images/mars.jpg', 
+        jupiter: 'images/jupiter.jpg', 
         saturn: 'images/saturn.jpg',
-        neptune: 'images/neptune.jpg',
+        neptune: 'images/neptune.jpg', 
         stars: 'images/stars.jpg',
-        moon: 'images/moon.jpg',
+        moon: 'images/moon.jpg', 
         phobos: 'images/phobos.jpg',
         asteroid: 'images/asteroid.jpg',
         vetinh: 'images/vetinh.jpg'
     };
 
     /* --- DỮ LIỆU CÁC THIÊN THỂ  --- */
-    const celestialData = [
+    const celestialData = [ 
         { id: 'sun', type: 'star', name: 'Mặt Trời', texture: assetPaths.sun, size: 80, orbitRadius: 0, spinSpeed: 0.05, 
-            fact: "Năng lượng của mặt trời sưởi ấm cả vũ trụ này...", 
-            message: "...nhưng nụ cười của cậu mới là thứ sưởi ấm mùa đông này =))) ." },
+            fact: "Năng lượng của mặt trời sưởi ấm cả vũ trụ này...", message: "...nhưng nụ cười của cậu mới là thứ sưởi ấm mùa đông này =))) ." }, 
         { id: 'venus', type: 'planet', name: 'Sao Kim', texture: assetPaths.venus, size: 6, orbitRadius: 150, orbitSpeed: 1.2, spinSpeed: 0.1, 
-            fact: "Sao Kim được đặt theo tên nữ thần tình yêu và sắc đẹp trong thần thoại La Mã...", 
-            message: "...điều đó giải thích tại sao tớ lại tìm thấy cậu ở đây hehe." },
+            fact: "Sao Kim được đặt theo tên nữ thần tình yêu và sắc đẹp trong thần thoại La Mã...", message: "...điều đó giải thích tại sao tớ lại tìm thấy cậu ở đây hehe." },
         { id: 'earth', type: 'planet', name: 'Trái Đất', texture: assetPaths.earth, size: 7, orbitRadius: 220, orbitSpeed: 1.0, spinSpeed: 0.5, 
-            fact: "Trái Đất là hành tinh duy nhất được biết đến có sự sống...", 
-            message: "...và có lẽ chúng ta cũng mới bắt đầu một hành trình nhỏ.", moons: [{ id: 'moon', name: 'Mặt Trăng', texture: assetPaths.moon, size: 1.5, orbitRadius: 15, orbitSpeed: 1.5, spinSpeed: 0.2 }] },
+            fact: "Trái Đất là hành tinh duy nhất được biết đến có sự sống...", message: "...và có lẽ chúng ta cũng mới bắt đầu một hành trình nhỏ.", 
+            moons: [ { id: 'moon', name: 'Mặt Trăng', texture: assetPaths.moon, size: 1.5, orbitRadius: 15, orbitSpeed: 1.5, spinSpeed: 0.2 } ] }, 
         { id: 'mars', type: 'planet', name: 'Sao Hỏa', texture: assetPaths.mars, size: 5, orbitRadius: 300, orbitSpeed: 0.8, spinSpeed: 0.4,
-            fact: "Sao Hỏa được gọi là 'Hành tinh Đỏ' vì màu sắc của nó...", 
-            message: "...giống như những rung động mới mẻ trong tim của mình hehehehe, í là tim nó cứ đỏ rực th =)))) .", 
-            moons: [{ id: 'phobos', name: 'Phobos', texture: assetPaths.phobos, size: 0.8, orbitRadius: 8, orbitSpeed: 3.0, spinSpeed: 0.5 }] },
-        { id: 'jupiter', type: 'planet', name: 'Sao Mộc', texture: assetPaths.jupiter, size: 30, orbitRadius: 450, orbitSpeed: 0.4, spinSpeed: 1.0,
-            fact: "Sao Mộc là hành tinh lớn nhất...", 
-            message: "...giống tớ í là yêu cậu nhiều ấy =)))) ." },
-        { id: 'saturn', type: 'planet', name: 'Sao Thổ', texture: assetPaths.saturn, size: 25, orbitRadius: 650, orbitSpeed: 0.3, spinSpeed: 0.9,
-            fact: "Sao Thổ nổi tiếng với vành đai tuyệt đẹp của nó...", 
-            message: "...biết đâu sau này mình cũng có thêm nhiều kỷ niệm vòng quanh nhau ha =)))." },
-        { id: 'neptune', type: 'planet', name: 'Sao Hải Vương', texture: assetPaths.neptune, size: 15, orbitRadius: 800, orbitSpeed: 0.2, spinSpeed: 0.6, 
-            fact: "Sao Hải Vương là hành tinh xa mặt trời nhất...", 
-            message: "...nhưng dù ở xa thế nào thì khoảng cách vẫn chưa bao giờ là vấn đề." }
+            fact: "Sao Hỏa được gọi là 'Hành tinh Đỏ' vì màu sắc của nó...", message: "...giống như những rung động mới mẻ trong tim của mình hehehehe, í là tim nó cứ đỏ rực th =)))) .", 
+            moons: [ { id: 'phobos', name: 'Phobos', texture: assetPaths.phobos, size: 0.8, orbitRadius: 8, orbitSpeed: 3.0, spinSpeed: 0.5 } ] }, 
+        { id: 'jupiter', type: 'planet', name: 'Sao Mộc', texture: assetPaths.jupiter, size: 30, orbitRadius: 450, orbitSpeed: 0.4, spinSpeed: 1.0, 
+            fact: "Sao Mộc là hành tinh lớn nhất...", message: "...giống tớ í là yêu cậu nhiều ấy =)))) ." }, 
+        { id: 'saturn', type: 'planet', name: 'Sao Thổ', texture: assetPaths.saturn, size: 25, orbitRadius: 650, orbitSpeed: 0.3, spinSpeed: 0.9, 
+            fact: "Sao Thổ nổi tiếng với vành đai tuyệt đẹp của nó...", message: "...biết đâu sau này mình cũng có thêm nhiều kỷ niệm vòng quanh nhau ha =)))." }, 
+        { id: 'neptune', type: 'planet', name: 'Sao Hải Vương', texture: assetPaths.neptune, size: 15, orbitRadius: 800, orbitSpeed: 0.2, spinSpeed: 0.6,
+            fact: "Sao Hải Vương là hành tinh xa mặt trời nhất...", message: "...nhưng dù ở xa thế nào thì khoảng cách vẫn chưa bao giờ là vấn đề." }
     ];
+
 
     /* --- CÁC THÔNG ĐIỆP CHỮ RƠI  --- */
     const messages = [
-        "U are the best",
-        "Cố lên !!!",
-        "Yêu cậu",
-        "Love u so much",
-        "nhớ cậu nhiều",
-        "tớ luôn bên cạnh cậu",
-        "💖", "💕", "🌟", "✨",
-        "You're my angel",
-        "Đừng bỏ cuộc nhé !!!",
-        "I'm alws here",
+        "U are the best", 
+        "Cố lên !!!", 
+        "Yêu cậu", 
+        "Love u so much", 
+        "nhớ cậu nhiều", 
+        "tớ luôn bên cạnh cậu", 
+        "💖", "💕", "🌟", "✨", 
+        "Stay strong",
+        "Keep going",
+        "Believe in yourself",
+        "You are amazing",
+        "You can do it",
+        "Never give up",
+        "Stay positive",
+        "You are loved",
+        "You are enough",
+        "Chúc cậu một ngày tốt lành",
+        "You're my angel", 
+        "Đừng bỏ cuộc nhé !!!", 
+        "I'm alws here", 
         "😘", "🥰", "❤️", "💘", "💝", "💞"
     ];
     const birthdayMessages = ["Happy Birthday!", "Chúc mừng sinh nhật!", "🎂", "🎉", "Tuổi mới vui vẻ!"];
 
-    /* --- CÁC THÔNG ĐIỆP SAO BĂNG CỦA BẠN Ở ĐÂY --- */
+    /* --- CÁC THÔNG ĐIỆP SAO BĂNG Ở ĐÂY --- */
     const shootingStarMessages = [
-        "Yêu tổ quốc, yêu đồng bào",
-        "Học tập tốt, lao động tốt",
-        "Đoàn kết tốt, kỷ luật tốt",
-        "Giữ gìn vệ sinh thật tốt",
+        "Yêu tổ quốc, yêu đồng bào", 
+        "Học tập tốt, lao động tốt", 
+        "Đoàn kết tốt, kỷ luật tốt", 
+        "Giữ gìn vệ sinh thật tốt", 
         "Khiêm tốn, thật thà, dũng cảm",
     ];
-
 
     // Cấu hình tần suất sự kiện ngẫu nhiên
     const isHighEndDevice = !window.matchMedia("(max-width: 768px)").matches;
@@ -252,18 +265,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const heartSymbols = ["♥", "💖", "💕", "🌟", "✨"];
     const textStyles = ['love', 'date', 'special'];
     const activeParticles = new Set();
-    let upNextPlaylist = []; let upNextIndex = 0; let isBirthdayMode = false; let isLetterModeActive = false; let typingInterval = null; let wavesurfer; let scene, camera, renderer, controls; let starfield; const celestialObjects = []; const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2(); const textureLoader = new THREE.TextureLoader(); let isAnimatingCamera = false; let followedObject = null; let cameraOffset = new THREE.Vector3(); let activeAsteroids = []; let activeComets = []; let sunEffects = {};
+    let upNextPlaylist = []; let upNextIndex = 0; let isBirthdayMode = false; let isLetterModeActive = false; let typingInterval = null; let wavesurfer; let scene, camera, renderer, controls; let starfield; const celestialObjects = []; const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2(); const textureLoader = new THREE.TextureLoader(); let isAnimatingCamera = false; let followedObject = null; let activeAsteroids = []; let activeComets = []; let sunEffects = {};
     let originalCameraPosition = new THREE.Vector3();
     let originalControlsTarget = new THREE.Vector3();
     let originalControlsDistance = { min: 20, max: 1200 };
-    let spaceStationEffects = {};
     const clock = new THREE.Clock();
     let isPreloadingNextSong = false;
 
     // =================================================================
     // PHẦN 3: CÁC HÀM TIỆN ÍCH VÀ HIỆU ỨNG
     // =================================================================
-
     function createProceduralTexture(gradientCallback, size = 256) {
         const canvas = document.createElement('canvas');
         canvas.width = size;
@@ -273,64 +284,126 @@ document.addEventListener('DOMContentLoaded', function() {
         return new THREE.CanvasTexture(canvas);
     }
 
-    function createFieryAsteroid() {
-        if (!assetPaths || !assetPaths.asteroid) {
-            console.error("Lỗi: assetPaths.asteroid chưa được định nghĩa!");
-            return;
+    function createPeakRocket() {
+        const rocketGroup = new THREE.Group();
+        const rocketMat = new THREE.MeshStandardMaterial({ color: 0xbababa, metalness: 0.9, roughness: 0.3 });
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.2, 10, 16), rocketMat);
+        const nose = new THREE.Mesh(new THREE.ConeGeometry(0.8, 5, 16), rocketMat);
+        nose.position.y = 7.5;
+        const booster = new THREE.Mesh(new THREE.CylinderGeometry(1, 0.8, 2, 16), rocketMat);
+        booster.position.y = -6;
+        const wingShape = new THREE.Shape();
+        wingShape.moveTo(0, 0); wingShape.lineTo(3, -2); wingShape.lineTo(3, -4); wingShape.lineTo(0, -5);
+        const wing = new THREE.Mesh(new THREE.ExtrudeGeometry(wingShape, { depth: 0.2, bevelEnabled: false }), rocketMat);
+        wing.position.set(1.2, -2, 0);
+        const wing2 = wing.clone(); wing2.rotation.y = Math.PI * 2 / 3;
+        const wing3 = wing.clone(); wing3.rotation.y = Math.PI * 4 / 3;
+        rocketGroup.add(body, nose, booster, wing, wing2, wing3);
+        rocketGroup.rotation.x = Math.PI / 2;
+        rocketGroup.scale.setScalar(1.2);
+        const trailParticles = [];
+        const particleCount = 300;
+        const trailGeometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+        trailGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        trailGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        const trailMaterial = new THREE.PointsMaterial({ size: 0.8, vertexColors: true, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false });
+        const trail = new THREE.Points(trailGeometry, trailMaterial);
+        for (let i = 0; i < particleCount; i++) {
+            trailParticles.push({
+                position: new THREE.Vector3(),
+                velocity: new THREE.Vector3(),
+                lifetime: 0,
+                maxLifetime: Math.random() * 2 + 1
+            });
         }
+        const spawnRadius = 1300;
+        const startX = (Math.random() > 0.5 ? 1 : -1) * spawnRadius;
+        const startY = (Math.random() - 0.5) * 500;
+        const startZ = (Math.random() - 0.5) * spawnRadius * 2;
+        rocketGroup.position.set(startX, startY, startZ);
+        rocketGroup.lookAt(0, 0, 0);
+        scene.add(rocketGroup, trail);
+        const duration = Math.random() * 12 + 8;
+        gsap.to(rocketGroup.position, {
+            x: -startX, y: -startY, z: -startZ, duration: duration, ease: "power1.in",
+            onComplete: () => {
+                scene.remove(rocketGroup, trail);
+                activePeakRockets = activePeakRockets.filter(r => r.group !== rocketGroup);
+            }
+        });
+        activePeakRockets.push({ group: rocketGroup, trail: trail, particles: trailParticles });
+    }
 
+    function updatePeakRocketTrail(rocket, delta) {
+        const positions = rocket.trail.geometry.attributes.position.array;
+        const colors = rocket.trail.geometry.attributes.color.array;
+        const enginePosition = rocket.group.position.clone().add(new THREE.Vector3(0, -6, 0).applyQuaternion(rocket.group.quaternion));
+        rocket.particles.forEach((p, i) => {
+            if (p.lifetime <= 0) {
+                p.position.copy(enginePosition);
+                const spread = 1.5;
+                p.velocity.set(
+                    (Math.random() - 0.5) * spread,
+                    (Math.random() - 0.5) * spread,
+                    (Math.random() - 0.5) * spread
+                ).add(rocket.group.position.clone().sub(p.position).normalize().multiplyScalar(-5));
+                p.lifetime = p.maxLifetime;
+            }
+            p.lifetime -= delta;
+            p.position.add(p.velocity.clone().multiplyScalar(delta));
+            const lifePercent = p.lifetime / p.maxLifetime;
+            const i3 = i * 3;
+            positions[i3] = p.position.x;
+            positions[i3 + 1] = p.position.y;
+            positions[i3 + 2] = p.position.z;
+            const color = new THREE.Color();
+            if (lifePercent > 0.7) {
+                color.setHSL(0.1, 1, 0.5 + (lifePercent - 0.7) * 1.5);
+            } else {
+                color.setHSL(0.05, 1, lifePercent * 0.7);
+            }
+            colors[i3] = color.r;
+            colors[i3 + 1] = color.g;
+            colors[i3 + 2] = color.b;
+        });
+        rocket.trail.geometry.attributes.position.needsUpdate = true;
+        rocket.trail.geometry.attributes.color.needsUpdate = true;
+    }
+
+    function createFieryAsteroid() {
         const asteroidGroup = new THREE.Group();
         const size = Math.random() * 4 + 2;
-
-        const coreGeometry = new THREE.DodecahedronGeometry(size, 1);
-        const coreMaterial = new THREE.MeshStandardMaterial({
-            map: textureLoader.load(assetPaths.asteroid),
-            emissive: 0xff6a00,
-            emissiveIntensity: 3.5,
-            roughness: 1
+        const coreGeometry = new THREE.DodecahedronGeometry(size, 3);
+        const uniforms = { uTime: { value: 0.0 } };
+        const coreMaterial = new THREE.ShaderMaterial({
+            uniforms: uniforms,
+            vertexShader: document.getElementById('vertexShader').textContent,
+            fragmentShader: document.getElementById('fragmentShader').textContent,
         });
         const asteroidCore = new THREE.Mesh(coreGeometry, coreMaterial);
         asteroidGroup.add(asteroidCore);
-
-        const particleCount = 1500;
-        const particlesGeometry = new THREE.BufferGeometry();
-        const posArray = new Float32Array(particleCount * 3);
-        const particleVelocities = [];
-
-        for (let i = 0; i < particleCount; i++) {
-            const vertex = new THREE.Vector3((Math.random() - 0.5) * size, (Math.random() - 0.5) * size, (Math.random() - 0.5) * size);
-            vertex.toArray(posArray, i * 3);
-            particleVelocities.push(new THREE.Vector3((Math.random() - 0.5) * 0.1, (Math.random() - 0.5) * 0.1, (Math.random() - 0.5) * 0.1));
-        }
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-
-        const particleTexture = createProceduralTexture((ctx, canvasSize) => {
+        const glowTexture = createProceduralTexture((ctx, canvasSize) => {
             const gradient = ctx.createRadialGradient(canvasSize / 2, canvasSize / 2, 0, canvasSize / 2, canvasSize / 2, canvasSize / 2);
-            gradient.addColorStop(0, 'rgba(255, 220, 150, 1)');
-            gradient.addColorStop(0.3, 'rgba(255, 150, 0, 0.8)');
+            gradient.addColorStop(0, 'rgba(255, 150, 0, 0.8)');
             gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvasSize, canvasSize);
         });
-
-        const particleMaterial = new THREE.PointsMaterial({
-            map: particleTexture,
-            size: 2.0,
+        const glowSprite = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: glowTexture,
             blending: THREE.AdditiveBlending,
-            transparent: true,
-            depthWrite: false,
-        });
-
-        const fireParticles = new THREE.Points(particlesGeometry, particleMaterial);
-        asteroidGroup.add(fireParticles);
-
+            transparent: true
+        }));
+        glowSprite.scale.set(size * 4, size * 4, 1);
+        asteroidGroup.add(glowSprite);
         const spawnRadius = 1000;
         const startX = (Math.random() - 0.5) * spawnRadius * 1.5;
         const startY = (Math.random() - 0.5) * 200;
         const startZ = (Math.random() > 0.5 ? 1 : -1) * (spawnRadius * 0.8);
         asteroidGroup.position.set(startX, startY, startZ);
         scene.add(asteroidGroup);
-
         const duration = Math.random() * 10 + 10;
         gsap.to(asteroidGroup.position, {
             x: -startX, y: -startY * 1.5, z: -startZ,
@@ -340,25 +413,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 activeAsteroids = activeAsteroids.filter(a => a.group !== asteroidGroup);
             }
         });
-
-        activeAsteroids.push({
-            group: asteroidGroup,
-            particles: fireParticles,
-            velocities: particleVelocities,
-            coreSize: size
-        });
+        activeAsteroids.push({ group: asteroidGroup, uniforms: uniforms });
     }
 
     function createComet() {
         const headGeometry = new THREE.SphereGeometry(2, 32, 32);
         const headMaterial = new THREE.MeshBasicMaterial({ color: 0x87ceeb });
         const cometHead = new THREE.Mesh(headGeometry, headMaterial);
-
         const particleCount = 1000;
         const particlesGeometry = new THREE.BufferGeometry();
         const posArray = new Float32Array(particleCount * 3);
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-
         const cometParticleTexture = createProceduralTexture((ctx, size) => {
             const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
             gradient.addColorStop(0, 'rgba(173, 216, 230, 1)');
@@ -367,21 +432,18 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, size, size);
         });
-
         const particleMaterial = new THREE.PointsMaterial({
             map: cometParticleTexture, size: 2.5, blending: THREE.AdditiveBlending,
             transparent: true, depthWrite: false, sizeAttenuation: true
         });
         const cometTail = new THREE.Points(particlesGeometry, particleMaterial);
         cometHead.add(cometTail);
-
         const spawnRadius = 900;
         const startX = (Math.random() > 0.5 ? 1 : -1) * spawnRadius;
         const startY = (Math.random() - 0.5) * 400;
         const startZ = (Math.random() - 0.5) * spawnRadius * 2;
         cometHead.position.set(startX, startY, startZ);
         scene.add(cometHead);
-
         const duration = Math.random() * 15 + 20;
         gsap.to(cometHead.position, {
             x: -startX, z: -startZ, duration: duration, ease: "power1.in",
@@ -440,33 +502,7 @@ document.addEventListener('DOMContentLoaded', function() {
         star.addEventListener('click', onStarCaught, { once: true });
         animation.onfinish = () => star.remove();
     }
-
-    function animateCamera(targetPosition, targetLookAt, duration = 1.5, onComplete = null) {
-        if (isAnimatingCamera) return;
-        isAnimatingCamera = true;
-        controls.enabled = false;
-
-        const tl = gsap.timeline({
-            onComplete: () => {
-                isAnimatingCamera = false;
-                controls.enabled = true;
-                if (onComplete) onComplete();
-            }
-        });
-
-        tl.to(camera.position, {
-            x: targetPosition.x, 
-            y: targetPosition.y,
-            z: targetPosition.z,
-            duration: duration, ease: "power2.inOut"
-        }, 0);
-
-        tl.to(controls.target, {
-            x: targetLookAt.x, y: targetLookAt.y, z: targetLookAt.z,
-            duration: duration, ease: "power3.inOut"
-        }, 0);
-    }
-
+    
     function createTextParticle() {
         if (!galaxy || activeParticles.size >= config.maxParticles) return;
         const messagesToUse = isBirthdayMode ? birthdayMessages : messages;
@@ -520,9 +556,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkAndPreloadNightlySong() {
         const now = new Date();
         if (now.getHours() < 22) return;
-
         const dailySongData = dailySongs.find(s => s.day === now.getDate());
-
         if (dailySongData && dailySongData.song.file !== preloadedNightlySong.url) {
             console.log(`Đang tải trước bài hát cho thư tối: ${dailySongData.song.title}`);
             const audioPreloader = new Audio();
@@ -535,7 +569,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================
     // PHẦN 4: LOGIC GIAO DIỆN NGƯỜI DÙNG (UI)
     // =================================================================
-
     function typewriterEffect(elementsToType, onComplete = () => { }) {
         if (typingInterval) clearInterval(typingInterval);
         let elementIndex = 0; let charIndex = 0;
@@ -605,9 +638,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function playTrack(track, isSpecialLetterTrack = false) {
         isPreloadingNextSong = false;
-
         if (!track || !track.file) { console.error("Lỗi: Đang cố gắng phát một bài hát không hợp lệ.", track); playNextInMix(); return; }
-
         if (!wavesurfer) {
             wavesurfer = WaveSurfer.create({
                 container: waveformContainer, waveColor: 'rgba(200, 200, 200, 0.5)', progressColor: '#ff6b9d',
@@ -617,17 +648,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 isLetterModeActive = false;
                 if (isBirthdayMode && birthdayData) { playTrack(birthdayData.song); } else { playNextInMix(); }
             });
-
             wavesurfer.on('audioprocess', () => {
                 const currentTime = wavesurfer.getCurrentTime();
                 const duration = wavesurfer.getDuration();
                 currentTimeEl.textContent = formatTime(currentTime);
-
                 if (duration > 20 && (duration - currentTime) < 20 && !isPreloadingNextSong) {
                     isPreloadingNextSong = true;
                     const nextTrackIndex = upNextIndex % upNextPlaylist.length;
                     const nextTrack = upNextPlaylist[nextTrackIndex];
-
                     if (nextTrack && nextTrack.file) {
                         console.log(`Đang tải trước bài hát tiếp theo: ${nextTrack.title}`);
                         const preloader = new Audio();
@@ -635,7 +663,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             });
-
             wavesurfer.on('error', (err) => { console.error(`Lỗi WaveSurfer: ${err}`); songTitleEl.textContent = "Bài hát lỗi, tự chuyển bài..."; setTimeout(playNextInMix, 2000); });
             wavesurfer.on('play', () => playPauseBtn.textContent = '❚❚');
             wavesurfer.on('pause', () => playPauseBtn.textContent = '▶');
@@ -731,20 +758,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const closeBtn = document.createElement('button');
         closeBtn.id = 'close-letter-btn';
         closeBtn.innerHTML = '×';
-
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = letterData.content;
         const pElements = Array.from(tempDiv.querySelectorAll('p'));
-
         letterContentDiv.append(closeBtn, titleEl, ...pElements, signatureEl);
-
         const signatureText = isBirthday ? 'Yêu cậu nhất luôn,<br>tun' : (specialSong ? 'Yêu cậu rất nhiều,<br>tun' : 'Luôn bên cạnh cậu,<br>tun');
         const elementsToType = [{ element: titleEl, text: letterData.title }, ...pElements.map(p => ({ element: p, text: p.innerHTML })), { element: signatureEl, text: signatureText }];
-
         letterContainer.classList.remove('hidden');
         typewriterEffect(elementsToType);
         if (specialSong && !isBirthday) fadeToSpecialTrack(specialSong);
-
         closeBtn.addEventListener('click', () => {
             letterContainer.classList.add('hidden');
             if (typingInterval) clearTimeout(typingInterval);
@@ -765,62 +787,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!wavesurfer) {
                 if (isBirthdayMode && birthdayData) { playTrack(birthdayData.song); } else { createDailyMix(); playNextInMix(); }
             } else { wavesurfer.play(); }
-
             overlay.classList.add('hidden-overlay');
             waveformControls.classList.remove('hidden');
             settingsToggleBtn.classList.remove('hidden');
             adjustLetterButtonPosition();
         };
-
         overlay.addEventListener('click', (event) => {
             event.stopPropagation();
             startAudio();
         }, { once: true });
-
-       closeInfoBtn.addEventListener('click', () => {
-            if (isAnimatingCamera) return;
-    
-            infoCard.classList.add('hidden');
-            
-            if (!followedObject) return;
-
-            // Xóa theo dõi ngay lập tức
-            followedObject = null;
-
-            // Bật lại animation
-            isAnimatingCamera = true;
-            controls.enabled = false;
-
-            // Tạo animation trở về vị trí ban đầu
-            const tl = gsap.timeline({
-                onComplete: () => {
-                    // Reset controls về trạng thái ban đầu
-                    controls.minDistance = originalControlsDistance.min;
-                    controls.maxDistance = originalControlsDistance.max;
-                    controls.enablePan = true;
-                    controls.enabled = true;
-                    isAnimatingCamera = false;
-                }
-            });
-
-            // Animation mượt mà trở về vị trí ban đầu
-            tl.to(camera.position, {
-                x: originalCameraPosition.x,
-                y: originalCameraPosition.y,
-                z: originalCameraPosition.z,
-                duration: 1.5,
-                ease: 'power2.inOut'
-            }, 0)
-            .to(controls.target, {
-                x: originalControlsTarget.x,
-                y: originalControlsTarget.y,
-                z: originalControlsTarget.z,
-                duration: 1.5,
-                ease: 'power2.inOut'
-            }, 0);
-        });
-
-
+        closeInfoBtn.addEventListener('click', resetCameraToDefault);
         nextBtn.addEventListener('click', playNextInMix);
         prevBtn.addEventListener('click', playPrevInMix);
         playPauseBtn.addEventListener('click', () => wavesurfer?.playPause());
@@ -843,7 +819,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================
     // PHẦN 5: THẾ GIỚI 3D (THREE.JS)
     // =================================================================
-
     function initThreeJS() {
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
@@ -852,28 +827,63 @@ document.addEventListener('DOMContentLoaded', function() {
         renderer.setClearColor(0x000000, 0);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.setSize(window.innerWidth, window.innerHeight);
-
         scene.add(new THREE.AmbientLight(0xffffff, 0.5));
         scene.add(new THREE.PointLight(0xffffff, 1.5));
-
         controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true; controls.dampingFactor = 0.05;
         controls.minDistance = 20; controls.maxDistance = 1200;
-
         controls.enablePan = true;
         controls.panSpeed = 0.8;
         controls.enableZoom = true;
         controls.zoomSpeed = 0.8;
         controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
-
+        controls.addEventListener('start', () => {
+            isAutoRotating = false;
+        });
         createStarfield();
         createSolarSystem();
         createBackgroundNebulae();
-
         window.addEventListener('resize', onWindowResize);
         window.addEventListener('click', onClick);
         animate();
         initializeDefaultCameraPosition();
+        setTimeout(() => {
+            initializeDefaultCameraPosition();
+        }, 100);
+    }
+
+    function handleAutoRotation() {
+        if (!isAutoRotating || !followedObject || isAnimatingCamera) return;
+
+        // 1. Lấy vị trí và kích thước thực tế của hành tinh
+        const planetPosition = new THREE.Vector3();
+        followedObject.getWorldPosition(planetPosition);
+        const boundingBox = new THREE.Box3().setFromObject(followedObject);
+        const planetRadius = boundingBox.getSize(new THREE.Vector3()).length() / 2;
+
+        // 2. Cập nhật góc quay với tốc độ đã định
+        autoRotateAngle += cameraSettings.autoRotateSpeed;
+
+        // 3. Tính khoảng cách hiện tại từ camera đến hành tinh
+        const distance = camera.position.distanceTo(planetPosition);
+
+        // 4. TÍNH TOÁN QUỸ ĐẠO MỚI (PHÉP THUẬT NẰM Ở ĐÂY)
+        // Vẫn dùng sin/cos cho chuyển động tròn trên mặt phẳng XZ
+        const newX = planetPosition.x + distance * Math.cos(autoRotateAngle);
+        const newZ = planetPosition.z + distance * Math.sin(autoRotateAngle);
+
+        // Thêm chuyển động lên/xuống mượt mà theo đường cong SIN
+        // Khi quay được nửa vòng, camera sẽ ở điểm cao nhất của vòng cung
+        const newY = planetPosition.y + (planetRadius * cameraSettings.verticalArcAmount * Math.sin(autoRotateAngle));
+
+        // 5. Cập nhật vị trí camera
+        camera.position.set(newX, newY, newZ);
+
+        // 6. ĐIỂM NHÌN ĐIỆN ẢNH: Không nhìn vào tâm, mà nhìn hơi cao hơn một chút
+        const lookAtTarget = planetPosition.clone().add(
+            new THREE.Vector3(0, planetRadius * cameraSettings.lookAtHeightOffset, 0)
+        );
+        camera.lookAt(lookAtTarget);
     }
 
     function createSunEffects(sunMesh) {
@@ -929,33 +939,48 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function createSpaceStation() {
-        const earthData = celestialObjects.find(obj => obj.mesh.userData.id === 'earth');
-        if (!earthData) return;
-        const issPivot = new THREE.Object3D();
-        earthData.pivot.add(issPivot);
-
-        const issMaterial = new THREE.SpriteMaterial({ map: textureLoader.load(assetPaths.vetinh), blending: THREE.AdditiveBlending, transparent: true });
-        const issSprite = new THREE.Sprite(issMaterial);
-        issSprite.scale.set(18, 18, 1);
-        issSprite.position.x = earthData.mesh.geometry.parameters.radius + 12;
-
-        const stationOrbitPivot = new THREE.Object3D();
-        stationOrbitPivot.add(issSprite);
-        issPivot.add(stationOrbitPivot);
-
-        const lightTexture = createProceduralTexture((ctx, size) => {
-            const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-            ctx.fillStyle = gradient; ctx.fillRect(0, 0, size, size);
+    function createExploringSatellite() {
+        const satelliteGroup = new THREE.Group();
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0xeeeeee, metalness: 0.9, roughness: 0.1 });
+        const panelMat = new THREE.MeshStandardMaterial({ color: 0x003366, metalness: 0.5, emissive: 0x001133 });
+        const body = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 2), bodyMat);
+        satelliteGroup.add(body);
+        const panel1 = new THREE.Mesh(new THREE.PlaneGeometry(5, 2), panelMat);
+        panel1.position.x = 3;
+        const panel2 = panel1.clone();
+        panel2.position.x = -3;
+        satelliteGroup.add(panel1, panel2);
+        const antenna = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 3), bodyMat);
+        antenna.position.z = 2.5;
+        satelliteGroup.add(antenna);
+        satelliteGroup.scale.setScalar(1.5);
+        const spawnRadius = 1200;
+        const startPosition = new THREE.Vector3(
+            (Math.random() - 0.5) * spawnRadius * 2,
+            (Math.random() - 0.5) * 400,
+            (Math.random() > 0.5 ? 1 : -1) * spawnRadius
+        );
+        satelliteGroup.position.copy(startPosition);
+        const targetPlanet = getRandomItem(celestialObjects.filter(obj => obj.userData.type === 'planet'));
+        const targetPosition = new THREE.Vector3();
+        targetPlanet.mesh.getWorldPosition(targetPosition);
+        targetPosition.x += (Math.random() - 0.5) * 100;
+        targetPosition.y += (Math.random() - 0.5) * 50;
+        satelliteGroup.lookAt(targetPosition);
+        scene.add(satelliteGroup);
+        const duration = Math.random() * 20 + 25;
+        gsap.to(satelliteGroup.position, {
+            x: targetPosition.x,
+            y: targetPosition.y,
+            z: targetPosition.z,
+            duration: duration,
+            ease: "none",
+            onComplete: () => {
+                scene.remove(satelliteGroup);
+                activeSatellites = activeSatellites.filter(s => s !== satelliteGroup);
+            }
         });
-
-        const redLight = new THREE.Sprite(new THREE.SpriteMaterial({ map: lightTexture, color: 0xff0000, blending: THREE.AdditiveBlending }));
-        redLight.scale.set(0.5, 0.5, 1); redLight.position.set(2, 1, 0.1); issSprite.add(redLight);
-        const whiteLight = new THREE.Sprite(new THREE.SpriteMaterial({ map: lightTexture, color: 0xffffff, blending: THREE.AdditiveBlending }));
-        whiteLight.scale.set(0.5, 0.5, 1); whiteLight.position.set(-2, -1, 0.1); issSprite.add(whiteLight);
-
-        spaceStationEffects = { pivot: stationOrbitPivot, lights: [redLight, whiteLight] };
+        activeSatellites.push(satelliteGroup);
     }
 
     function createStarfield() {
@@ -979,80 +1004,167 @@ document.addEventListener('DOMContentLoaded', function() {
     function createSolarSystem() {
         celestialData.forEach(data => {
             const pivot = new THREE.Object3D();
-            if (data.type === 'planet') {
-                pivot.rotation.x = (Math.random() - 0.5) * 0.1;
-                pivot.rotation.z = (Math.random() - 0.5) * 0.1;
-            }
             scene.add(pivot);
-
             const geometry = new THREE.SphereGeometry(data.size, 64, 64);
-            const material = data.type === 'star' ? new THREE.MeshBasicMaterial({ map: textureLoader.load(data.texture) })
+            const material = data.type === 'star'
+                ? new THREE.MeshBasicMaterial({ map: textureLoader.load(data.texture) })
                 : new THREE.MeshStandardMaterial({ map: textureLoader.load(data.texture), roughness: 0.9, metalness: 0.1 });
-
             const mesh = new THREE.Mesh(geometry, material);
             mesh.position.x = data.orbitRadius;
-            const spinPivot = new THREE.Object3D();
-            spinPivot.add(mesh);
-            pivot.add(spinPivot);
-
-            if (data.id === 'sun') createSunEffects(mesh);
-            if (data.id === 'saturn') createAsteroidBelt(data.size * 1.5, 15, 2000);
-
-            // SỬA LỖI: Không gán lại data.mesh ở đây
             mesh.userData = { ...data, isClickable: true };
-            celestialObjects.push({ mesh, pivot, spinPivot, orbitSpeed: data.orbitSpeed, spinSpeed: data.spinSpeed });
-
+            pivot.add(mesh);
+            if (data.id === 'sun') createSunEffects(mesh);
+            celestialObjects.push({
+                mesh: mesh,
+                pivot: pivot,
+                orbitSpeed: data.orbitSpeed,
+                spinSpeed: data.spinSpeed,
+                userData: data
+            });
             if (data.moons) {
                 data.moons.forEach(moonData => {
-                    const moonPivot = new THREE.Object3D(); mesh.add(moonPivot);
+                    const moonPivot = new THREE.Object3D();
+                    mesh.add(moonPivot);
                     const moonGeometry = new THREE.SphereGeometry(moonData.size, 32, 32);
                     const moonMaterial = new THREE.MeshStandardMaterial({ map: textureLoader.load(moonData.texture), roughness: 0.9 });
                     const moonMesh = new THREE.Mesh(moonGeometry, moonMaterial);
                     moonMesh.position.x = moonData.orbitRadius;
                     moonMesh.userData = { ...moonData, isClickable: false };
-                    const moonSpinPivot = new THREE.Object3D(); moonSpinPivot.add(moonMesh); moonPivot.add(moonSpinPivot);
-                    celestialObjects.push({ mesh: moonMesh, pivot: moonPivot, spinPivot: moonSpinPivot, orbitSpeed: moonData.orbitSpeed, spinSpeed: moonData.spinSpeed });
+                    moonPivot.add(moonMesh);
+                    celestialObjects.push({
+                        mesh: moonMesh,
+                        pivot: moonPivot,
+                        orbitSpeed: moonData.orbitSpeed,
+                        spinSpeed: moonData.spinSpeed,
+                        userData: moonData
+                    });
                 });
             }
         });
-        createSpaceStation();
+    }
+
+    function createProceduralSaturnRing() {
+        const particleCount = 50000;
+        const positions = [];
+        const colors = [];
+        const innerRadius = 40;
+        const outerRadius = 65;
+        const thickness = 2;
+        const colorInside = new THREE.Color("#BDB7A5");
+        const colorMiddle = new THREE.Color("#A59B82");
+        const colorOutside = new THREE.Color("#D4CDBA");
+        for (let i = 0; i < particleCount; i++) {
+            const radius = THREE.MathUtils.randFloat(innerRadius, outerRadius);
+            const angle = Math.random() * Math.PI * 2;
+            const x = Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+            const y = (Math.random() - 0.5) * thickness * (1 - (radius - innerRadius) / (outerRadius - innerRadius));
+            positions.push(x, y, z);
+            const percent = (radius - innerRadius) / (outerRadius - innerRadius);
+            let color;
+            if (percent < 0.3) {
+                color = colorInside;
+            } else if (percent < 0.8) {
+                color = colorMiddle.clone().lerp(colorInside, (percent - 0.3) / 0.5);
+            } else {
+                color = colorOutside;
+            }
+            colors.push(color.r, color.g, color.b);
+        }
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+        const material = new THREE.PointsMaterial({
+            size: 0.2,
+            vertexColors: true,
+            blending: THREE.AdditiveBlending,
+            transparent: true,
+            opacity: 0.7
+        });
+        const ringParticles = new THREE.Points(geometry, material);
+        const saturnObject = celestialObjects.find(obj => obj.userData.id === 'saturn');
+        if (saturnObject) {
+            saturnObject.mesh.add(ringParticles);
+        }
+    }
+    
+    function animateCamera(targetPosition, targetLookAt, duration = 1.5, onComplete = null) {
+        if (isAnimatingCamera) return;
+        isAnimatingCamera = true;
+        controls.enabled = false; // Tắt điều khiển tạm thời
+
+        const cameraProxy = {
+            posX: camera.position.x, posY: camera.position.y, posZ: camera.position.z,
+            targetX: controls.target.x, targetY: controls.target.y, targetZ: controls.target.z,
+        };
+
+        gsap.to(cameraProxy, {
+            duration: duration,
+            ease: "power3.inOut",
+            posX: targetPosition.x, posY: targetPosition.y, posZ: targetPosition.z,
+            targetX: targetLookAt.x, targetY: targetLookAt.y, targetZ: targetLookAt.z,
+            onUpdate: () => {
+                camera.position.set(cameraProxy.posX, cameraProxy.posY, cameraProxy.posZ);
+                controls.target.set(cameraProxy.targetX, cameraProxy.targetY, cameraProxy.targetZ);
+                controls.update(); // Rất quan trọng: đồng bộ OrbitControls
+            },
+            onComplete: () => {
+                isAnimatingCamera = false;
+                controls.enabled = true;
+                if (onComplete) onComplete();
+            }
+        });
+    }
+
+    function resetCameraToDefault() {
+        if (isAnimatingCamera || !followedObject) return;
+        isAutoRotating = false; // Tắt chế độ tự xoay
+        
+        infoCard.classList.add('hidden');
+        followedObject = null; // Ngừng theo dõi
+
+        animateCamera(
+            originalCameraPosition, // Vị trí camera ban đầu đã lưu
+            originalControlsTarget, // Điểm nhìn ban đầu đã lưu
+            1.5,
+            () => {
+                // Khôi phục lại các cài đặt ban đầu của controls
+                controls.minDistance = originalControlsDistance.min;
+                controls.maxDistance = originalControlsDistance.max;
+                controls.enablePan = true;
+            }
+        );
+    }
+
+    function updateFollowedObject() {
+        // Chỉ hoạt động khi có đối tượng được theo dõi và camera không đang trong quá trình chuyển cảnh
+        if (followedObject && !isAnimatingCamera) {
+            const targetPosition = new THREE.Vector3();
+            followedObject.getWorldPosition(targetPosition);
+            
+            // Cập nhật điểm nhìn của OrbitControls
+            controls.target.copy(targetPosition);
+        }
     }
 
     function animate() {
         requestAnimationFrame(animate);
         const elapsedTime = clock.getElapsedTime();
         const delta = clock.getDelta();
-
         celestialObjects.forEach(obj => {
             if (obj.pivot) {
-                obj.pivot.rotation.y += (obj.orbitSpeed || 0) * 0.5 * delta;
+                obj.pivot.rotation.y += (obj.orbitSpeed || 0) * 0.1 * delta;
             }
-            if (obj.spinPivot) {
-                obj.spinPivot.rotation.y += (obj.spinSpeed || 0) * delta;
-            }
+            obj.mesh.rotation.y += (obj.spinSpeed || 0) * delta;
         });
-
         if (sunEffects.corona) sunEffects.corona.material.rotation = elapsedTime * 0.01;
-
         activeAsteroids.forEach(a => {
-            const positions = a.particles.geometry.attributes.position.array;
-            for (let i = 0; i < a.velocities.length; i++) {
-                const i3 = i * 3;
-                positions[i3] += a.velocities[i].x;
-                positions[i3 + 1] += a.velocities[i].y;
-                positions[i3 + 2] += a.velocities[i].z;
-
-                const dist = Math.sqrt(positions[i3] ** 2 + positions[i3 + 1] ** 2 + positions[i3 + 2] ** 2);
-                if (dist > a.coreSize * 2.5) {
-                    positions[i3] = (Math.random() - 0.5) * a.coreSize;
-                    positions[i3 + 1] = (Math.random() - 0.5) * a.coreSize;
-                    positions[i3 + 2] = (Math.random() - 0.5) * a.coreSize;
-                }
+            if (a.uniforms) {
+                a.uniforms.uTime.value = elapsedTime;
             }
-            a.particles.geometry.attributes.position.needsUpdate = true;
-            a.group.rotation.y += 0.005;
+            a.group.rotation.y += 0.005 * delta * 60;
+            a.group.rotation.x += 0.002 * delta * 60;
         });
-
         activeComets.forEach(c => {
             const particles = c.tail.geometry.attributes.position.array;
             for (let i = 0; i < particles.length; i += 3) {
@@ -1066,59 +1178,17 @@ document.addEventListener('DOMContentLoaded', function() {
             c.tail.geometry.attributes.position.needsUpdate = true;
         });
 
-        if (spaceStationEffects.pivot) {
-            spaceStationEffects.pivot.rotation.y += 0.05 * delta;
-            const time = elapsedTime;
-            spaceStationEffects.lights[0].visible = Math.sin(time * 5) > 0.5;
-            spaceStationEffects.lights[1].visible = Math.sin(time * 10) > 0.5;
-        }
-
+        activePeakRockets.forEach(rocket => updatePeakRocketTrail(rocket, delta));
         if (starfield) starfield.rotation.y -= 0.00005;
         updateFollowedObject();
-        controls.update();
+        handleAutoRotation();
+        if (!isAnimatingCamera) {
+            controls.update();
+        }
         renderer.render(scene, camera);
+
     }
 
-    function updateFollowedObject() {
-        if (!followedObject) return;
-        
-        const targetPosition = new THREE.Vector3();
-        followedObject.getWorldPosition(targetPosition);
-        
-        // Kiểm tra xem đối tượng có phải mặt trời không
-        const isSun = followedObject.userData && followedObject.userData.id === 'sun';
-        
-        if (isSun) {
-            // Xử lý đặc biệt cho mặt trời - ít aggressive hơn
-            const desiredCameraPosition = targetPosition.clone().add(cameraOffset);
-            camera.position.lerp(desiredCameraPosition, 0.02); // Lerp chậm hơn
-            controls.target.lerp(targetPosition, 0.03);
-            
-            // Kiểm tra khoảng cách cho mặt trời
-            const distance = camera.position.distanceTo(targetPosition);
-            const minDistance = controls.minDistance;
-            if (distance < minDistance) {
-                const direction = new THREE.Vector3()
-                    .subVectors(camera.position, targetPosition)
-                    .normalize();
-                camera.position.copy(targetPosition.clone().add(direction.multiplyScalar(minDistance + 5)));
-            }
-        } else {
-            // Logic cũ cho các hành tinh khác
-            const desiredCameraPosition = targetPosition.clone().add(cameraOffset);
-            camera.position.lerp(desiredCameraPosition, 0.05);
-            controls.target.lerp(targetPosition, 0.08);
-            
-            const distance = camera.position.distanceTo(targetPosition);
-            const minDistance = controls.minDistance;
-            if (distance < minDistance) {
-                const direction = new THREE.Vector3()
-                    .subVectors(camera.position, targetPosition)
-                    .normalize();
-                camera.position.copy(targetPosition.clone().add(direction.multiplyScalar(minDistance)));
-            }
-        }
-    }
     function onWindowResize() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
@@ -1126,104 +1196,86 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function onClick(event) {
-    if (overlay.classList.contains('hidden-overlay') === false ||
-        letterContainer.classList.contains('hidden') === false) {
-        return;
-    }
-
-    if (isAnimatingCamera) return;
-    
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    raycaster.setFromCamera(mouse, camera);
-    
-    // Lấy tất cả objects có thể click
-    const clickableObjects = celestialObjects
-        .map(obj => obj.mesh)
-        .filter(mesh => mesh.userData && mesh.userData.isClickable);
-    
-    const intersects = raycaster.intersectObjects(clickableObjects, false);
-    
-    if (intersects.length > 0 && infoCard.classList.contains('hidden')) {
-        const clickedMesh = intersects[0].object;
-        if (clickedMesh.userData) {
-            // LƯU VỊ TRÍ CAMERA HIỆN TẠI TRƯỚC KHI CHUYỂN ĐỔI
-            originalCameraPosition.copy(camera.position);
-            originalControlsTarget.copy(controls.target);
-            originalControlsDistance.min = controls.minDistance;
-            originalControlsDistance.max = controls.maxDistance;
-            showPlanetInfo(clickedMesh);
+        if (overlay.classList.contains('hidden-overlay') === false || letterContainer.classList.contains('hidden') === false) {
+            return;
+        }
+        if (isAnimatingCamera) return;
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        const clickableObjects = celestialObjects
+            .map(obj => obj.mesh)
+            .filter(mesh => mesh.userData && mesh.userData.isClickable);
+        const intersects = raycaster.intersectObjects(clickableObjects, false);
+        if (intersects.length > 0 && infoCard.classList.contains('hidden')) {
+            const clickedMesh = intersects[0].object;
+            if (clickedMesh.userData) {
+                originalCameraPosition.copy(camera.position);
+                originalControlsTarget.copy(controls.target);
+                originalControlsDistance.min = controls.minDistance;
+                originalControlsDistance.max = controls.maxDistance;
+                showPlanetInfo(clickedMesh);
+            }
         }
     }
-}
 
-    function showPlanetInfo(clickedMesh) { 
-    if (isAnimatingCamera || !clickedMesh || !clickedMesh.userData) return;
-    
-    const data = clickedMesh.userData;
-    controls.enablePan = false;
+    function showPlanetInfo(clickedMesh) {
+        if (isAnimatingCamera || !clickedMesh || !clickedMesh.userData) return;
+        isAutoRotating = false; // Tắt chế độ tự xoay khi chọn hành tinh
+        const data = clickedMesh.userData;
 
-    // Lấy vị trí thế giới chính xác
-    const planetPosition = new THREE.Vector3();
-    clickedMesh.getWorldPosition(planetPosition);
-    let distance, cameraTargetPosition;
-    if (data.id === 'sun') {
-        distance = data.size * 2.5;
-        const directionToSun = new THREE.Vector3()
-            .subVectors(camera.position, planetPosition)
-            .normalize();
-        cameraTargetPosition = planetPosition.clone()
-            .add(directionToSun.multiplyScalar(distance)); // Use positive distance
-        cameraTargetPosition.y = Math.max(cameraTargetPosition.y, data.size * 0.5);
-    } else {
-        // Tính toán vị trí camera phù hợp
-        distance = Math.max(data.size * 4, 50); // Đảm bảo khoảng cách tối thiểu
-        const currentCameraDir = new THREE.Vector3()
-            .subVectors(camera.position, planetPosition)
-            .normalize();
-        
-        cameraTargetPosition = planetPosition.clone()
-            .add(currentCameraDir.multiplyScalar(distance));
-    }
-
-    animateCamera(cameraTargetPosition, planetPosition, 1.5, () => {
-        // Lưu đối tượng đang theo dõi
         followedObject = clickedMesh;
-        
-        // Thiết lập giới hạn controls dựa trên loại thiên thể
-        if (data.id === 'sun') {
-            controls.minDistance = data.size * 1.8;
-            controls.maxDistance = data.size * 5;
-        } else {
-            controls.minDistance = Math.max(data.size * 1.5, 20);
-            controls.maxDistance = Math.max(data.size * 10, 200);
-        }
-        
-        // Tính toán và lưu offset camera - QUAN TRỌNG: Tính sau animation
-        setTimeout(() => {
-            const currentPosition = new THREE.Vector3();
-            clickedMesh.getWorldPosition(currentPosition);
-            cameraOffset.subVectors(camera.position, currentPosition);
-        }, 100); // Đợi animation ổn định
-    });
+        controls.enablePan = false;
 
-    // Hiển thị thông tin
-    infoCardTitle.textContent = data.name || 'Unknown';
-    infoCardFact.textContent = data.fact || '';
-    infoCardMessage.textContent = data.message || '';
-    
-    // Cập nhật vị trí info card
-    const playerHeight = waveformControls.classList.contains('hidden') ? 0 : waveformControls.offsetHeight;
-    infoCard.style.bottom = `${playerHeight + 30}px`;
-    infoCard.classList.remove('hidden');
-}
-    function initializeDefaultCameraPosition() {
-        // Lưu vị trí camera mặc định
-        originalCameraPosition.set(0, 150, 400);
-        originalControlsTarget.set(0, 0, 0);
-        originalControlsDistance.min = 20;
-        originalControlsDistance.max = 1200;
+        const planetPosition = new THREE.Vector3();
+        clickedMesh.getWorldPosition(planetPosition);
+
+
+        const boundingBox = new THREE.Box3().setFromObject(clickedMesh);
+        const size = new THREE.Vector3();
+        boundingBox.getSize(size);
+        const planetRadius = size.length() / 2; // Bán kính thực tế, chính xác hơn
+
+        // Tính khoảng cách camera lý tưởng, cộng thêm một khoảng an toàn nhỏ
+        const idealDistance = planetRadius * 2.5; // Luôn cách bề mặt ít nhất 5 đơn vị
+
+        // Lấy hướng camera hiện tại để giữ góc nhìn
+        const cameraDirection = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
+        const cameraTargetPosition = planetPosition.clone().add(cameraDirection.multiplyScalar(idealDistance));
+        cameraTargetPosition.y = Math.max(cameraTargetPosition.y, planetPosition.y + planetRadius * 0.5);
+
+        // =================================================================
+
+        // Bắt đầu animation
+        animateCamera(cameraTargetPosition, planetPosition, 1.5, () => {
+            // Cập nhật giới hạn zoom sau khi đến nơi
+            controls.minDistance = planetRadius * 1.2; // Cho phép zoom gần hơn một chút
+            controls.maxDistance = planetRadius * 15;
+            // KÍCH HOẠT TỰ ĐỘNG XOAY KHI ANIMATION KẾT THÚC
+            // 1. Tính toán góc bắt đầu để tránh camera bị "giật"
+            const startAngleVec = new THREE.Vector3().subVectors(camera.position, planetPosition);
+            autoRotateAngle = Math.atan2(startAngleVec.z, startAngleVec.x);
+            
+            // 2. Bật cờ tự động xoay
+            isAutoRotating = true;
+        });
+
+        // Hiển thị thẻ thông tin
+        infoCardTitle.textContent = data.name || 'Unknown';
+        infoCardFact.textContent = data.fact || '';
+        infoCardMessage.textContent = data.message || '';
+        const playerHeight = waveformControls.classList.contains('hidden') ? 0 : waveformControls.offsetHeight;
+        infoCard.style.bottom = `${playerHeight + 30}px`;
+        infoCard.classList.remove('hidden');
     }
+
+    function initializeDefaultCameraPosition() {
+        originalCameraPosition.copy(camera.position);
+        originalControlsTarget.copy(controls.target);
+        originalControlsDistance.min = controls.minDistance;
+        originalControlsDistance.max = controls.maxDistance;
+    }
+
     // =================================================================
     // PHẦN 6: VÒNG LẶP CHÍNH VÀ KHỞI TẠO
     // =================================================================
@@ -1234,27 +1286,30 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         requestAnimationFrame(mainLoop);
     }
+
     function init() {
         runBirthdayCheck();
         setupUIEventListeners();
         initThreeJS();
+        // **TỐI ƯU HÓA 5**: Gọi các hàm tạo hiệu ứng chính ở đây để cấu trúc rõ ràng hơn
+        createProceduralSaturnRing();
+        createAsteroidBelt(375, 50, 2000);
 
         checkAndPreloadNightlySong();
         setInterval(checkAndPreloadNightlySong, 60000);
-
         setTimeout(() => setInterval(createShootingStar, config.shootingStarInterval), 3000);
         setTimeout(() => {
             createFieryAsteroid();
             setInterval(createFieryAsteroid, config.asteroidInterval);
         }, 8000);
         setTimeout(() => setInterval(createComet, config.cometInterval), 10000);
-
         setupGyroControls();
         setupMouseParallax();
         requestAnimationFrame(mainLoop);
         if (isBirthdayMode) { activateBirthdayMode(); } else { checkAndSetupLetterButton(); }
         setTimeout(() => loadingScreen.classList.add('loaded'), 3000);
+        setTimeout(() => setInterval(createPeakRocket, 18000), 15000);
+        setTimeout(() => setInterval(createExploringSatellite, 20000), 5000);
     }
     init();
 });
-
