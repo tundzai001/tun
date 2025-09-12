@@ -9,459 +9,223 @@
     /* Biến cho hiệu ứng con quay hồi chuyển trên điện thoại */
     --gyro-rotate-x: 0deg;
     --gyro-rotate-y: 0deg;
-}
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+    /* Biến màu chủ đề mặc định (Ban ngày) */
+    --theme-color-primary: #ff6b9d;
+    --theme-color-secondary: #c534ed;
+    --theme-text-special: #a8e6cf;
 }
-
+* { margin: 0; padding: 0; box-sizing: border-box; }
 html, body {
-    width: 100%;
-    height: 100%;
-    position: fixed; /* Ngăn cuộn trang */
-    overflow: hidden;
-    -webkit-user-select: none; /* Chặn chọn văn bản */
-    user-select: none;
-    touch-action: none; /* Tối ưu hóa cho cảm ứng */
-    -webkit-tap-highlight-color: transparent;
+    width: 100%; height: 100%; position: fixed;
+    overflow: hidden; user-select: none;
+    touch-action: none; -webkit-tap-highlight-color: transparent;
 }
-
-body {
-    background-color: #000;
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    cursor: default;
-}
-
-.hidden {
-    display: none !important;
-}
-
+body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: default; }
+.hidden { display: none !important; }
 
 /* ======================================================= */
 /* 2. CANVAS 3D & CÁC LỚP NỀN (BACKGROUND LAYERS)       */
 /* ======================================================= */
-
-/* 
-   FIX LỖI QUAN TRỌNG NHẤT:
-   Đặt canvas chiếm toàn bộ màn hình và nằm ở lớp dưới cùng.
-*/
 #webgl-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    outline: none;
-    z-index: 1; /* Lớp nền 3D chính */
-    cursor: grab;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    outline: none; z-index: 1; cursor: grab;
 }
-#webgl-canvas:active {
-    cursor: grabbing;
-}
-
-/* Lớp chứa các hiệu ứng chữ rơi */
-#galaxy {
-    position: fixed;
-    inset: 0;
-    z-index: 2; /* Nằm trên canvas 3D */
-    pointer-events: none;
-    perspective: 800px;
-}
-
+#webgl-canvas:active { cursor: grabbing; }
+#galaxy { position: fixed; inset: 0; z-index: 2; pointer-events: none; perspective: 800px; }
 
 /* ======================================================= */
 /* 3. MÀN HÌNH CHỜ VÀ CÁC LỚP PHỦ                        */
 /* ======================================================= */
 #loading-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    background: #000;
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    position: fixed; inset: 0; z-index: 99999; background: #000; color: #fff;
+    display: flex; justify-content: center; align-items: center;
     transition: opacity 1s ease-out;
 }
-#loading-screen.loaded {
-    opacity: 0;
-    pointer-events: none;
-}
-.loading-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-}
-.loading-content p {
-    font-size: 1rem;
-    color: #ccc;
-}
+#loading-screen.loaded { opacity: 0; pointer-events: none; }
+.loading-content { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+.loading-content p { font-size: 1rem; color: #ccc; }
 .loading-heart {
-    width: 50px;
-    height: 50px;
-    background: #ff6b9d;
-    position: relative;
-    transform: rotate(45deg);
-    animation: beat 1.2s infinite cubic-bezier(0.2, 0.8, 0.2, 1);
+    width: 50px; height: 50px; background: #ff6b9d; position: relative;
+    transform: rotate(45deg); animation: beat 1.2s infinite cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-
 .loading-heart:before, .loading-heart:after {
-    content: "";
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    background: #ff6b9d;
-    border-radius: 50%;
+    content: ""; position: absolute; width: 50px; height: 50px;
+    background: #ff6b9d; border-radius: 50%;
 }
-
-.loading-heart:before {
-    top: -25px;
-    left: 0;
-}
-
-.loading-heart:after {
-    top: 0;
-    left: -25px;
-}
-
-.progress-container {
-    width: 200px;
-    height: 8px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-    overflow: hidden;
-}
-#progress-bar {
-    width: 0%;
-    height: 100%;
-    background: #ff6b9d;
-    border-radius: 4px;
-    transition: width 0.4s ease-out;
-}
-#progress-text {
-    font-family: monospace;
-    font-size: 14px;
-    color: #ccc;
-}
-
+.loading-heart:before { top: -25px; left: 0; }
+.loading-heart:after { top: 0; left: -25px; }
+.progress-container { width: 200px; height: 8px; background: rgba(255, 255, 255, 0.2); border-radius: 4px; overflow: hidden; }
+#progress-bar { width: 0%; height: 100%; background: #ff6b9d; border-radius: 4px; transition: width 0.4s ease-out; }
+#progress-text { font-family: monospace; font-size: 14px; color: #ccc; }
 #music-overlay {
-    z-index: 9999;
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    cursor: pointer;
-    transition: opacity 0.8s ease, backdrop-filter 0.8s ease;
+    z-index: 9999; position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    cursor: pointer; transition: opacity 0.8s ease, backdrop-filter 0.8s ease;
 }
-#music-overlay.hidden-overlay {
-    opacity: 0;
-    pointer-events: none;
-    backdrop-filter: blur(0px);
-}
-.start-prompt {
-    text-align: center;
-    color: #fff;
-    opacity: 1;
-    transform: scale(1);
-    transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.8s ease;
-}
-.hidden-overlay .start-prompt {
-    transform: scale(1.5);
-    opacity: 0;
-}
-.start-prompt h1 {
-    font-size: clamp(2rem, 5vw, 3.5rem); /* Responsive font size */
-    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-}
-.start-prompt p {
-    font-size: clamp(0.9rem, 2vw, 1.2rem);
-    color: #ccc;
-    margin-top: 10px;
-    letter-spacing: 1px;
-}
-
+#music-overlay.hidden-overlay { opacity: 0; pointer-events: none; backdrop-filter: blur(0px); }
+.start-prompt { text-align: center; color: #fff; opacity: 1; transform: scale(1); transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.8s ease; }
+.hidden-overlay .start-prompt { transform: scale(1.5); opacity: 0; }
+.start-prompt h1 { font-size: clamp(2rem, 5vw, 3.5rem); text-shadow: 0 0 15px rgba(255, 255, 255, 0.5); }
+.start-prompt p { font-size: clamp(0.9rem, 2vw, 1.2rem); color: #ccc; margin-top: 10px; letter-spacing: 1px; }
 #birthday-celebration {
-    position: fixed; inset: 0; z-index: 10001;
-    display: none; /* Dùng JS để flex */
+    position: fixed; inset: 0; z-index: 10001; display: none;
     justify-content: center; align-items: center;
     background: rgba(0,0,0,0.5); pointer-events: none;
     opacity: 0; transition: opacity 1s ease-in-out;
 }
-#birthday-celebration p {
-    font-size: clamp(3rem, 8vw, 6rem);
-    color: white;
-    text-shadow: 0 0 10px #ff6b9d, 0 0 20px #ff6b9d, 0 0 40px #ff6b9d;
-    animation: birthday-pulse 2s infinite;
-}
+#birthday-celebration p { font-size: clamp(3rem, 8vw, 6rem); color: white; text-shadow: 0 0 10px #ff6b9d, 0 0 20px #ff6b9d, 0 0 40px #ff6b9d; animation: birthday-pulse 2s infinite; }
 
 /* ======================================================= */
 /* 4. CÁC THÀNH PHẦN GIAO DIỆN (UI COMPONENTS)            */
 /* ======================================================= */
 #waveform-controls {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-    width: 90%;
-    max-width: 450px;
-    color: #fff;
-    padding: 10px 15px;
-    background: rgba(20, 20, 25, 0.65);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    z-index: 1000; width: 90%; max-width: 450px; color: #fff; padding: 10px 15px;
+    background: rgba(20, 20, 25, 0.65); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);
     transition: opacity 0.5s, transform 0.5s;
 }
-#waveform-controls.hidden {
-    opacity: 0;
-    pointer-events: none;
-    transform: translate(-50%, 20px);
-}
+#waveform-controls.hidden { opacity: 0; pointer-events: none; transform: translate(-50%, 20px); }
 #waveform { width: 100%; }
-.player-info {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    margin-top: 5px;
-}
+.player-info { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 5px; margin-top: 5px; }
 #song-title {
-    font-size: 0.85rem;
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 100%;
-    text-align: center;
+    font-size: 0.85rem; font-weight: 500; white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis; width: 100%; text-align: center;
+    transition: color 0.8s ease;
 }
-.player-buttons {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-}
-.player-buttons button {
-    background: none; border: none; color: #eee;
-    font-size: 1.5rem; cursor: pointer;
-    transition: color 0.2s, transform 0.2s;
-}
-.player-buttons button:hover { color: #ff6b9d; transform: scale(1.1); }
+.player-buttons { display: flex; width: 100%; justify-content: space-between; align-items: center; }
+.player-buttons button { background: none; border: none; color: #eee; font-size: 1.5rem; cursor: pointer; transition: color 0.2s, transform 0.2s; }
+.player-buttons button:hover { color: var(--theme-color-primary); transform: scale(1.1); }
 #prev-btn, #next-btn { font-size: 1.2rem; }
 #favorite-btn { font-size: 1.2rem; }
-#favorite-btn.favorited { color: #ff6b9d; }
+#favorite-btn.favorited { color: var(--theme-color-primary); }
 #current-time, #duration { font-family: monospace; font-size: 0.8rem; color: #ccc; }
-
 #planet-info-card {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    width: 90%;
-    max-width: 450px;
-    background: rgba(25, 25, 35, 0.7);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-radius: 12px;
-    padding: 20px;
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    opacity: 0;
-    transform: translate(-50%, 20px);
-    transition: opacity 0.4s ease, transform 0.4s ease, bottom 0.5s ease;
-    pointer-events: none;
-    z-index: 1002;
+    position: fixed; bottom: 30px; left: 20px; width: 90%; max-width: 350px;
+    background: rgba(25, 25, 35, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    border-radius: 12px; padding: 20px; color: #fff; border: 1px solid rgba(255, 255, 255, 0.1);
+    opacity: 0; transform: translateX(-20px); transition: opacity 0.4s ease, transform 0.4s ease, bottom 0.5s ease;
+    pointer-events: none; z-index: 1002;
 }
-#planet-info-card:not(.hidden) {
-    opacity: 1;
-    transform: translate(-50%, 0);
-    pointer-events: auto;
-}
-#close-info-btn {
-    position: absolute; top: 8px; right: 12px;
-    background: none; border: none; color: #fff;
-    font-size: 1.5rem; cursor: pointer;
-}
+#planet-info-card:not(.hidden) { opacity: 1; transform: translateX(0); pointer-events: auto; }
+#close-info-btn { position: absolute; top: 8px; right: 12px; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
 #info-card-title {
-    color: #ff6b9d;
+    color: var(--theme-color-primary);
     margin-bottom: 10px;
-    text-shadow: 0 0 10px #ff6b9d;
+    text-shadow: 0 0 10px var(--theme-color-primary);
+    transition: color 0.8s ease, text-shadow 0.8s ease;
 }
-#info-card-fact {
-    font-style: italic; color: #ccc;
-    margin-bottom: 15px; font-size: 0.9rem;
-}
+#info-card-fact { font-style: italic; color: #ccc; margin-bottom: 15px; font-size: 0.9rem; }
 #info-card-message { font-size: 1rem; line-height: 1.5; }
-
 #letter-container {
-    position: fixed; inset: 0; z-index: 10000;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    display: flex; /* Thay vì dùng JS */
-    justify-content: center; align-items: center;
-    padding: 20px;
-    opacity: 0;
-    transform: scale(0.95);
-    transition: opacity 0.4s ease, transform 0.4s ease;
-    pointer-events: none;
+    position: fixed; inset: 0; z-index: 10000; background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    display: flex; justify-content: center; align-items: center;
+    padding: 20px; opacity: 0; transform: scale(0.95);
+    transition: opacity 0.4s ease, transform 0.4s ease; pointer-events: none;
 }
-#letter-container:not(.hidden) {
-    opacity: 1; transform: scale(1); pointer-events: auto;
-}
+#letter-container:not(.hidden) { opacity: 1; transform: scale(1); pointer-events: auto; }
 .letter-content {
-    background: rgba(20, 20, 30, 0.9);
-    color: #eee;
-    padding: 30px 40px;
+    background: rgba(20, 20, 30, 0.9); color: #eee; padding: 30px 40px;
     border-radius: 10px;
-    border: 1px solid rgba(255, 107, 157, 0.5);
-    max-width: 90%; width: 600px;
-    max-height: 80vh; overflow-y: auto;
-    position: relative;
+    border: 1px solid var(--theme-color-primary);
+    max-width: 90%; width: 600px; max-height: 80vh; overflow-y: auto; position: relative;
+    transition: border-color 0.8s ease;
 }
-.letter-content h1 { color: #ff6b9d; font-size: 1.5rem; margin-bottom: 20px; }
+.letter-content h1 {
+    color: var(--theme-color-primary);
+    font-size: 1.5rem; margin-bottom: 20px;
+    transition: color 0.8s ease;
+}
 .letter-content p { font-size: 1.1rem; line-height: 1.7; margin-bottom: 15px; }
 .letter-content .signature { text-align: right; margin-top: 30px; font-style: italic; }
-#close-letter-btn {
-    position: absolute; top: 10px; right: 15px;
-    background: none; border: none; color: #fff;
-    font-size: 1.875rem; cursor: pointer;
-}
+#close-letter-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; color: #fff; font-size: 1.875rem; cursor: pointer; }
 
 /* ======================================================= */
-/* 5. CÁC NÚT ĐIỀU KHIỂN NỔI (FLOATING CONTROLS)         */
+/* 5A. CÁC NÚT ĐIỀU KHIỂN NỔI (FLOATING CONTROLS)        */
 /* ======================================================= */
 .floating-controls button {
-    position: fixed;
-    z-index: 1001;
-    background: rgba(25, 25, 35, 0.6);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    font-size: 1.25rem;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(10px);
-    transition: background-color 0.3s, transform 0.3s;
+    position: fixed; z-index: 1001; background: rgba(25, 25, 35, 0.6);
+    color: #fff; border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%; width: 44px; height: 44px; font-size: 1.25rem; cursor: pointer;
+    display: flex; justify-content: center; align-items: center;
+    backdrop-filter: blur(10px); transition: background-color 0.3s, transform 0.3s;
 }
-.floating-controls button:hover {
-    background-color: rgba(45, 45, 55, 0.8);
-    transform: scale(1.1);
-}
-
+.floating-controls button:hover { background-color: rgba(45, 45, 55, 0.8); transform: scale(1.1); }
 #settings-toggle-btn { top: 20px; right: 20px; }
 #fly-mode-btn { top: 75px; right: 20px; }
-#special-day-btn { bottom: 20px; right: 20px; background: linear-gradient(145deg, #ff6b9d, #c534ed); border: none; animation: pulse 2s infinite; font-size: 1.5rem; }
-
+#special-day-btn {
+    bottom: 20px; right: 20px;
+    background: linear-gradient(145deg, var(--theme-color-primary), var(--theme-color-secondary));
+    border: none; animation: pulse 2s infinite; font-size: 1.5rem;
+    transition: background 0.8s ease;
+}
 #fly-mode-btn.fly-mode-active {
-    border-color: #ff6b9d;
+    border-color: var(--theme-color-primary);
     background-color: rgba(255, 107, 157, 0.3);
     box-shadow: 0 0 10px rgba(255, 107, 157, 0.5);
+    transition: border-color 0.8s ease;
 }
-#fly-mode-btn span {
-    margin-left: 8px;
-    font-size: 0.8rem;
-}
+#fly-mode-btn span { margin-left: 8px; font-size: 0.8rem; }
+#settings-panel { position: fixed; top: 75px; right: 20px; z-index: 1001; background: rgba(25, 25, 35, 0.7); backdrop-filter: blur(12px); border-radius: 12px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.1); }
+#settings-panel input[type="range"] { width: 120px; }
 
-#settings-panel {
-    position: fixed; top: 75px; right: 20px; z-index: 1001;
-    background: rgba(25, 25, 35, 0.7);
-    backdrop-filter: blur(12px);
-    border-radius: 12px;
-    padding: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+/* ======================================================= */
+/* 5B. WIDGET THỜI TIẾT                            */
+/* ======================================================= */
+#weather-widget-container { position: fixed; top: 20px; left: 20px; z-index: 1001; }
+#weather-toggle-btn { position: relative; }
+#weather-tooltip {
+    position: absolute; top: 100%; left: 0; margin-top: 10px; width: 220px;
+    background: rgba(25, 25, 35, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-radius: 12px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff; display: flex; flex-direction: column; gap: 8px;
+    opacity: 0; pointer-events: none; transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
-#settings-panel input[type="range"] {
-    width: 120px;
+#weather-widget-container:hover #weather-tooltip { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.weather-info-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
+.weather-info-row span:first-child { color: #ccc; }
+#weather-location {
+    font-size: 1.1rem; font-weight: bold;
+    color: var(--theme-color-primary);
+    margin-bottom: 5px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 8px;
+    transition: color 0.8s ease;
+}
+#weather-quote {
+    font-style: italic; font-size: 0.8rem;
+    color: var(--theme-text-special);
+    margin-top: 5px; text-align: center;
+    transition: color 0.8s ease;
 }
 
 /* ======================================================= */
 /* 6. HIỆU ỨNG ĐẶC BIỆT (SPECIAL EFFECTS)                 */
 /* ======================================================= */
-.text-particle {
-    position: absolute;
-    top: 0;
-    color: #fff;
-    font-size: 1rem;
-    font-weight: 500;
-    transform: translateX(-50%);
-    width: max-content;
-    padding: 4px 10px;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.1);
-    text-shadow: 0 0 8px currentColor;
-    pointer-events: auto;
-    will-change: transform, opacity;
-}
+.text-particle { position: absolute; top: 0; color: #fff; font-size: 1rem; font-weight: 500; transform: translateX(-50%); width: max-content; padding: 4px 10px; border-radius: 8px; background: rgba(0, 0, 0, 0.1); text-shadow: 0 0 8px currentColor; pointer-events: auto; will-change: transform, opacity; }
 .text-particle.love { color: #ff6b9d; }
 .text-particle.date { color: #c534ed; }
 .text-particle.special { color: #a8e6cf; }
 .text-particle.heart { background: none; font-size: 1.5rem; }
 .text-particle.birthday { color: #4ecdc4; }
-
-.shooting-star {
-    position: fixed; top: -50px; /* Bắt đầu ngoài màn hình */
-    width: 250px; height: 2px;
-    background: linear-gradient(to left, rgba(255, 255, 255, 0.6), transparent);
-    border-radius: 50%;
-    filter: drop-shadow(0 0 6px white);
-    z-index: 3;
-    pointer-events: auto; /* Cho phép click */
-    cursor: pointer;
-}
-.star-message {
-    position: fixed;
-    transform: translate(-50%, -50%);
-    background: rgba(255, 105, 180, 0.85);
-    color: white;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 14px;
-    z-index: 9999;
-    pointer-events: none;
-    animation: fade-in-out 2.5s ease-in-out forwards;
-}
-
-#fly-mode-overlay {
-    position: fixed; inset: 0; z-index: 10002;
-    display: flex; justify-content: center; align-items: center;
-    background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(8px);
-    opacity: 0; transition: opacity 0.5s ease; pointer-events: none;
-}
+.shooting-star { position: fixed; top: -50px; width: 250px; height: 2px; background: linear-gradient(to left, rgba(255, 255, 255, 0.6), transparent); border-radius: 50%; filter: drop-shadow(0 0 6px white); z-index: 3; pointer-events: auto; cursor: pointer; }
+.star-message { position: fixed; transform: translate(-50%, -50%); background: rgba(255, 105, 180, 0.85); color: white; padding: 8px 15px; border-radius: 20px; font-size: 14px; z-index: 9999; pointer-events: none; animation: fade-in-out 2.5s ease-in-out forwards; }
+#fly-mode-overlay { position: fixed; inset: 0; z-index: 10002; display: flex; justify-content: center; align-items: center; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.5s ease; pointer-events: none; }
 #fly-mode-overlay:not(.hidden) { opacity: 1; }
-#fly-mode-overlay p {
-    color: white; font-size: 1.8rem;
-    padding: 20px 40px; background: rgba(20, 20, 25, 0.7);
-    border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);
-    text-shadow: 0 0 10px #fff;
-}
-
+#fly-mode-overlay p { color: white; font-size: 1.8rem; padding: 20px 40px; background: rgba(20, 20, 25, 0.7); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); text-shadow: 0 0 10px #fff; }
 
 /* ======================================================= */
 /* 7. ANIMATIONS                                         */
 /* ======================================================= */
 @keyframes beat { 0%, 100% { transform: scale(1) rotate(45deg); } 50% { transform: scale(1.1) rotate(45deg); } }
-@keyframes pulse { 0%, 100% { box-shadow: 0 0 15px #ff6b9d, 0 0 25px #c534ed; } 50% { box-shadow: 0 0 25px #ff6b9d, 0 0 40px #c534ed; } }
-@keyframes birthday-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-@keyframes fade-in-out {
-    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-    20% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
-    80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+@keyframes pulse { 
+    0%, 100% { box-shadow: 0 0 15px var(--theme-color-primary), 0 0 25px var(--theme-color-secondary); } 
+    50% { box-shadow: 0 0 25px var(--theme-color-primary), 0 0 40px var(--theme-color-secondary); } 
 }
-
+@keyframes birthday-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes fade-in-out { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); } 80% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } }
 
 /* ======================================================= */
 /* 8. MEDIA QUERIES (RESPONSIVE DESIGN)                  */
@@ -476,4 +240,24 @@ body {
     .floating-controls button { width: 40px; height: 40px; }
     #settings-toggle-btn { top: 15px; right: 15px; }
     #fly-mode-btn { top: 65px; right: 15px; }
+    #weather-widget-container { top: 15px; left: 15px; }
+}
+
+/* ======================================================= */
+/* 9. DYNAMIC UI THEMES (MỚI)                            */
+/* ======================================================= */
+body.state-dawn {
+    --theme-color-primary: #ffae8b;
+    --theme-color-secondary: #ff8c69;
+    --theme-text-special: #ffd6c8;
+}
+body.state-dusk {
+    --theme-color-primary: #ff8a35;
+    --theme-color-secondary: #ff6a00;
+    --theme-text-special: #ffc291;
+}
+body.state-night {
+    --theme-color-primary: #b5c5ff;
+    --theme-color-secondary: #4a5a8a;
+    --theme-text-special: #d8deff;
 }
