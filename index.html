@@ -154,6 +154,30 @@
         <button id="fly-mode-btn" class="hidden">🚀</button>
         <button id="special-day-btn" class="hidden">💌</button>
     </div>
+    <!-- WIDGET THỜI TIẾT (MỚI) -->
+    <div id="weather-widget-container" class="floating-controls hidden">
+        <button id="weather-toggle-btn">🌦️</button>
+        <div id="weather-tooltip">
+            <div id="weather-location">Thành Đô</div>
+            <div class="weather-info-row">
+                <span>Trạng thái:</span>
+                <span id="weather-condition">Đang tải...</span>
+            </div>
+            <div class="weather-info-row">
+                <span>Nhiệt độ:</span>
+                <span id="weather-temp">--°C</span>
+            </div>
+            <div class="weather-info-row">
+                <span>Chất lượng không khí:</span>
+                <span id="weather-aqi">--</span>
+            </div>
+            <div class="weather-info-row">
+                <span>Pha mặt trăng:</span>
+                <span id="weather-moon">--</span>
+            </div>
+            <p id="weather-quote">Vũ trụ này đang đồng bộ cùng cậu.</p>
+        </div>
+    </div>
 
     <!-- Bảng cài đặt -->
     <div id="settings-panel" class="hidden">
@@ -201,6 +225,7 @@
 
     <!-- CÁC FILE SCRIPT CỦA BẠN (QUAN TRỌNG: PHẢI LÀ type="module") -->
     <script type="module" src="data.js"></script>
+    <script type="module" src="weather.js"></script>
     <script type="module" src="script.js"></script>
 </body>
 </html>
