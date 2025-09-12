@@ -56,9 +56,15 @@ const closeInfoBtn = document.getElementById('close-info-btn');
 const canvas = document.getElementById('webgl-canvas');
 const letterContainer = document.getElementById('letter-container');
 
-let preloadedNightlySong = { url: null, audio: null };
-const HOME_CAMERA_POSITION = new THREE.Vector3(0, 150, 450); // Hơi xa hơn một chút
-const HOME_CONTROLS_TARGET = new THREE.Vector3(0, 0, 0);   //Luôn nhìn vào mặt trời
+// --- BIẾN QUẢN LÝ ÂM NHẠC NÂNG CAO ---
+let isNightlyPlaylistActive = false;
+let mainPlaylistState = { index: 0, time: 0 };
+let preloadedNextAudio = null;
+let saveStateInterval = null;
+// ------------------------------------
+
+const HOME_CAMERA_POSITION = new THREE.Vector3(0, 150, 450);
+const HOME_CONTROLS_TARGET = new THREE.Vector3(0, 0, 0);
 let activeSatellites = [];
 let activePeakRockets = [];
 let isAutoRotating = false;
@@ -81,7 +87,6 @@ const activeParticles = new Set();
 let upNextPlaylist = [];
 let upNextIndex = 0;
 let isBirthdayMode = false;
-let isLetterModeActive = false;
 let typingInterval = null;
 let wavesurfer;
 let scene, camera, renderer, controls;
@@ -97,7 +102,6 @@ let activeAsteroids = [];
 let activeComets = [];
 let sunEffects = {};
 const clock = new THREE.Clock();
-let isPreloadingNextSong = false;
 let cameraViewMode = 'thirdPerson';
 let cameraOrbitYaw = 0;
 let cameraOrbitPitch = 0.2;
@@ -315,7 +319,6 @@ function createComet() {
     });
     activeComets.push({ head: cometHead, tail: cometTail });
 }
-
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -418,19 +421,62 @@ function setupMouseParallax() {
 
 function checkAndPreloadNightlySong() {
     const now = new Date();
-    if (now.getHours() < 22) return;
-    const dailySongData = dailySongs.find(s => s.day === now.getDate());
-    if (dailySongData && dailySongData.song.file !== preloadedNightlySong.url) {
-        const audioPreloader = new Audio();
-        audioPreloader.src = dailySongData.song.file;
-        audioPreloader.preload = 'auto';
-        preloadedNightlySong = { url: dailySongData.song.file, audio: audioPreloader };
+    const hour = now.getHours();
+    if (!(hour >= 22 || hour < 8)) return;
+    let effectiveDate = new Date(now);
+    if (hour >= 0 && hour < 8) {
+        effectiveDate.setDate(effectiveDate.getDate() - 1);
+    }
+    const day = effectiveDate.getDate();
+    const dailySongData = dailySongs.find(s => s.day === day);
+    if (dailySongData) {
+        const preloader = new Audio();
+        preloader.src = dailySongData.song.file;
     }
 }
 
 // =================================================================
-// PHẦN 4: LOGIC GIAO DIỆN NGƯỜI DÙNG (UI)
+// PHẦN 4: HỆ THỐNG ÂM NHẠC NÂNG CAO & GIAO DIỆN NGƯỜI DÙNG (UI)
 // =================================================================
+
+function savePlaybackState() {
+    if (!wavesurfer || !wavesurfer.getMediaElement().src) return;
+    const state = {
+        isNightly: isNightlyPlaylistActive,
+        playlist: upNextPlaylist,
+        index: upNextIndex,
+        time: wavesurfer.getCurrentTime(),
+        volume: wavesurfer.getVolume()
+    };
+    localStorage.setItem('playbackState', JSON.stringify(state));
+}
+
+function loadPlaybackState() {
+    const savedState = localStorage.getItem('playbackState');
+    if (!savedState) return null;
+    try {
+        return JSON.parse(savedState);
+    } catch (e) { return null; }
+}
+
+function preloadNextTrack() {
+    if (preloadedNextAudio) {
+        preloadedNextAudio.src = '';
+        preloadedNextAudio = null;
+    }
+    // Logic này giờ đây hoạt động với playlist hiện tại (upNextPlaylist)
+    // bất kể đó là main hay nightly.
+    if (upNextPlaylist.length === 0) return;
+    const nextIndex = (upNextIndex + 1) % upNextPlaylist.length;
+    const nextTrack = upNextPlaylist[nextIndex];
+    if (nextTrack && nextTrack.file) {
+        console.log(`Preloading next track: ${nextTrack.title}`);
+        preloadedNextAudio = new Audio();
+        preloadedNextAudio.src = nextTrack.file;
+        preloadedNextAudio.preload = 'auto';
+    }
+}
+
 function typewriterEffect(elementsToType, onComplete = () => { }) {
     if (typingInterval) clearInterval(typingInterval);
     let elementIndex = 0; let charIndex = 0;
@@ -498,47 +544,55 @@ function fadeIn() {
     }, 50);
 }
 
-function playTrack(track, isSpecialLetterTrack = false) {
-    isPreloadingNextSong = false;
-    if (!track || !track.file) { playNextInMix(); return; }
+function playTrack(track, playlist, index, startTime = 0) {
+    if (!track || !track.file) {
+        console.error("Invalid track data. Cannot play.");
+        playNext();
+        return;
+    }
+    upNextPlaylist = playlist;
+    upNextIndex = index;
+
     if (!wavesurfer) {
         wavesurfer = WaveSurfer.create({
             container: waveformContainer, waveColor: 'rgba(200, 200, 200, 0.5)', progressColor: '#ff6b9d',
             height: 50, barWidth: 2, barRadius: 3, cursorWidth: 0, responsive: true, hideScrollbar: true, media: audio, backend: 'MediaElement'
         });
-        wavesurfer.on('finish', () => {
-            isLetterModeActive = false;
-            if (isBirthdayMode && birthdayData) { playTrack(birthdayData.song); } else { playNextInMix(); }
-        });
-        wavesurfer.on('audioprocess', () => {
-            const currentTime = wavesurfer.getCurrentTime();
-            const duration = wavesurfer.getDuration();
-            currentTimeEl.textContent = formatTime(currentTime);
-            if (duration > 20 && (duration - currentTime) < 20 && !isPreloadingNextSong) {
-                isPreloadingNextSong = true;
-                const nextTrackIndex = upNextIndex % upNextPlaylist.length;
-                const nextTrack = upNextPlaylist[nextTrackIndex];
-                if (nextTrack && nextTrack.file) {
-                    const preloader = new Audio();
-                    preloader.src = nextTrack.file;
-                }
-            }
-        });
-        wavesurfer.on('error', (err) => { songTitleEl.textContent = "Bài hát lỗi, tự chuyển bài..."; controlAmbientSound(false); setTimeout(playNextInMix, 2000); });
+        wavesurfer.on('finish', playNext);
+        wavesurfer.on('audioprocess', () => currentTimeEl.textContent = formatTime(wavesurfer.getCurrentTime()));
+        wavesurfer.on('error', (err) => { console.error("Audio error:", err); songTitleEl.textContent = "Bài hát lỗi, tự chuyển..."; setTimeout(playNext, 2000); });
         wavesurfer.on('play', () => { playPauseBtn.textContent = '❚❚'; controlAmbientSound(false); });
         wavesurfer.on('pause', () => { playPauseBtn.textContent = '▶'; controlAmbientSound(true); });
     }
-    stopFade(); wavesurfer.pause();
+    stopFade();
+    wavesurfer.pause();
     songTitleEl.textContent = "Đang tải bài hát...";
     controlAmbientSound(true);
-    currentTimeEl.textContent = "0:00"; durationEl.textContent = "0:00";
     wavesurfer.load(track.file);
     updateFavoriteButton(track.file);
     wavesurfer.once('ready', () => {
         songTitleEl.textContent = track.title;
         durationEl.textContent = formatTime(wavesurfer.getDuration());
-        if (isSpecialLetterTrack) { fadeIn(); } else { wavesurfer.play(); }
+        if (startTime > 0 && startTime < wavesurfer.getDuration()) {
+            wavesurfer.seekTo(startTime / wavesurfer.getDuration());
+        }
+        fadeIn();
+        preloadNextTrack();
     });
+}
+
+function playNext() {
+    // Hàm này giờ đây không cần biết là playlist nào, nó chỉ đơn giản
+    // phát bài tiếp theo trong `upNextPlaylist` đang hoạt động.
+    if (upNextPlaylist.length === 0) return;
+    const nextIndex = (upNextIndex + 1) % upNextPlaylist.length;
+    playTrack(upNextPlaylist[nextIndex], upNextPlaylist, nextIndex);
+}
+
+function playPrev() {
+    if (upNextPlaylist.length === 0) return;
+    const prevIndex = (upNextIndex - 1 + upNextPlaylist.length) % upNextPlaylist.length;
+    playTrack(upNextPlaylist[prevIndex], upNextPlaylist, prevIndex);
 }
 
 function createDailyMix() {
@@ -547,22 +601,6 @@ function createDailyMix() {
     upNextIndex = 0;
 }
 
-function playNextInMix() {
-    if (upNextPlaylist.length === 0) createDailyMix();
-    if (upNextPlaylist.length > 0) {
-        playTrack(upNextPlaylist[upNextIndex]);
-        upNextIndex = (upNextIndex + 1) % upNextPlaylist.length;
-    }
-}
-
-function playPrevInMix() {
-    if (upNextPlaylist.length === 0) return;
-    upNextIndex = (upNextIndex - 2 + upNextPlaylist.length) % upNextPlaylist.length;
-    playTrack(upNextPlaylist[upNextIndex]);
-    upNextIndex = (upNextIndex + 1) % upNextPlaylist.length;
-}
-
-function fadeToSpecialTrack(specialSong) { isLetterModeActive = true; fadeOut(() => playTrack(specialSong, true)); }
 function getFavorites() { return JSON.parse(localStorage.getItem('favoriteSongs')) || []; }
 function saveFavorites(favorites) { localStorage.setItem('favoriteSongs', JSON.stringify(favorites)); }
 
@@ -591,8 +629,13 @@ function getLetterForCurrentTime() {
     if (!dailyLetters || !dailySongs || !daytimeLetters) return null;
     const now = new Date();
     const hour = now.getHours();
-    const day = now.getDate();
-    if (hour >= 0 && hour < 22) {
+    let effectiveDate = new Date(now);
+    if (hour >= 0 && hour < 8) {
+        effectiveDate.setDate(effectiveDate.getDate() - 1);
+    }
+    const day = effectiveDate.getDate();
+    console.log("Thời gian hệ thống:", now.toString(), "| Giờ hiệu lực:", hour, "| Ngày hiệu lực để lấy thư:", day);
+    if (hour >= 8 && hour < 22) {
         const daytimeLetterData = daytimeLetters.find(l => l.day === day);
         return daytimeLetterData ? { letter: daytimeLetterData, song: null } : null;
     }
@@ -610,8 +653,10 @@ function checkAndSetupLetterButton() {
     }
 }
 
+// --- HÀM MỞ THƯ ĐƯỢC NÂNG CẤP HOÀN TOÀN ---
 function openLetter(letterData, specialSong = null, isBirthday = false) {
     if (!letterContainer || !letterContainer.classList.contains('hidden')) return;
+
     const letterContentDiv = letterContainer.querySelector('.letter-content');
     letterContentDiv.innerHTML = '';
     const titleEl = document.createElement('h1');
@@ -626,15 +671,42 @@ function openLetter(letterData, specialSong = null, isBirthday = false) {
     letterContentDiv.append(closeBtn, titleEl, ...pElements, signatureEl);
     const signatureText = isBirthday ? 'Yêu cậu nhất luôn,<br>tun' : (specialSong ? 'Yêu cậu rất nhiều,<br>tun' : 'Luôn bên cạnh cậu,<br>tun');
     const elementsToType = [{ element: titleEl, text: letterData.title }, ...pElements.map(p => ({ element: p, text: p.innerHTML })), { element: signatureEl, text: signatureText }];
+    
     letterContainer.classList.remove('hidden');
     typewriterEffect(elementsToType);
-    if (specialSong && !isBirthday) fadeToSpecialTrack(specialSong);
+
+    // LOGIC ÂM NHẠC MỚI
+    if (specialSong && !isNightlyPlaylistActive && !isBirthday) {
+        // 1. Lưu lại trạng thái của playlist chính
+        mainPlaylistState.index = upNextIndex;
+        mainPlaylistState.time = wavesurfer.getCurrentTime();
+        
+        // 2. Kích hoạt Nightly Mode
+        isNightlyPlaylistActive = true;
+        console.log("Entering Nightly Mode.");
+        
+        // 3. Tạo playlist ban đêm từ dailySongs
+        const allNightlySongs = dailySongs.map(item => item.song);
+        const remainingNightlySongs = allNightlySongs.filter(song => song.file !== specialSong.file);
+        const shuffledNightlySongs = shuffleArray(remainingNightlySongs);
+        const fullNightlyPlaylist = [specialSong, ...shuffledNightlySongs];
+
+        // 4. Phát nhạc
+        fadeOut(() => {
+            playTrack(fullNightlyPlaylist[0], fullNightlyPlaylist, 0);
+        });
+
+    } else if (specialSong && isBirthday) {
+        // Logic cho sinh nhật vẫn đơn giản: chỉ phát 1 bài
+        fadeOut(() => playTrack(specialSong, [specialSong], 0));
+    }
+
     closeBtn.addEventListener('click', () => {
         letterContainer.classList.add('hidden');
         if (typingInterval) clearTimeout(typingInterval);
-        if (isLetterModeActive) { isLetterModeActive = false; fadeOut(playNextInMix); }
     }, { once: true });
 }
+
 
 function adjustLetterButtonPosition() {
     const btn = document.getElementById('special-day-btn');
@@ -645,24 +717,62 @@ function adjustLetterButtonPosition() {
 
 function setupUIEventListeners() {
     const startAudio = () => {
-        if (wavesurfer && wavesurfer.isPlaying()) return;
-        if (!wavesurfer) {
-            if (isBirthdayMode && birthdayData) { playTrack(birthdayData.song); } else { createDailyMix(); playNextInMix(); }
-        } else { wavesurfer.play(); }
+        if (!saveStateInterval) {
+            saveStateInterval = setInterval(savePlaybackState, 5000);
+        }
+
+        const savedState = loadPlaybackState();
+        let shouldResumeNightly = false;
+        
+        if (savedState) {
+            const letterInfo = getLetterForCurrentTime();
+            if (savedState.isNightly && letterInfo && letterInfo.song) {
+                shouldResumeNightly = true;
+            }
+        }
+        
+        if (shouldResumeNightly) {
+            console.log("Resuming Nightly Mode from saved state.");
+            isNightlyPlaylistActive = true;
+            const playlistToPlay = savedState.playlist;
+            const index = savedState.index;
+            const time = savedState.time;
+            playTrack(playlistToPlay[index], playlistToPlay, index, time);
+        } else {
+            console.log("Starting in Normal/Day Mode.");
+            isNightlyPlaylistActive = false;
+            createDailyMix(); // Luôn tạo mix mới để có sự ngẫu nhiên
+            let index = 0;
+            let time = 0;
+            if (savedState && !savedState.isNightly && savedState.playlist[savedState.index]) {
+                const foundIndex = upNextPlaylist.findIndex(t => t.file === savedState.playlist[savedState.index].file);
+                if (foundIndex !== -1) {
+                    index = foundIndex;
+                    time = savedState.time;
+                }
+            }
+            playTrack(upNextPlaylist[index], upNextPlaylist, index, time);
+        }
+
+        if (savedState && savedState.volume) {
+            wavesurfer.setVolume(savedState.volume);
+            volumeSlider.value = savedState.volume;
+        }
+
         overlay.classList.add('hidden-overlay');
         waveformControls.classList.remove('hidden');
         settingsToggleBtn.classList.remove('hidden');
         flyModeBtn.classList.remove('hidden');
         adjustLetterButtonPosition();
     };
-    overlay.addEventListener('click', (event) => {
-        event.stopPropagation();
-        startAudio();
-    }, { once: true });
+
+    overlay.addEventListener('click', startAudio, { once: true });
+    
     closeInfoBtn.addEventListener('click', resetCameraToDefault);
-    nextBtn.addEventListener('click', playNextInMix);
-    prevBtn.addEventListener('click', playPrevInMix);
+    nextBtn.addEventListener('click', playNext);
+    prevBtn.addEventListener('click', playPrev);
     playPauseBtn.addEventListener('click', () => wavesurfer?.playPause());
+    
     favoriteBtn.addEventListener('click', () => {
         if (!wavesurfer || !wavesurfer.getMediaElement().src) return;
         let favorites = getFavorites();
@@ -675,12 +785,13 @@ function setupUIEventListeners() {
         saveFavorites(favorites);
         updateFavoriteButton(currentUrl);
     });
+    
     settingsToggleBtn.addEventListener('click', () => settingsPanel.classList.toggle('hidden'));
     volumeSlider.addEventListener('input', e => wavesurfer?.setVolume(e.target.value));
 }
 
 // =================================================================
-// PHẦN 5: THẾ GIỚI 3D (THREE.JS)
+// PHẦN 5: THẾ GIỚI 3D (THREE.JS) - KHÔNG THAY ĐỔI
 // =================================================================
 function setupLoadingManager() {
     loadingManager = new THREE.LoadingManager();
@@ -850,7 +961,6 @@ function updateFlyModeLogic(delta) {
 }
 
 function createSpaceship() {
-    // TẠO HÀM HELPER ĐỂ TẠO ĐỘNG CƠ
     function createNacelle(materials) {
         const nacelleGroup = new THREE.Group();
         const nacelleBodyGeom = new THREE.CapsuleGeometry(1, 15, 16, 32);
@@ -872,7 +982,6 @@ function createSpaceship() {
     }
 
     const spaceshipGroup = new THREE.Group();
-    // Gom các material lại để dễ truyền vào hàm con
     const materials = {
         hull: new THREE.MeshStandardMaterial({ color: 0xe0e0e0, metalness: 0.9, roughness: 0.4 }),
         accent: new THREE.MeshStandardMaterial({ color: 0x404040, metalness: 0.95, roughness: 0.5 }),
@@ -914,13 +1023,12 @@ function createSpaceship() {
     pylonLeft.rotation.z *= -1;
     spaceshipGroup.add(pylonLeft);
 
-    // GỌI HÀM createNacelle() HAI LẦN
     const nacelleRight = createNacelle(materials);
     nacelleRight.position.set(0, -2, 8);
     spaceshipGroup.add(nacelleRight);
     
     const nacelleLeft = createNacelle(materials);
-    nacelleLeft.position.set(0, -2, -8); // Chỉ cần set vị trí khác
+    nacelleLeft.position.set(0, -2, -8);
     spaceshipGroup.add(nacelleLeft);
     
     spaceshipGroup.userData.nacelleLeft = nacelleLeft;
@@ -960,10 +1068,9 @@ function createWarpTrail() {
         trail.userData = { lifetimes, velocities };
         trail.visible = false;
         
-        // Gắn trail vào đúng động cơ tương ứng
         const nacelle = spaceship.userData[`nacelle${side}`];
         if (nacelle) {
-            nacelle.add(trail); // Gắn vào động cơ
+            nacelle.add(trail);
             spaceship.userData[`trail${side}`] = trail;
         }
     });
@@ -981,25 +1088,23 @@ function updateWarpTrail(delta) {
 
         const positions = trail.geometry.attributes.position.array;
         const { lifetimes, velocities } = trail.userData;
-        const emissionPoint = new THREE.Vector3(-8, 0, 0); // Vị trí phát hạt phía sau động cơ
+        const emissionPoint = new THREE.Vector3(-8, 0, 0);
         
         for (let i = 0; i < lifetimes.length; i++) {
             lifetimes[i] -= delta;
 
             if (lifetimes[i] <= 0) {
-                // Tái sinh hạt
                 positions[i * 3] = emissionPoint.x + (Math.random() - 0.5) * 0.5;
                 positions[i * 3 + 1] = emissionPoint.y + (Math.random() - 0.5) * 0.5;
                 positions[i * 3 + 2] = emissionPoint.z + (Math.random() - 0.5) * 0.5;
                 
-                velocities[i * 3] = -20 - Math.random() * 10; // Tốc độ bắn ra sau
+                velocities[i * 3] = -20 - Math.random() * 10;
                 velocities[i * 3 + 1] = 0;
                 velocities[i * 3 + 2] = 0;
                 
-                lifetimes[i] = Math.random() * 2 + 1; // Tuổi thọ
+                lifetimes[i] = Math.random() * 2 + 1;
             }
 
-            // Cập nhật vị trí
             positions[i * 3] += velocities[i * 3] * delta;
             positions[i * 3 + 1] += velocities[i * 3 + 1] * delta;
             positions[i * 3 + 2] += velocities[i * 3 + 2] * delta;
@@ -1035,16 +1140,13 @@ function createSolarSystem(textureLoader) {
         if (data.type === 'star') {
             const uniforms = { 
                 uTime: { value: 0.0 },
-                // Thêm texture vào shader
                 uTexture: { value: textureLoader.load(data.texture) }
             };
             material = new THREE.ShaderMaterial({
                 uniforms: uniforms,
                 vertexShader: document.getElementById('vertexShader').textContent,
-                // Chúng ta sẽ cần một fragment shader mới cho mặt trời
                 fragmentShader: document.getElementById('sunFragmentShader').textContent,
             });
-            // Lưu lại uniform để có thể cập nhật trong vòng lặp animate
             sunEffects.uniforms = uniforms;
         } else {
             material = new THREE.MeshStandardMaterial({ map: textureLoader.load(data.texture), roughness: 0.9, metalness: 0.1 });
@@ -1091,15 +1193,12 @@ function createSunEffects(sunMesh) {
         gradient.addColorStop(1, 'rgba(255, 69, 0, 0)');
         ctx.fillStyle = gradient; ctx.fillRect(0, 0, size, size);
     });
-
-    // SỬA Ở ĐÂY: Đảm bảo blending là AdditiveBlending và bật transparent
     const coronaMaterial = new THREE.SpriteMaterial({
         map: sunCoronaTexture,
-        blending: THREE.AdditiveBlending, // Quan trọng nhất: Cộng ánh sáng, không che phủ
+        blending: THREE.AdditiveBlending,
         transparent: true,
-        opacity: 0.8 // Bạn có thể điều chỉnh độ sáng ở đây
+        opacity: 0.8
     });
-
     const corona = new THREE.Sprite(coronaMaterial);
     const sunSize = sunMesh.geometry.parameters.radius;
     corona.scale.set(sunSize * 4, sunSize * 4, 1);
@@ -1107,54 +1206,39 @@ function createSunEffects(sunMesh) {
     sunEffects.corona = corona;
 }
 
-// THAY THẾ TOÀN BỘ HÀM CŨ BẰNG HÀM NÀY
 function createProceduralSaturnRing() {
     const particleCount = 20000;
     const positions = [];
     const colors = [];
-    const customData = []; // Dữ liệu tùy chỉnh: [bán kính, tốc độ, góc ban đầu]
-
+    const customData = [];
     const innerRadius = 40;
     const outerRadius = 65;
     const thickness = 2;
-
     const colorInside = new THREE.Color("#A19A87");
     const colorMiddle = new THREE.Color("#8C826B");
     const colorOutside = new THREE.Color("#B5AF9D");
-
     for (let i = 0; i < particleCount; i++) {
         const radius = THREE.MathUtils.randFloat(innerRadius, outerRadius);
         const angle = Math.random() * Math.PI * 2;
-        
-        // Vị trí ban đầu của hạt
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
         const y = (Math.random() - 0.5) * thickness * (1 - (radius - innerRadius) / (outerRadius - innerRadius));
         positions.push(x, y, z);
-
-        // Tốc độ quay (hạt ở gần quay nhanh hơn)
         const speed = (Math.random() * 0.1 + 0.05) / radius * 100;
-        customData.push(radius, speed, angle, 0); // Lưu dữ liệu để shader sử dụng
-
-        // Màu sắc dựa trên vị trí
+        customData.push(radius, speed, angle, 0);
         const percent = (radius - innerRadius) / (outerRadius - innerRadius);
         let color = percent < 0.3 ? colorInside : (percent < 0.8 ? colorMiddle.clone().lerp(colorInside, (percent - 0.3) / 0.5) : colorOutside);
         colors.push(color.r, color.g, color.b);
     }
-
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
     geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
     geometry.setAttribute('customData', new THREE.Float32BufferAttribute(customData, 4));
-
     const material = new THREE.ShaderMaterial({
-        uniforms: {
-            uTime: { value: 0.0 }
-        },
-        // Vertex Shader tính toán chuyển động xoay của từng hạt
+        uniforms: { uTime: { value: 0.0 } },
         vertexShader: `
             uniform float uTime;
-            attribute vec4 customData; // x: radius, y: speed, z: startAngle
+            attribute vec4 customData;
             attribute vec3 color;      
             varying vec3 vColor;
             void main() {
@@ -1163,29 +1247,24 @@ function createProceduralSaturnRing() {
                 float radius = customData.x;
                 float speed = customData.y;
                 float startAngle = customData.z;
-                
-                // CÔNG THỨC XOAY
-                float newAngle = startAngle + (uTime * speed * 0.1); // Giảm tốc độ chung một chút
+                float newAngle = startAngle + (uTime * speed * 0.1);
                 pos.x = radius * cos(newAngle);
                 pos.z = radius * sin(newAngle);
-
                 vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-                gl_PointSize = 0.15 * (300.0 / -mvPosition.z); // Kích thước hạt
+                gl_PointSize = 0.15 * (300.0 / -mvPosition.z);
                 gl_Position = projectionMatrix * mvPosition;
             }
         `,
-        // Fragment Shader tô màu cho hạt
         fragmentShader: `
             varying vec3 vColor;
             void main() {
-                gl_FragColor = vec4(vColor, 0.5); // Giảm độ trong suốt một chút
+                gl_FragColor = vec4(vColor, 0.5);
             }
         `,
         blending: THREE.AdditiveBlending,
         transparent: true,
         depthWrite: false,
     });
-
     saturnRing = new THREE.Points(geometry, material);
     const saturnObject = celestialObjects.find(obj => obj.userData.id === 'saturn');
     if (saturnObject) {
@@ -1197,19 +1276,15 @@ function createAsteroidBelt(radius, width, count) {
     const belt = new THREE.Group();
     const geometry = new THREE.DodecahedronGeometry(0.5, 0);
     const material = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 1 });
-
     for (let i = 0; i < count; i++) {
         const rock = new THREE.Mesh(geometry, material);
-        
         const orbitRadius = radius + (Math.random() - 0.5) * width;
         const orbitAngle = Math.random() * Math.PI * 2;
         const orbitSpeed = (Math.random() * 0.2 + 0.05) * (Math.random() > 0.5 ? 1 : -1);
         const y = (Math.random() - 0.5) * 5;
-
         rock.userData.orbitRadius = orbitRadius;
         rock.userData.orbitAngle = orbitAngle;
         rock.userData.orbitSpeed = orbitSpeed;
-
         rock.position.set(
             orbitRadius * Math.cos(orbitAngle), 
             y, 
@@ -1290,12 +1365,10 @@ function animateCamera(targetPosition, targetLookAt, duration = 1.5, onComplete 
     if (isAnimatingCamera) return;
     isAnimatingCamera = true;
     controls.enabled = false;
-
     const cameraProxy = {
         posX: camera.position.x, posY: camera.position.y, posZ: camera.position.z,
         targetX: controls.target.x, targetY: controls.target.y, targetZ: controls.target.z,
     };
-
     gsap.to(cameraProxy, {
         duration: duration,
         ease: "power3.inOut",
@@ -1317,17 +1390,13 @@ function animateCamera(targetPosition, targetLookAt, duration = 1.5, onComplete 
 function resetCameraToDefault() {
     if (isAnimatingCamera || !followedObject) return;
     isAutoRotating = false;
-    
     infoCard.classList.add('hidden');
     followedObject = null;
-
-    // Luôn luôn quay về vị trí "NHÀ" đã được định nghĩa
     animateCamera(
         HOME_CAMERA_POSITION,
         HOME_CONTROLS_TARGET,
         1.5,
         () => {
-            // Khôi phục lại giới hạn zoom mặc định
             controls.minDistance = 20;
             controls.maxDistance = 1200;
             controls.enablePan = true;
@@ -1341,10 +1410,8 @@ function showPlanetInfo(clickedMesh) {
     const data = clickedMesh.userData;
     followedObject = clickedMesh;
     controls.enablePan = false;
-
     const planetPosition = new THREE.Vector3();
     clickedMesh.getWorldPosition(planetPosition);
-
     let planetRadius = 10;
     if (clickedMesh.geometry && clickedMesh.geometry.parameters && clickedMesh.geometry.parameters.radius) {
         planetRadius = clickedMesh.geometry.parameters.radius;
@@ -1354,12 +1421,10 @@ function showPlanetInfo(clickedMesh) {
         boundingBox.getSize(size);
         planetRadius = size.length() / 2;
     }
-
     const idealDistance = planetRadius * 2.5;
     const cameraDirection = new THREE.Vector3().subVectors(camera.position, planetPosition).normalize();
     const cameraTargetPosition = planetPosition.clone().add(cameraDirection.multiplyScalar(idealDistance));
     cameraTargetPosition.y = Math.max(cameraTargetPosition.y, planetPosition.y + planetRadius * 0.5);
-
     animateCamera(cameraTargetPosition, planetPosition, 1.5, () => {
         controls.minDistance = planetRadius * 1.2;
         controls.maxDistance = planetRadius * 15;
@@ -1367,7 +1432,6 @@ function showPlanetInfo(clickedMesh) {
         autoRotateAngle = Math.atan2(startAngleVec.z, startAngleVec.x);
         isAutoRotating = true;
     });
-
     infoCardTitle.textContent = data.name || 'Unknown';
     infoCardFact.textContent = data.fact || '';
     infoCardMessage.textContent = data.message || '';
@@ -1403,7 +1467,6 @@ function onWindowResize() {
     composer.setSize(window.innerWidth, window.innerHeight);
 }
 
-
 function showControlsHelp() {
     let helpDiv = document.getElementById('flight-controls-help');
     if (!helpDiv) {
@@ -1415,14 +1478,12 @@ function showControlsHelp() {
             z-index: 1000; display: none; line-height: 1.6; font-family: sans-serif;
         `;
         document.body.appendChild(helpDiv);
-
         window.addEventListener('keydown', (e) => {
             if (e.code === 'KeyH') {
                 helpDiv.style.display = helpDiv.style.display === 'none' ? 'block' : 'none';
             }
         });
     }
-    
     helpDiv.innerHTML = `
         <h3 style="margin-bottom: 10px; color: #ff6b9d;">Hướng Dẫn (Nhấn H để Ẩn/Hiện)</h3>
         <strong style="color: #4ecdc4;">Chế độ Quan sát (Mặc định):</strong>
@@ -1456,38 +1517,30 @@ function animate() {
             rock.position.z = rock.userData.orbitRadius * Math.sin(rock.userData.orbitAngle);
             rock.rotation.y += 0.5 * delta;
         });
-    
     }
     if (isAutoRotating && followedObject) {
         const planetPosition = new THREE.Vector3();
         followedObject.getWorldPosition(planetPosition);
-        
         const distance = camera.position.distanceTo(planetPosition);
         autoRotateAngle += cameraSettings.autoRotateSpeed;
-        
         const newX = planetPosition.x + distance * Math.cos(autoRotateAngle);
         const newZ = planetPosition.z + distance * Math.sin(autoRotateAngle);
         const verticalOffset = Math.sin(elapsedTime * 0.5) * cameraSettings.verticalArcAmount;
-        
         camera.position.x = newX;
         camera.position.z = newZ;
         camera.position.y = planetPosition.y + (followedObject.geometry.parameters.radius * cameraSettings.lookAtHeightOffset) + verticalOffset;
-        
         camera.lookAt(planetPosition);
         controls.target.copy(planetPosition);
     }
 
     if (isFlyMode) updateWarpTrail(delta);
-    
     if (sunEffects.corona) sunEffects.corona.material.rotation = elapsedTime * 0.01;
     if (sunEffects.uniforms) sunEffects.uniforms.uTime.value = elapsedTime;
-    
     activeAsteroids.forEach(a => {
         if (a.uniforms) a.uniforms.uTime.value = elapsedTime;
         a.group.rotation.y += 0.005 * delta * 60;
         a.group.rotation.x += 0.002 * delta * 60;
     });
-
     activeComets.forEach(c => {
         const particles = c.tail.geometry.attributes.position.array;
         for (let i = 0; i < particles.length; i += 3) {
@@ -1506,7 +1559,6 @@ function animate() {
     if (starfield) starfield.rotation.y -= 0.00005;
 
     if (!isAnimatingCamera && controls.enabled) controls.update();
-    
     composer.render();
 }
 
@@ -1519,12 +1571,13 @@ function initThreeJS() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    scene.add(new THREE.PointLight(0xffffff, 1.5));
+    const pointLight = new THREE.PointLight(0xffffff, 1.5, 2000);
+    scene.add(pointLight);
+    
     spaceship = createSpaceship();
     scene.add(spaceship);
     createWarpTrail();
     
-    // SỬA LỖI CUỐI CÙNG: Gọi các hàm không có tiền tố THREE.
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true; controls.dampingFactor = 0.05;
     controls.minDistance = 20; controls.maxDistance = 1200;
@@ -1534,9 +1587,9 @@ function initThreeJS() {
 
     const renderPass = new RenderPass(scene, camera);
     const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-    bloomPass.threshold = 0.95;
-    bloomPass.strength = 0.7;
-    bloomPass.radius = 0.35;
+    bloomPass.threshold = 0;
+    bloomPass.strength = 0.6;
+    bloomPass.radius = 0.5;
     composer = new EffectComposer(renderer);
     composer.addPass(renderPass);
     composer.addPass(bloomPass);
@@ -1593,6 +1646,8 @@ function init() {
     setTimeout(() => setInterval(createPeakRocket, 9000), 15000);
     setTimeout(() => setInterval(createExploringSatellite, 12000), 5000);
     showControlsHelp();
+    
+    window.addEventListener('beforeunload', savePlaybackState);
 }
 
 init();
