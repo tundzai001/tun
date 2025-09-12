@@ -166,23 +166,40 @@
             content: `<p>Không muốn bae đi một chút nào đâu huhu, muốn bae ở đây cơ, i mít u so much, ilu2, ước gì có thêm thời gian, tớ sẽ dành nhiều thời gian hơn cho cậu, không ngờ mới quen thế này kiểu cũng đang vui tự nhiên lại di du học bị buồn vl ấy chứ :(( chắc chiều mà ra sân bay cùng chắc đứng đấy không nỡ để b Hà đi mất, bị thương b Hà nhiều chút, xa nhà để đi học mà lại còn một mình, xung quanh toàn người lạ, không biết nhìn hiền thế có ai bắt nạt không nữa mong là không... th kệ dii bae ơi, i love u so much, cố lên im alws by ur side.</p>` },
         { day: 14, title: "Giờ này, chắc cậu đang nghỉ ngơi rồi nhỉ....", 
             content: `<p>Hôm nay bên đấy của bae có mệt mỏi khhoonggg khi mà phải kiểu sắp xếp đồ đạc chuẩn bị các thứ đó.... èo oi sao mà nghe đã thấy mệt rồi ấy =)))) bae nhớ phải ăn uống đầy đủ nha. bae sang bên đấy cố gắng nha, mạnh mẽ leennn keep fighting!!!!! mệt thì có tớ bên cạnh cậu, tớ luôn bên cạnh cậu nhaa alws luôn. I love u so much bae ạ</p>` },
-        { day: 15, title: "Gửi cậu, ngày giữa tháng!", content: `<p>Nhanh thật, đã nửa tháng rồi. Chúc cậu một ngày học tập hiệu quả. Nhớ cậu!</p>` },
-        { day: 16, title: "Gửi cậu, ngày thứ mười sáu...", content: `<p>Cuối tuần của cậu thế nào? Kể tớ nghe vào tối nay nhé. Giờ thì chúc cậu một ngày thứ Bảy thật vui.</p>` },
-        { day: 17, title: "Gửi cậu, ngày chủ nhật an lành", content: `<p>Hôm nay hãy cho phép bản thân được "lười" một chút nhé. Nạp thật nhiều năng lượng cho tuần mới nha cậu.</p>` },
-        { day: 18, title: "Gửi cậu, ngày thứ mười tám...", content: `<p>Lại một tuần mới bắt đầu. Chúc cậu mọi sự hanh thông. Nhớ ăn trưa đúng bữa đó!</p>` },
-        { day: 19, title: "Gửi cậu, ngày thứ mười chín...", content: `<p>Một lời nhắn nhỏ nhắc cậu đừng ngồi học lâu quá, thỉnh thoảng đứng dậy vươn vai một chút nhé. Tớ lo cho cậu đó.</p>` },
-        { day: 20, title: "Gửi cậu, ngày thứ hai mươi...", content: `<p>2/3 chặng đường của tháng rồi. Cậu giỏi lắm. Chúc cậu một ngày học nhẹ nhàng.</p>` },
-        { day: 21, title: "Gửi cậu, ngày thứ hai mươi mốt...", content: `<p>Chỉ muốn ghé qua đây và để lại một nụ cười cho cậu. :) Cố lên nhé!</p>` },
-        { day: 22, title: "Gửi cậu, ngày thứ hai mươi hai...", content: `<p>Sắp cuối tháng rồi, thời gian bay nhanh thật. Chúc cậu ngày mới tốt lành. Tối mình gặp nhau qua màn hình nhé.</p>` },
-        { day: 23, title: "Gửi cậu, ngày thứ hai mươi ba...", content: `<p>Hôm nay tớ... (kể một hoạt động ngắn của cậu). Còn cậu thì sao? Chúc cậu một ngày học vui vẻ, không áp lực.</p>` },
-        { day: 24, title: "Gửi cậu, ngày thứ hai mươi bốn...", content: `<p>Chủ nhật vui vẻ nhé cậu. Hôm nay hãy làm điều gì đó khiến cậu thực sự hạnh phúc!</p>` },
-        { day: 25, title: "Gửi cậu, ngày thứ hai mươi lăm...", content: `<p>Tuần cuối cùng của tháng rồi! Cố gắng lên nhé. Chúc cậu một ngày học thật hiệu quả để cuối tuần đi chơi.</p>` },
-        { day: 26, title: "Gửi cậu, ngày thứ hai mươi sáu...", content: `<p>Thời tiết bên đó có lạnh không? Nhớ mặc đủ ấm nhé. Chúc cậu một ngày học tập ấm áp.</p>` },
-        { day: 27, title: "Gửi cậu, ngày thứ hai mươi bảy...", content: `<p>Một lời nhắn gửi thật nhiều động lực cho cậu. Cậu là giỏi nhất! ^^</p>` },
-        { day: 28, title: "Gửi cậu, ngày thứ hai mươi tám...", content: `<p>Đếm ngược những ngày cuối tháng. Cố lên nhé. Tớ luôn ở đây ủng hộ cậu.</p>` },
-        { day: 29, title: "Gửi cậu, ngày thứ hai mươi chín...", content: `<p>Hôm nay có bài kiểm tra nào không? Chúc cậu làm bài thật tốt. Tự tin lên nhé!</p>` },
-        { day: 30, title: "Gửi cậu, ngày áp chót của tháng", content: `<p>Ngày 30 rồi! Chúc cậu một ngày học nhẹ nhàng để chuẩn bị khép lại một tháng thật đẹp.</p>` },
-        { day: 31, title: "Gửi cậu, ngày cuối cùng của tháng...", content: `<p>Chúc cậu một ngày học cuối tháng thật thành công để khép lại một tháng trọn vẹn nhé. Tối mình nói chuyện.</p>` },
+        { day: 15, title: "Gửi cậu, ngày giữa tháng!", 
+            content: `<p>Nhanh thật, đã nửa tháng rồi. Chúc cậu một ngày học tập hiệu quả. Nhớ cậu!</p>` },
+        { day: 16, title: "Gửi cậu, ngày thứ mười sáu...", 
+            content: `<p>Cuối tuần của cậu thế nào? Kể tớ nghe vào tối nay nhé. Giờ thì chúc cậu một ngày thứ Bảy thật vui.</p>` },
+        { day: 17, title: "Gửi cậu, ngày chủ nhật an lành", 
+            content: `<p>Hôm nay hãy cho phép bản thân được "lười" một chút nhé. Nạp thật nhiều năng lượng cho tuần mới nha cậu.</p>` },
+        { day: 18, title: "Gửi cậu, ngày thứ mười tám...", 
+            content: `<p>Lại một tuần mới bắt đầu. Chúc cậu mọi sự hanh thông. Nhớ ăn trưa đúng bữa đó!</p>` },
+        { day: 19, title: "Gửi cậu, ngày thứ mười chín...", 
+            content: `<p>Một lời nhắn nhỏ nhắc cậu đừng ngồi học lâu quá, thỉnh thoảng đứng dậy vươn vai một chút nhé. Tớ lo cho cậu đó.</p>` },
+        { day: 20, title: "Gửi cậu, ngày thứ hai mươi...", 
+            content: `<p>2/3 chặng đường của tháng rồi. Cậu giỏi lắm. Chúc cậu một ngày học nhẹ nhàng.</p>` },
+        { day: 21, title: "Gửi cậu, ngày thứ hai mươi mốt...", 
+            content: `<p>Chỉ muốn ghé qua đây và để lại một nụ cười cho cậu. :) Cố lên nhé!</p>` },
+        { day: 22, title: "Gửi cậu, ngày thứ hai mươi hai...", 
+            content: `<p>Sắp cuối tháng rồi, thời gian bay nhanh thật. Chúc cậu ngày mới tốt lành. Tối mình gặp nhau qua màn hình nhé.</p>` },
+        { day: 23, title: "Gửi cậu, ngày thứ hai mươi ba...", 
+            content: `<p>Hôm nay tớ... (kể một hoạt động ngắn của cậu). Còn cậu thì sao? Chúc cậu một ngày học vui vẻ, không áp lực.</p>` },
+        { day: 24, title: "Gửi cậu, ngày thứ hai mươi bốn...", 
+            content: `<p>Chủ nhật vui vẻ nhé cậu. Hôm nay hãy làm điều gì đó khiến cậu thực sự hạnh phúc!</p>` },
+        { day: 25, title: "Gửi cậu, ngày thứ hai mươi lăm...", 
+            content: `<p>Tuần cuối cùng của tháng rồi! Cố gắng lên nhé. Chúc cậu một ngày học thật hiệu quả để cuối tuần đi chơi.</p>` },
+        { day: 26, title: "Gửi cậu, ngày thứ hai mươi sáu...", 
+            content: `<p>Thời tiết bên đó có lạnh không? Nhớ mặc đủ ấm nhé. Chúc cậu một ngày học tập ấm áp.</p>` },
+        { day: 27, title: "Gửi cậu, ngày thứ hai mươi bảy...", 
+            content: `<p>Một lời nhắn gửi thật nhiều động lực cho cậu. Cậu là giỏi nhất! ^^</p>` },
+        { day: 28, title: "Gửi cậu, ngày thứ hai mươi tám...",
+            content: `<p>Đếm ngược những ngày cuối tháng. Cố lên nhé. Tớ luôn ở đây ủng hộ cậu.</p>` },
+        { day: 29, title: "Gửi cậu, ngày thứ hai mươi chín...", 
+            content: `<p>Hôm nay có bài kiểm tra nào không? Chúc cậu làm bài thật tốt. Tự tin lên nhé!</p>` },
+        { day: 30, title: "Gửi cậu, ngày áp chót của tháng", 
+            content: `<p>Ngày 30 rồi! Chúc cậu một ngày học nhẹ nhàng để chuẩn bị khép lại một tháng thật đẹp.</p>` },
+        { day: 31, title: "Gửi cậu, ngày cuối cùng của tháng...", 
+            content: `<p>Chúc cậu một ngày học cuối tháng thật thành công để khép lại một tháng trọn vẹn nhé. Tối mình nói chuyện.</p>` },
     ];
 
     /* --- ĐƯỜNG DẪN ẢNH (ASSETS)  --- */
@@ -203,23 +220,127 @@
 
     /* --- DỮ LIỆU CÁC THIÊN THỂ  --- */
     export const celestialData = [ 
-        { id: 'sun', type: 'star', name: 'Mặt Trời', texture: assetPaths.sun, size: 80, orbitRadius: 0, spinSpeed: 0.2, 
-            fact: "Năng lượng của mặt trời sưởi ấm cả vũ trụ này...", message: "...nhưng nụ cười của cậu mới là thứ sưởi ấm mùa đông này =))) ." }, 
-        { id: 'venus', type: 'planet', name: 'Sao Kim', texture: assetPaths.venus, size: 6, orbitRadius: 150, orbitSpeed: 4.0, spinSpeed: 0.5, 
-            fact: "Sao Kim được đặt theo tên nữ thần tình yêu và sắc đẹp trong thần thoại La Mã...", message: "...điều đó giải thích tại sao tớ lại tìm thấy cậu ở đây hehe." },
-        { id: 'earth', type: 'planet', name: 'Trái Đất', texture: assetPaths.earth, size: 7, orbitRadius: 220, orbitSpeed: 3.0, spinSpeed: 2.5, 
-            fact: "Trái Đất là hành tinh duy nhất được biết đến có sự sống...", message: "...và có lẽ chúng ta cũng mới bắt đầu một hành trình nhỏ.", 
-            moons: [ { id: 'moon', name: 'Mặt Trăng', texture: assetPaths.moon, size: 1.5, orbitRadius: 15, orbitSpeed: 1.5, spinSpeed: 0.2 } ] }, 
-        { id: 'mars', type: 'planet', name: 'Sao Hỏa', texture: assetPaths.mars, size: 5, orbitRadius: 300, orbitSpeed: 2.5, spinSpeed: 2.0,
-            fact: "Sao Hỏa được gọi là 'Hành tinh Đỏ' vì màu sắc của nó...", message: "...giống như những rung động mới mẻ trong tim của mình hehehehe, í là tim nó cứ đỏ rực th =)))) .", 
-            moons: [ { id: 'phobos', name: 'Phobos', texture: assetPaths.phobos, size: 0.8, orbitRadius: 8, orbitSpeed: 3.0, spinSpeed: 0.5 } ] }, 
-        { id: 'jupiter', type: 'planet', name: 'Sao Mộc', texture: assetPaths.jupiter, size: 30, orbitRadius: 450, orbitSpeed: 1.5, spinSpeed: 4.0, 
-            fact: "Sao Mộc là hành tinh lớn nhất...", message: "...giống tớ í là yêu cậu nhiều ấy =)))) ." }, 
-        { id: 'saturn', type: 'planet', name: 'Sao Thổ', texture: assetPaths.saturn, size: 25, orbitRadius: 650, orbitSpeed: 1.0, spinSpeed: 3.5, 
-            fact: "Sao Thổ nổi tiếng với vành đai tuyệt đẹp của nó...", message: "...biết đâu sau này mình cũng có thêm nhiều kỷ niệm vòng quanh nhau ha =)))." }, 
-        { id: 'neptune', type: 'planet', name: 'Sao Hải Vương', texture: assetPaths.neptune, size: 15, orbitRadius: 800, orbitSpeed: 0.8, spinSpeed: 2.8,
-            fact: "Sao Hải Vương là hành tinh xa mặt trời nhất...", message: "...nhưng dù ở xa thế nào thì khoảng cách vẫn chưa bao giờ là vấn đề." }
-    ];
+        { 
+            id: 'sun', 
+            type: 'star', 
+            name: 'Mặt Trời', 
+            texture: assetPaths.sun, 
+            size: 80, 
+            orbitRadius: 0, 
+            spinSpeed: 0.2, 
+            fact: "Năng lượng của mặt trời sưởi ấm cả vũ trụ này...", 
+            message: "...nhưng nụ cười của cậu mới là thứ sưởi ấm mùa đông này =))) .",
+            camera: {
+                offset: { x: 0, y: 150, z: 250 }, // Góc quay từ trên cao, cảm nhận sự vĩ đại và bao trùm
+                lookAtOffset: { x: 0, y: 20, z: 0 }, // Nhìn vào phần trên của mặt trời, không phải tâm
+                orbitSpeed: 0.0005 // Quỹ đạo cực kỳ chậm, trang nghiêm
+            }
+        }, 
+        { 
+            id: 'venus', 
+            type: 'planet', 
+            name: 'Sao Kim', 
+            texture: assetPaths.venus, 
+            size: 6, 
+            orbitRadius: 150, 
+            orbitSpeed: 4.0, 
+            spinSpeed: 0.5, 
+            fact: "Sao Kim được đặt theo tên nữ thần tình yêu và sắc đẹp trong thần thoại La Mã...", 
+            message: "...điều đó giải thích tại sao tớ lại tìm thấy cậu ở đây hehe.",
+            camera: {
+                offset: { x: -18, y: 8, z: 18 }, // Góc quay chéo, tinh tế, như đang chiêm ngưỡng một viên ngọc quý
+                lookAtOffset: { x: 0, y: 1, z: 0 }, // Nhìn hơi cao hơn một chút để tạo sự tôn trọng
+                orbitSpeed: 0.0025 // Tốc độ quay nhẹ nhàng, duyên dáng
+            }
+        },
+        { 
+            id: 'earth', 
+            type: 'planet', 
+            name: 'Trái Đất', 
+            texture: assetPaths.earth, 
+            size: 7, 
+            orbitRadius: 220, 
+            orbitSpeed: 3.0, 
+            spinSpeed: 2.5, 
+            fact: "Trái Đất là hành tinh duy nhất được biết đến có sự sống...", 
+            message: "...và có lẽ chúng ta cũng mới bắt đầu một hành trình nhỏ.", 
+            moons: [ { id: 'moon', name: 'Mặt Trăng', texture: assetPaths.moon, size: 1.5, orbitRadius: 15, orbitSpeed: 1.5, spinSpeed: 0.2 } ],
+            camera: {
+                offset: { x: 25, y: 5, z: 25 }, // Góc quay kinh điển, đầy hy vọng, thấy được phần sáng tối của một ngày
+                lookAtOffset: { x: 0, y: 0, z: 0 }, // Nhìn thẳng vào ngôi nhà của chúng ta
+                orbitSpeed: 0.002 // Tốc độ quay ổn định, bình yên
+            }
+        }, 
+        { 
+            id: 'mars', 
+            type: 'planet', 
+            name: 'Sao Hỏa', 
+            texture: assetPaths.mars, 
+            size: 5, 
+            orbitRadius: 300, 
+            orbitSpeed: 2.5, 
+            spinSpeed: 2.0,
+            fact: "Sao Hỏa được gọi là 'Hành tinh Đỏ' vì màu sắc của nó...", 
+            message: "...giống như những rung động mới mẻ trong tim của mình hehehehe, í là tim nó cứ đỏ rực th =)))) .", 
+            moons: [ { id: 'phobos', name: 'Phobos', texture: assetPaths.phobos, size: 0.8, orbitRadius: 8, orbitSpeed: 3.0, spinSpeed: 0.5 } ],
+            camera: {
+                offset: { x: 0, y: 10, z: -18 }, // Góc quay từ phía sau, tạo viền sáng đỏ rực đầy kịch tính quanh hành tinh
+                lookAtOffset: { x: 0, y: 0, z: 0 },
+                orbitSpeed: 0.003 // Tốc độ nhanh hơn một chút, thể hiện sự rung động, bồi hồi
+            }
+        }, 
+        { 
+            id: 'jupiter', 
+            type: 'planet', 
+            name: 'Sao Mộc', 
+            texture: assetPaths.jupiter, 
+            size: 30, 
+            orbitRadius: 450, 
+            orbitSpeed: 1.5, 
+            spinSpeed: 4.0, 
+            fact: "Sao Mộc là hành tinh lớn nhất...", 
+            message: "...giống tớ í là yêu cậu nhiều ấy =)))) .",
+            camera: {
+                offset: { x: 50, y: -15, z: 50 }, // Góc quay từ dưới thấp nhìn lên, nhấn mạnh sự khổng lồ, choáng ngợp
+                lookAtOffset: { x: 0, y: 10, z: 0 }, // Nhìn lên trên, tăng cảm giác to lớn
+                orbitSpeed: 0.0008 // Quỹ đạo rất chậm, đường bệ, tương xứng với kích thước
+            }
+        }, 
+        { 
+            id: 'saturn', 
+            type: 'planet', 
+            name: 'Sao Thổ', 
+            texture: assetPaths.saturn, 
+            size: 25, 
+            orbitRadius: 650, 
+            orbitSpeed: 1.0, 
+            spinSpeed: 3.5, 
+            fact: "Sao Thổ nổi tiếng với vành đai tuyệt đẹp của nó...", 
+            message: "...biết đâu sau này mình cũng có thêm nhiều kỷ niệm vòng quanh nhau ha =))).",
+            camera: {
+                offset: { x: 60, y: -20, z: 60 }, // Góc quay cực thấp, để vành đai chiếm trọn khung hình, tạo sự hùng vĩ
+                lookAtOffset: { x: 0, y: 5, z: 0 }, // Nhìn vào phần trên của hành tinh
+                orbitSpeed: 0.0007 // Tốc độ chậm nhất, để người xem có thể chiêm ngưỡng trọn vẹn vẻ đẹp
+            }
+        }, 
+        { 
+            id: 'neptune', 
+            type: 'planet', 
+            name: 'Sao Hải Vương', 
+            texture: assetPaths.neptune, 
+            size: 15, 
+            orbitRadius: 800, 
+            orbitSpeed: 0.8, 
+            spinSpeed: 2.8,
+            fact: "Sao Hải Vương là hành tinh xa mặt trời nhất...", 
+            message: "...nhưng dù ở xa thế nào thì khoảng cách vẫn chưa bao giờ là vấn đề.",
+            camera: {
+                offset: { x: 0, y: 20, z: 45 }, // Góc quay trực diện, xa và tĩnh, tạo cảm giác thanh bình, yên tĩnh
+                lookAtOffset: { x: 0, y: 0, z: 0 },
+                orbitSpeed: 0.0015 // Tốc độ chậm, thể hiện sự tĩnh lặng của không gian xa xôi
+            }
+        }
+];
 
 
     /* --- CÁC THÔNG ĐIỆP CHỮ RƠI  --- */
