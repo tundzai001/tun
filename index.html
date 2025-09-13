@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 
     <!-- 
       IMPORT MAP: Rất quan trọng!
@@ -153,6 +154,7 @@
         <button id="settings-toggle-btn" class="hidden">⚙️</button>
         <button id="fly-mode-btn" class="hidden">🚀</button>
         <button id="special-day-btn" class="hidden">💌</button>
+        <button id="flight-day-btn" class="hidden">Một hành trình mới...</button>
     </div>
     <!-- WIDGET THỜI TIẾT (MỚI) -->
     <div id="weather-widget-container" class="floating-controls hidden">
@@ -207,7 +209,33 @@
     
     <!-- Bảng hướng dẫn điều khiển (sẽ được tạo bởi JS) -->
     <!-- <div id="flight-controls-help"></div> -->
-    
+    <!-- LỚP PHỦ CHO HIỆU ỨNG CHUYẾN BAY -->
+    <div id="flight-overlay" class="hidden">
+        <div id="flight-map">
+            <!-- Các điểm sân bay -->
+            <div class="airport-dot" id="hanoi-dot"><span>HAN</span></div>
+            <div class="airport-dot" id="chengdu-dot"><span>CTU</span></div>
+
+            <!-- SVG chứa cả đường bay và máy bay -->
+            <svg id="flight-path-svg" viewbox="0 0 100 100" preserveAspectRatio="none">
+                <path id="flight-path" d="M 80 58 Q 75 45 77 48" stroke="rgba(255, 255, 255, 0.6)" stroke-width="0.3" fill="none" />
+                <g id="airplane-icon-svg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="2.5" height="2.5" viewBox="0 0 24 24" fill="white">
+                        <path id="flight-path" d="M 80 62 Q 70 50 78 48" stroke="rgba(255, 255, 255, 0.7)" stroke-width="0.3" fill="none" />
+                    </svg>
+                    <animateMotion id="fly-animation" dur="8s" begin="indefinite" fill="freeze" rotate="auto">
+                        <mpath href="#flight-path" />
+                    </animateMotion>
+                </g>
+            </svg>
+        </div>
+
+            <!-- THÔNG BÁO THƯ MỚI (THÊM MỚI) -->
+        <div id="flight-notification" class="hidden">
+            <p>Bạn có một lá thư từ người thương...</p>
+            <button id="read-flight-letter-btn">Đọc ngay</button>
+        </div>
+    </div>
     <!-- Hiệu ứng chúc mừng sinh nhật -->
     <div id="birthday-celebration">
         <p>Happy Birthday!</p>
