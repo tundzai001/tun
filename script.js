@@ -17,11 +17,13 @@ import {
     celestialData, 
     messages, 
     birthdayMessages, 
-    shootingStarMessages
+    shootingStarMessages,
+    flightDayLetter
 } from './data.js';
 
 // Import HÀM LẤY DỮ LIỆU THỜI TIẾT
 import { getWeatherData } from './weather.js';
+
 
 // =================================================================
 // PHẦN 1: KHAI BÁO BIẾN VÀ DOM ELEMENTS
@@ -287,7 +289,92 @@ function updateUniverseAmbiance(weather, delta) {
     else if (weather.aqi.category.toLowerCase().includes('moderate')) targetFogDensity = 0.0003;
     if (scene.fog) scene.fog.density = THREE.MathUtils.lerp(scene.fog.density, targetFogDensity, 0.05);
 }
+// =================================================================
+// SPECIAL PERSON
+function setupFlightDayExperience() {
+    // === Lấy các elements cần thiết ===
+    const flightBtn = document.getElementById('flight-day-btn');
+    const flightOverlay = document.getElementById('flight-overlay');
+    const flightMap = document.getElementById('flight-map');
+    const airplaneIcon = document.getElementById('airplane-icon-svg');
+    const musicControls = document.getElementById('waveform-controls');
+    const flightNotification = document.getElementById('flight-notification');
+    const readLetterBtn = document.getElementById('read-flight-letter-btn');
+    const letterContainer = document.getElementById('letter-container');
+    const specialDayBtn = document.getElementById('special-day-btn');
 
+    let flightAnimationFinished = false;
+
+    // Hiển thị các nút cần thiết cho ngày bay
+    flightBtn.classList.remove('hidden');
+    specialDayBtn.classList.remove('hidden');
+    specialDayBtn.innerHTML = '💌'; // Đảm bảo nó là icon thư
+
+    // === Hàm để chạy toàn bộ kịch bản chuyến bay ===
+    const startFlightSequence = () => {
+        flightBtn.style.display = 'none';
+        if (musicControls) musicControls.classList.add('hidden');
+        flightOverlay.classList.remove('hidden');
+
+        const flightDuration = 8000; // 8 giây
+
+        // Bắt đầu hiệu ứng bay
+        setTimeout(() => {
+            flightMap.classList.add('drawing-path');
+            flightMap.classList.add('flying');
+        }, 500);
+
+        // Hiển thị thông báo đọc thư giữa chuyến bay
+        setTimeout(() => {
+            flightNotification.classList.remove('hidden');
+        }, 500 + (flightDuration / 2));
+        
+        // Đánh dấu là chuyến bay đã kết thúc sau khi animation chạy xong
+        setTimeout(() => {
+            flightAnimationFinished = true;
+        }, flightDuration + 500);
+    };
+
+    // === Hàm để mở thư và quản lý nút đóng ===
+    const showFlightLetter = () => {
+        // Tạm dừng hiệu ứng nếu nó đang chạy
+        if (!flightAnimationFinished) {
+            flightMap.style.animationPlayState = 'paused';
+            if (airplaneIcon) airplaneIcon.style.animationPlayState = 'paused';
+        }
+        
+        flightNotification.classList.add('hidden');
+        openLetter(flightDayLetter, null, false);
+
+        // Quan trọng: Gán sự kiện cho nút đóng "mới" được tạo ra bởi openLetter
+        const closeBtn = letterContainer.querySelector('#close-letter-btn');
+        if (closeBtn) {
+            closeBtn.onclick = () => closeFlightLetter(); // Ghi đè hành vi mặc định
+        }
+    };
+
+    // === Hàm để đóng thư và quyết định hành động tiếp theo ===
+    const closeFlightLetter = () => {
+        letterContainer.classList.add('hidden');
+        
+        // Nếu animation chưa kết thúc, hãy tiếp tục nó
+        if (!flightAnimationFinished) {
+            flightMap.style.animationPlayState = 'running';
+            if (airplaneIcon) airplaneIcon.style.animationPlayState = 'running';
+        } 
+        // Nếu animation đã kết thúc, đóng cả bản đồ để quay về vũ trụ
+        else {
+            flightOverlay.classList.add('hidden');
+            if (musicControls) musicControls.classList.remove('hidden');
+        }
+    };
+
+    // === Gán sự kiện cho các nút ===
+    flightBtn.addEventListener('click', startFlightSequence, { once: true });
+    readLetterBtn.addEventListener('click', showFlightLetter);
+    // Nút 💌 dùng để đọc lại thư
+    specialDayBtn.addEventListener('click', showFlightLetter);
+}
 // =================================================================
 // PHẦN 3: CÁC HÀM TIỆN ÍCH VÀ HIỆU ỨNG
 // =================================================================
@@ -1474,12 +1561,31 @@ async function init() {
     setupGyroControls();
     setupMouseParallax();
     requestAnimationFrame(mainLoop);
-    if (isBirthdayMode) activateBirthdayMode();
-    else checkAndSetupLetterButton();
+    const today = new Date();
+    const flightDate = 13; 
+    const flightMonth = 9; // Tháng 9
+    const flightYear = 2025;
+
+        // Ưu tiên 1: Kiểm tra có phải ngày bay không
+    if (today.getDate() === flightDate && today.getMonth() + 1 === flightMonth && today.getFullYear() === flightYear) {
+            // Nếu đúng, chỉ chạy kịch bản ngày bay
+        setTimeout(setupFlightDayExperience, 2000);
+    } 
+        // Ưu tiên 2: Nếu không phải ngày bay, kiểm tra có phải sinh nhật không
+    else if (isBirthdayMode) {
+        activateBirthdayMode();
+    } 
+        // Mặc định: Nếu không phải cả hai, chạy logic thư hàng ngày
+    else {
+        checkAndSetupLetterButton();
+    }
+
+        // Các hàm hẹn giờ và sự kiện khác giữ nguyên
     setTimeout(() => setInterval(createPeakRocket, 9000), 15000);
     setTimeout(() => setInterval(createExploringSatellite, 12000), 5000);
     showControlsHelp();
     window.addEventListener('beforeunload', savePlaybackState);
+
 }
 
 init();
