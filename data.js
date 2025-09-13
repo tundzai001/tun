@@ -391,8 +391,9 @@
 // =================================================================
 export const flightDayLetter = {
     title: "Gửi cậu, cô gái dũng cảm của tớ =)) èo nghe sến nhỉ",
-    content: `<p>Khi cậu đọc được những dòng này, có lẽ cậu cũng đang chuẩn bị đến sân bay, sang một nơi lạ lẫm bắt đầu một hành trình mới. Tớ biết cảm giác của cậu lúc này có lẽ rất hỗn loạn, buồn một chút hoặc nhiều chút =)))), một chút háo hức cho chặng đường mới, một chút lo lắng, và cả một chút buồn khi phải rời xa Hà Nội, rời xa gia đình cũng như người thân quen hàng ngày của mình, xa em bánh mì, bạn Chi, bạn Vy, bạn Nấm và nhiều người thân khác nữa </p>
+    content: `<p>Khi cậu đọc được những dòng này, có lẽ cậu cũng đang chuẩn bị đến sân bay hoặc đến rùi, haizz sang một nơi lạ lẫm bắt đầu một hành trình mới. Tớ biết cảm giác của cậu lúc này có lẽ rất hỗn loạn, buồn một chút hoặc nhiều chút =)))), một chút háo hức cho chặng đường mới, một chút lo lắng, và cả một chút buồn khi phải rời xa Hà Nội, rời xa gia đình cũng như người thân quen hàng ngày của mình, xa em bánh mì, bạn Chi, bạn Vy, bạn Nấm và nhiều người thân khác nữa </p>
               <p>Nhưng mà cậu oiii, hãy cố lênn, sẽ làm được thôi. Tớ tin cậu có thể làm được, cậu rất mạnh mẽ mà. Cậu đang tiến đến một quãng đường mới, một tương lai mà cậu đã rất nỗ lực, mệt mỏi rất nhiều để có được. Tớ tự hào về cậu vô cùng.</p>
               <p>Hà Nội,gia đình, bạn bè và tớ sẽ luôn ở đây, đợi cậu. Hành trình này có thể dài, có thể sẽ gặp nhiều khó khăn nhưng mà luôn nhớ mọi người alws bên cạnh cậu. Hãy thật mạnh mẽ, chăm sóc bản thân chu đáo và tận hưởng từng khoảnh khắc nhé.</p>
               <p>Tớ yêu cậu. Hẹn gặp lại cậu ở Thành Đô, hoặc sớm thôi, ở Hà Nội nhé.</p>`
 };
+
