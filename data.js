@@ -378,4 +378,13 @@
         "Khiêm tốn, thật thà, dũng cảm",
     ];
 
-    
+    // =================================================================
+// DỮ LIỆU ĐẶC BIỆT CHO NGÀY BAY (CHỈ DÙNG HÔM NAY)
+// =================================================================
+export const flightDayLetter = {
+    title: "Gửi cậu, cô gái dũng cảm của tớ =)) èo nghe sến nhỉ",
+    content: `<p>Khi cậu đọc được những dòng này, có lẽ chiếc máy bay cũng đang đợi cậu để bắt đầu một hành trình mới. Tớ biết cảm giác của cậu lúc này có lẽ rất hỗn loạn, buồn một chút hoặc nhiều chút =)))): một chút háo hức cho chặng đường mới, một chút lo lắng, và cả một chút buồn khi phải rời xa Hà Nội thân thương, rời xa gia đình cũng như những người bạn thân, người thân quen hàng ngày của mình.</p>
+              <p>Nhưng mà cậu oiii, hãy cố lênn. Cậu đang tiến đến một quãng đường mới, một tương lai mà cậ đã nỗ lực rất nhiều để có được. Tớ tự hào về cậu vô cùng.</p>
+              <p>Hà Nội và gia đình, bạn bè và tớ sẽ luôn ở đây, đợi cậu. Hành trình này có thể dài, nhưng mà tình cảm thì không thẻ phai nhạt nha =))) mọi người alws bên cạnh cậu. Hãy thật mạnh mẽ, chăm sóc bản thân chu đáo và tận hưởng từng khoảnh khắc nhé.</p>
+              <p>Tớ yêu cậu. Hẹn gặp lại cậu ở Thành Đô, hoặc sớm thôi, ở Hà Nội nhé.</p>`
+};
