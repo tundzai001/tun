@@ -18,7 +18,8 @@ import {
     messages, 
     birthdayMessages, 
     shootingStarMessages,
-    flightDayLetter
+    flightDayLetter,
+    airportData // <<--- QUAN TRỌNG: Đảm bảo dòng này tồn tại
 } from './data.js';
 
 // Import HÀM LẤY DỮ LIỆU THỜI TIẾT
@@ -289,91 +290,178 @@ function updateUniverseAmbiance(weather, delta) {
     else if (weather.aqi.category.toLowerCase().includes('moderate')) targetFogDensity = 0.0003;
     if (scene.fog) scene.fog.density = THREE.MathUtils.lerp(scene.fog.density, targetFogDensity, 0.05);
 }
+
 // =================================================================
-// SPECIAL PERSON
+// SPECIAL PERSON - PHIÊN BẢN SỬA LỖI ĐÓNG BĂNG THỜI GIAN
+// =================================================================
+
+// Khai báo các biến trạng thái ở phạm vi rộng hơn
+let map = null;
+let animatedMarker = null;
+let animationFrameId = null;
+let isFlightInProgress = false;
+let isNotificationShown = false;
+let isPlanePaused = false;
+let flightStartTime = 0;
+let timePausedAt = 0; // <<-- BIẾN MỚI: Ghi lại thời điểm tạm dừng
+const FLIGHT_DURATION_MS = 25000;
+
 function setupFlightDayExperience() {
-    // === Lấy các elements cần thiết ===
     const flightBtn = document.getElementById('flight-day-btn');
     const flightOverlay = document.getElementById('flight-overlay');
-    const flightMap = document.getElementById('flight-map');
-    const airplaneIcon = document.getElementById('airplane-icon-svg');
-    const musicControls = document.getElementById('waveform-controls');
     const flightNotification = document.getElementById('flight-notification');
     const readLetterBtn = document.getElementById('read-flight-letter-btn');
     const letterContainer = document.getElementById('letter-container');
-    const specialDayBtn = document.getElementById('special-day-btn');
+    const musicControls = document.getElementById('waveform-controls');
 
-    let flightAnimationFinished = false;
-
-    // Hiển thị các nút cần thiết cho ngày bay
     flightBtn.classList.remove('hidden');
-    specialDayBtn.classList.remove('hidden');
-    specialDayBtn.innerHTML = '💌'; // Đảm bảo nó là icon thư
 
-    // === Hàm để chạy toàn bộ kịch bản chuyến bay ===
-    const startFlightSequence = () => {
-        flightBtn.style.display = 'none';
-        if (musicControls) musicControls.classList.add('hidden');
-        flightOverlay.classList.remove('hidden');
+    const animateMap = (pathPoints) => {
+        if (!map || !isFlightInProgress) {
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+            return;
+        }
 
-        const flightDuration = 8000; // 8 giây
+        // <<-- THAY ĐỔI QUAN TRỌNG: XỬ LÝ VIỆC TẠM DỪNG NGAY TỪ ĐẦU -->>
+        // Nếu đang bị tạm dừng, không làm gì cả, chỉ chờ khung hình tiếp theo.
+        if (isPlanePaused) {
+            animationFrameId = requestAnimationFrame(() => animateMap(pathPoints));
+            return;
+        }
 
-        // Bắt đầu hiệu ứng bay
-        setTimeout(() => {
-            flightMap.classList.add('drawing-path');
-            flightMap.classList.add('flying');
-        }, 500);
+        let progress = (Date.now() - flightStartTime) / FLIGHT_DURATION_MS;
 
-        // Hiển thị thông báo đọc thư giữa chuyến bay
-        setTimeout(() => {
-            flightNotification.classList.remove('hidden');
-        }, 500 + (flightDuration / 2));
-        
-        // Đánh dấu là chuyến bay đã kết thúc sau khi animation chạy xong
-        setTimeout(() => {
-            flightAnimationFinished = true;
-        }, flightDuration + 500);
-    };
+        if (progress >= 1.0) {
+            // Xử lý khi kết thúc chuyến bay (logic này bây giờ sẽ chạy đúng lúc)
+            progress = 1.0;
+            isFlightInProgress = false;
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+            console.log("Flight Finished!");
+            setTimeout(() => {
+                flightOverlay.classList.remove('visible');
+                setTimeout(() => {
+                    musicControls?.classList.remove('hidden');
+                    flightBtn.style.display = 'block';
+                    if (map) { map.remove(); map = null; }
+                }, 1500);
+            }, 1000); // Giảm thời gian chờ một chút
+            return; // Dừng vòng lặp
+        }
 
-    // === Hàm để mở thư và quản lý nút đóng ===
-    const showFlightLetter = () => {
-        // Tạm dừng hiệu ứng nếu nó đang chạy
-        if (!flightAnimationFinished) {
-            flightMap.style.animationPlayState = 'paused';
-            if (airplaneIcon) airplaneIcon.style.animationPlayState = 'paused';
+        // Nội suy vị trí của máy bay
+        let currentLatLng;
+        if (progress < 0.5) {
+            const segmentProgress = progress * 2;
+            currentLatLng = L.latLng(
+                pathPoints[0].lat + (pathPoints[1].lat - pathPoints[0].lat) * segmentProgress,
+                pathPoints[0].lng + (pathPoints[1].lng - pathPoints[0].lng) * segmentProgress
+            );
+        } else {
+            const segmentProgress = (progress - 0.5) * 2;
+            currentLatLng = L.latLng(
+                pathPoints[1].lat + (pathPoints[2].lat - pathPoints[1].lat) * segmentProgress,
+                pathPoints[1].lng + (pathPoints[2].lng - pathPoints[1].lng) * segmentProgress
+            );
         }
         
+        animatedMarker.setLatLng(currentLatLng);
+        
+        console.log(`Flight Progress: ${progress.toFixed(2)}`);
+
+        const startZoom = 8;
+        const endZoom = 11;
+        const currentZoom = startZoom + (endZoom - startZoom) * progress;
+        map.setView(currentLatLng, currentZoom, { animate: false });
+
+        if (progress >= 0.5 && !isNotificationShown) {
+            console.log("!!! HALFWAY POINT REACHED - PAUSING LOGIC !!!");
+            isNotificationShown = true;
+            flightNotification.classList.remove('hidden');
+            isPlanePaused = true; // <<-- Đặt cờ tạm dừng
+            timePausedAt = Date.now(); // <<-- Ghi lại thời điểm chính xác khi tạm dừng
+        }
+        
+        animationFrameId = requestAnimationFrame(() => animateMap(pathPoints));
+    };
+
+    const showFlightLetter = () => {
         flightNotification.classList.add('hidden');
         openLetter(flightDayLetter, null, false);
-
-        // Quan trọng: Gán sự kiện cho nút đóng "mới" được tạo ra bởi openLetter
         const closeBtn = letterContainer.querySelector('#close-letter-btn');
         if (closeBtn) {
-            closeBtn.onclick = () => closeFlightLetter(); // Ghi đè hành vi mặc định
+            closeBtn.onclick = () => {
+                letterContainer.classList.add('hidden');
+                if (isFlightInProgress) {
+                    // <<-- THAY ĐỔI QUAN TRỌNG: ĐIỀU CHỈNH LẠI THỜI GIAN BẮT ĐẦU -->>
+                    // Tính khoảng thời gian đã bị tạm dừng
+                    const pausedDuration = Date.now() - timePausedAt;
+                    // "Bù" khoảng thời gian này vào thời gian bắt đầu
+                    flightStartTime += pausedDuration;
+                    isPlanePaused = false; // <<-- Cho phép logic chạy tiếp
+                }
+            };
         }
     };
 
-    // === Hàm để đóng thư và quyết định hành động tiếp theo ===
-    const closeFlightLetter = () => {
-        letterContainer.classList.add('hidden');
+    const startFlightSequence = () => {
+        // ... Hàm này giữ nguyên như phiên bản trước, không cần thay đổi ...
+        if (typeof L === 'undefined' || !airportData || isFlightInProgress) return;
+
+        isFlightInProgress = true;
+        isNotificationShown = false;
+        isPlanePaused = false;
+        timePausedAt = 0; // Reset
+        flightBtn.style.display = 'none';
+        musicControls?.classList.add('hidden');
+        flightOverlay.classList.add('visible');
+
+        const originCode = 'HAN', destCode = 'CTU';
+        const origin = airportData[originCode], dest = airportData[destCode];
+
+        if (!origin || !dest) { /* ... xử lý lỗi ... */ return; }
+
+        if (map) map.remove();
+        map = L.map('flight-map', { /* ... cấu hình map ... */ }).setView(origin.coords, 5);
         
-        // Nếu animation chưa kết thúc, hãy tiếp tục nó
-        if (!flightAnimationFinished) {
-            flightMap.style.animationPlayState = 'running';
-            if (airplaneIcon) airplaneIcon.style.animationPlayState = 'running';
-        } 
-        // Nếu animation đã kết thúc, đóng cả bản đồ để quay về vũ trụ
-        else {
-            flightOverlay.classList.add('hidden');
-            if (musicControls) musicControls.classList.remove('hidden');
-        }
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { /* ... */ }).addTo(map);
+        L.circleMarker(origin.coords, { /* ... */ }).addTo(map).bindPopup(`<b>${origin.city} (${originCode})</b>`).openPopup();
+        L.circleMarker(dest.coords, { /* ... */ }).addTo(map).bindPopup(`<b>${dest.city} (${destCode})</b>`);
+
+        const latlngs = [
+            origin.coords,
+            [(origin.coords[0] + dest.coords[0]) / 2 + 1.5, (origin.coords[1] + dest.coords[1]) / 2],
+            dest.coords
+        ];
+        L.polyline(latlngs, {
+            color: 'rgba(255, 255, 255, 0.6)', weight: 2, dashArray: '5, 10'
+        }).addTo(map);
+        
+        map.fitBounds(L.polyline(latlngs).getBounds().pad(0.3));
+        const pathPoints = latlngs.map(coord => L.latLng(coord[0], coord[1]));
+        const planeIcon = L.divIcon({ html: '✈️', className: 'plane-icon', iconSize: [24, 24] });
+
+        setTimeout(() => {
+            if (!map) return;
+            map.flyTo(origin.coords, 8, { animate: true, duration: 4 });
+
+            setTimeout(() => {
+                if (!isFlightInProgress) return;
+                
+                animatedMarker = L.marker(origin.coords, { icon: planeIcon });
+                map.addLayer(animatedMarker);
+                
+                flightStartTime = Date.now();
+                animateMap(pathPoints);
+
+            }, 4000);
+
+        }, 1000);
     };
 
-    // === Gán sự kiện cho các nút ===
-    flightBtn.addEventListener('click', startFlightSequence, { once: true });
+    flightBtn.addEventListener('click', startFlightSequence);
     readLetterBtn.addEventListener('click', showFlightLetter);
-    // Nút 💌 dùng để đọc lại thư
-    specialDayBtn.addEventListener('click', showFlightLetter);
 }
 // =================================================================
 // PHẦN 3: CÁC HÀM TIỆN ÍCH VÀ HIỆU ỨNG
@@ -1341,7 +1429,6 @@ function showPlanetInfo(clickedMesh) {
     followedObject = clickedMesh;
     controls.enablePan = false;
 
-    // LƯU LẠI VỊ TRÍ CAMERA HIỆN TẠI
     preFocusCameraState.position.copy(camera.position);
     preFocusCameraState.target.copy(controls.target);
 
@@ -1352,8 +1439,8 @@ function showPlanetInfo(clickedMesh) {
 
     cinematicOrbitSpeed = cameraScript.orbitSpeed;
 
-    animateCamera(cameraTargetPosition, lookAtTargetPosition, 2.0, () => { // Tăng thời gian chuyển cảnh
-        controls.minDistance = 0; // Tạm thời cho phép zoom sát
+    animateCamera(cameraTargetPosition, lookAtTargetPosition, 2.0, () => {
+        controls.minDistance = 0;
         controls.maxDistance = 10000;
         
         const startAngleVec = new THREE.Vector3().subVectors(camera.position, lookAtTargetPosition);
@@ -1361,7 +1448,6 @@ function showPlanetInfo(clickedMesh) {
         isAutoRotating = true;
     });
 
-    // Cập nhật và hiển thị thẻ thông tin
     infoCardTitle.textContent = data.name || 'Unknown';
     infoCardFact.textContent = data.fact || '';
     infoCardMessage.textContent = data.message || '';
@@ -1435,20 +1521,17 @@ function animate() {
         const lookAtTargetPosition = planetPosition.clone().add(lookAtOffset);
         
         const distance = camera.position.distanceTo(lookAtTargetPosition);
-        autoRotateAngle += cinematicOrbitSpeed; // Sử dụng tốc độ đã lưu
+        autoRotateAngle += cinematicOrbitSpeed; 
         
         const newX = lookAtTargetPosition.x + distance * Math.cos(autoRotateAngle);
         const newZ = lookAtTargetPosition.z + distance * Math.sin(autoRotateAngle);
         
-        // Giữ camera ở độ cao tương đối so với điểm nhìn
         const relativeCamY = camera.position.y - lookAtTargetPosition.y;
 
         camera.position.x = newX;
         camera.position.z = newZ;
-        // Giữ nguyên độ cao tương đối
         camera.position.y = lookAtTargetPosition.y + relativeCamY;
 
-        // Luôn nhìn vào điểm đã định sẵn
         camera.lookAt(lookAtTargetPosition);
         controls.target.copy(lookAtTargetPosition);
     }
@@ -1566,26 +1649,21 @@ async function init() {
     const flightMonth = 9; // Tháng 9
     const flightYear = 2025;
 
-        // Ưu tiên 1: Kiểm tra có phải ngày bay không
     if (today.getDate() === flightDate && today.getMonth() + 1 === flightMonth && today.getFullYear() === flightYear) {
-            // Nếu đúng, chỉ chạy kịch bản ngày bay
         setTimeout(setupFlightDayExperience, 2000);
-    } 
-        // Ưu tiên 2: Nếu không phải ngày bay, kiểm tra có phải sinh nhật không
-    else if (isBirthdayMode) {
+    }
+
+    if (isBirthdayMode) {
         activateBirthdayMode();
-    } 
-        // Mặc định: Nếu không phải cả hai, chạy logic thư hàng ngày
-    else {
+    } else {
         checkAndSetupLetterButton();
     }
 
-        // Các hàm hẹn giờ và sự kiện khác giữ nguyên
+
     setTimeout(() => setInterval(createPeakRocket, 9000), 15000);
     setTimeout(() => setInterval(createExploringSatellite, 12000), 5000);
     showControlsHelp();
     window.addEventListener('beforeunload', savePlaybackState);
-
 }
 
 init();
