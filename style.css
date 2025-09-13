@@ -2,17 +2,9 @@
 /* 1. THIẾT LẬP CHUNG & RESET                            */
 /* ======================================================= */
 :root {
-    /* Biến cho hiệu ứng parallax khi di chuột */
-    --parallax-x-far: 0px;
-    --parallax-x-mid: 0px;
-    --parallax-x-near: 0px;
-    /* Biến cho hiệu ứng con quay hồi chuyển trên điện thoại */
-    --gyro-rotate-x: 0deg;
-    --gyro-rotate-y: 0deg;
-
-    /* Biến màu chủ đề mặc định (Ban ngày) */
-    --theme-color-primary: #ff6b9d;
-    --theme-color-secondary: #c534ed;
+    --parallax-x-far: 0px; --parallax-x-mid: 0px; --parallax-x-near: 0px;
+    --gyro-rotate-x: 0deg; --gyro-rotate-y: 0deg;
+    --theme-color-primary: #ff6b9d; --theme-color-secondary: #c534ed;
     --theme-text-special: #a8e6cf;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -118,10 +110,10 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
 }
 #info-card-fact { font-style: italic; color: #ccc; margin-bottom: 15px; font-size: 0.9rem; }
 #info-card-message { font-size: 1rem; line-height: 1.5; }
+
 /* ======================================================= */
 /* STYLE NÂNG CẤP CHO KHUNG THƯ                          */
 /* ======================================================= */
-
 #letter-container {
     position: fixed; inset: 0; z-index: 10002; background-color: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
@@ -130,58 +122,40 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
     transition: opacity 0.5s ease, transform 0.5s ease; pointer-events: none;
 }
 #letter-container:not(.hidden) { opacity: 1; transform: scale(1); pointer-events: auto; }
-
 .letter-content {
-    background: rgba(10, 15, 30, 0.9); /* Nền xanh đen mờ ảo */
-    color: #e0e0e0; /* Chữ màu trắng ngà */
+    background: rgba(10, 15, 30, 0.9);
+    color: #e0e0e0;
     padding: 40px 50px;
     border-radius: 15px;
     max-width: 90%; width: 650px; max-height: 85vh; overflow-y: auto; position: relative;
-    box-shadow: 0 0 30px rgba(78, 205, 196, 0.3); /* Đổ bóng nhẹ */
-
-    /* Viền gradient phát sáng */
+    box-shadow: 0 0 30px rgba(78, 205, 196, 0.3);
     border: 2px solid transparent;
     background-clip: padding-box;
     border-image: linear-gradient(145deg, #4ecdc4, #5c67e3) 1;
     animation: glow-border 4s linear infinite;
 }
-
-/* Tùy chỉnh thanh cuộn cho đẹp hơn */
 .letter-content::-webkit-scrollbar { width: 6px; }
 .letter-content::-webkit-scrollbar-track { background: transparent; }
 .letter-content::-webkit-scrollbar-thumb { background-color: rgba(78, 205, 196, 0.5); border-radius: 3px; }
-
 .letter-content h1 {
-    color: #a8e6cf; /* Màu xanh bạc hà */
+    color: #a8e6cf;
     font-size: 1.8rem; margin-bottom: 25px; text-align: center;
     text-shadow: 0 0 10px rgba(168, 230, 207, 0.5);
 }
-
 .letter-content p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 20px; }
-
 .letter-content .signature {
     text-align: right; margin-top: 40px; font-style: normal;
-    font-family: 'Dancing Script', cursive; /* Áp dụng font viết tay */
+    font-family: 'Dancing Script', cursive;
     font-size: 1.8rem;
-    color: #ffae8b; /* Màu cam đào ấm áp */
+    color: #ffae8b;
 }
-
 #close-letter-btn {
     position: absolute; top: 15px; right: 20px; background: none;
     border: none; color: #fff; font-size: 2rem; cursor: pointer;
     transition: transform 0.3s ease, color 0.3s ease;
 }
-#close-letter-btn:hover {
-    transform: rotate(90deg);
-    color: #ff6b9d;
-}
+#close-letter-btn:hover { transform: rotate(90deg); color: #ff6b9d; }
 
-/* Animation cho viền phát sáng */
-@keyframes glow-border {
-    0% { border-image: linear-gradient(145deg, #4ecdc4, #5c67e3) 1; }
-    50% { border-image: linear-gradient(145deg, #5c67e3, #4ecdc4) 1; }
-    100% { border-image: linear-gradient(145deg, #4ecdc4, #5c67e3) 1; }
-}
 /* ======================================================= */
 /* 5A. CÁC NÚT ĐIỀU KHIỂN NỔI (FLOATING CONTROLS)        */
 /* ======================================================= */
@@ -260,22 +234,22 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
 /* 7. ANIMATIONS                                         */
 /* ======================================================= */
 @keyframes beat { 0%, 100% { transform: scale(1) rotate(45deg); } 50% { transform: scale(1.1) rotate(45deg); } }
-@keyframes pulse { 
-    0%, 100% { box-shadow: 0 0 15px var(--theme-color-primary), 0 0 25px var(--theme-color-secondary); } 
-    50% { box-shadow: 0 0 25px var(--theme-color-primary), 0 0 40px var(--theme-color-secondary); } 
-}
+@keyframes pulse { 0%, 100% { box-shadow: 0 0 15px var(--theme-color-primary), 0 0 25px var(--theme-color-secondary); } 50% { box-shadow: 0 0 25px var(--theme-color-primary), 0 0 40px var(--theme-color-secondary); } }
 @keyframes birthday-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 @keyframes fade-in-out { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); } 80% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } }
+@keyframes glow-border { 0% { border-image: linear-gradient(145deg, #4ecdc4, #5c67e3) 1; } 50% { border-image: linear-gradient(145deg, #5c67e3, #4ecdc4) 1; } 100% { border-image: linear-gradient(145deg, #4ecdc4, #5c67e3) 1; } }
+@keyframes slideInFromLeft { to { left: 30px; } }
+@keyframes fadeInScaleUp { from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
 
 /* ======================================================= */
 /* 8. MEDIA QUERIES (RESPONSIVE DESIGN)                  */
 /* ======================================================= */
 @media (max-width: 480px) {
-    #waveform-controls { left: 10px; right: 10px; bottom: 10px; padding: 6px 10px; }
+    #waveform-controls { left: 10px; right: 10px; bottom: 10px; width: auto; transform: none; padding: 6px 10px; }
     .player-buttons { gap: 15px; }
     #song-title { font-size: 0.75rem; }
-    .letter-content { padding: 20px; }
-    #planet-info-card { bottom: 10px; padding: 15px; }
+    .letter-content { padding: 30px 20px; }
+    #planet-info-card { left: 10px; right: 10px; width: auto; bottom: 10px; padding: 15px; }
     #special-day-btn { bottom: 15px; right: 15px; }
     .floating-controls button { width: 40px; height: 40px; }
     #settings-toggle-btn { top: 15px; right: 15px; }
@@ -284,28 +258,15 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
 }
 
 /* ======================================================= */
-/* 9. DYNAMIC UI THEMES (MỚI)                            */
+/* 9. DYNAMIC UI THEMES                                  */
 /* ======================================================= */
-body.state-dawn {
-    --theme-color-primary: #ffae8b;
-    --theme-color-secondary: #ff8c69;
-    --theme-text-special: #ffd6c8;
-}
-body.state-dusk {
-    --theme-color-primary: #ff8a35;
-    --theme-color-secondary: #ff6a00;
-    --theme-text-special: #ffc291;
-}
-body.state-night {
-    --theme-color-primary: #b5c5ff;
-    --theme-color-secondary: #4a5a8a;
-    --theme-text-special: #d8deff;
-}
-/* ======================================================= */
-/* 10. HIỆU ỨNG NÂNG CẤP CHO NGÀY BAY (ZOOM + NOTIFICATION) */
-/* ======================================================= */
+body.state-dawn { --theme-color-primary: #ffae8b; --theme-color-secondary: #ff8c69; --theme-text-special: #ffd6c8; }
+body.state-dusk { --theme-color-primary: #ff8a35; --theme-color-secondary: #ff6a00; --theme-text-special: #ffc291; }
+body.state-night { --theme-color-primary: #b5c5ff; --theme-color-secondary: #4a5a8a; --theme-text-special: #d8deff; }
 
-
+/* ======================================================= */
+/* 10. HIỆU ỨNG NGÀY BAY - ĐÃ ĐỒNG BỘ VỚI SCRIPT.JS      */
+/* ======================================================= */
 #flight-day-btn {
     position: fixed; bottom: 30px; left: -200px; z-index: 1005;
     width: auto; padding: 10px 20px; border-radius: 20px;
@@ -314,114 +275,45 @@ body.state-night {
     animation: slideInFromLeft 2s ease-out 3s forwards;
     box-shadow: 0 0 15px rgba(78, 205, 196, 0.7);
 }
-@keyframes slideInFromLeft { to { left: 30px; } }
 
-/* Lớp phủ chứa bản đồ */
 #flight-overlay {
-    position: fixed; inset: 0; z-index: 10001; /* <<-- SỬA Z-INDEX */
+    position: fixed; inset: 0; z-index: 10001;
     background-color: #0c141f;
-    opacity: 0; transition: opacity 1.5s ease-in-out;
     display: flex; justify-content: center; align-items: center;
     overflow: hidden;
+    opacity: 0; visibility: hidden;
+    transition: opacity 1.5s ease-in-out, visibility 1.5s ease-in-out;
 }
-#flight-overlay:not(.hidden) { opacity: 1; }
+#flight-overlay.visible { opacity: 1; visibility: visible; }
+#flight-map { width: 100%; height: 100%; background-color: #0c141f; }
+.plane-icon { font-size: 20px !important; text-align: center; line-height: 24px; filter: drop-shadow(0 0 3px rgba(255,255,255,0.8)); }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: rgba(10, 20, 40, 0.85); color: #fff; box-shadow: 0 3px 14px rgba(0,0,0,0.4); }
+.leaflet-popup-content { font-family: 'Poppins', sans-serif; }
+.leaflet-control-attribution, .leaflet-control-attribution a { color: #bbb !important; text-shadow: none; }
+.leaflet-control-attribution a { color: #4ecdc4 !important; }
+.leaflet-popup-close-button { color: #fff !important; }
+.leaflet-popup-close-button:hover { background-color: transparent !important; color: #ff6b9d !important; }
 
-#flight-map {
-    width: 100%; height: 100%;
-    position: relative;
-    background-image: url('images/worldmap.jpg');
-    background-size: cover;
-    background-position: center;
-    z-index: 1; 
-}
-#flight-map.flying {
-    animation: cinematic-pan-zoom 8s ease-in-out forwards;
-}
-
-@keyframes cinematic-pan-zoom {
-    0% { transform: scale(3.5) translate(-28%, -15%); }
-    100% { transform: scale(4.5) translate(-25%, 2%); }
-}
-
-/* Các điểm sân bay - ĐÃ SỬA LỖI CÚ PHÁP */
-.airport-dot {
-    position: absolute; width: 12px; height: 12px; background: white;
-    border-radius: 50%; transform: translate(-50%, -50%);
-    box-shadow: 0 0 15px white, 0 0 25px #4ecdc4;
-    animation: pulse-dot 2s infinite;
-}
-.airport-dot span {
-    position: absolute; 
-    transform: translateX(-50%);
-    color: white; font-weight: bold; font-family: monospace; font-size: 10px;
-}
-
-/* TỌA ĐỘ SÂN BAY ĐÚNG - ĐƯA RA NGOÀI LÀM QUY TẮC RIÊNG */
-#hanoi-dot {
-    top: 58%;
-    left: 80%;
-}
-#chengdu-dot {
-    top: 48%;
-    left: 77%;
-}
-
-@keyframes pulse-dot {
-    0% { transform: translate(-50%, -50%) scale(0.9); box-shadow: 0 0 15px white, 0 0 25px #4ecdc4; }
-    70% { transform: translate(-50%, -50%) scale(1.1); box-shadow: 0 0 25px white, 0 0 40px #4ecdc4; }
-    100% { transform: translate(-50%, -50%) scale(0.9); box-shadow: 0 0 15px white, 0 0 25px #4ecdc4; }
-}
-
-/* Đường bay SVG */
-#flight-path-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-#flight-path {
-    stroke-dasharray: 1000; stroke-dashoffset: 1000;
-}
-#flight-map.drawing-path #flight-path {
-    transition: stroke-dashoffset 8s ease-in-out;
-    stroke-dashoffset: 0;
-}
-
-/* Icon máy bay SVG */
-#airplane-icon-svg {
-    opacity: 0;
-    offset-path: path('M 80 58 Q 75 45 77 48'); /* ĐƯỜNG BAY ĐÃ CẬP NHẬT */
-    offset-rotate: auto;
-}
-#flight-map.flying #airplane-icon-svg {
-    opacity: 1;
-    animation: fly-the-path 8s ease-in-out forwards;
-}
-
-/* Thông báo thư */
+/* Thông báo đọc thư trong chuyến bay */
 #flight-notification {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    position: absolute;
+    bottom: 50px;
+    z-index: 10002;
     background: rgba(10, 20, 40, 0.85);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    color: white; padding: 25px 35px; border-radius: 15px;
-    text-align: center; border: 1px solid rgba(78, 205, 196, 0.5);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    animation: fadeInScaleUp 0.8s ease-out forwards;
-    z-index: 10;
+    padding: 20px 30px;
+    border-radius: 12px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
+    border: 1px solid rgba(78, 205, 196, 0.7);
+    animation: slideInUp 0.5s ease-out;
 }
-#flight-notification p {
-    font-size: 1.2rem; margin: 0 0 20px 0;
-}
+@keyframes slideInUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+#flight-notification p { font-size: 1.2rem; margin: 0 0 20px 0; }
 #read-flight-letter-btn {
     background: #4ecdc4; color: white; border: none;
     padding: 10px 25px; border-radius: 8px; font-size: 1rem;
     font-weight: bold; cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-#read-flight-letter-btn:hover {
-    transform: scale(1.05); box-shadow: 0 0 15px #4ecdc4;
-}
-
-@keyframes fadeInScaleUp {
-    from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-}
-@keyframes fly-the-path {
-    from { offset-distance: 0%; }
-    to { offset-distance: 100%; }
-}
+#read-flight-letter-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px #4ecdc4; }
