@@ -2,167 +2,56 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>this is a gift for u</title>
-    <link rel="icon" href="data:,">
-    <!-- LINK TỚI FILE CSS (Bạn sẽ cần tạo file style.css để định dạng giao diện) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Our Little Universe</title>
     <link rel="stylesheet" href="style.css">
-
-    <!-- FONT CHỮ TỪ GOOGLE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- Thư viện Leaflet cho bản đồ chuyến bay -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Plugin cho Leaflet để tạo animation máy bay -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.animatedmarker@1.0.0/src/AnimatedMarker.min.js"></script>
 
-    <!-- 
-      IMPORT MAP: Rất quan trọng!
-      Nó cho trình duyệt biết nơi để tìm các thư viện Three.js khi script.js gọi `import ... from 'three'`.
-    -->
-    <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.164.1/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.164.1/examples/jsm/"
-      }
-    }
-    </script>
-
-    <!-- ======================================================= -->
-    <!-- CÁC ĐOẠN MÃ SHADER (GLSL) -->
-    <!-- ======================================================= -->
-
-    <!-- Vertex Shader chung cho hiệu ứng bề mặt -->
-    <script type="x-shader/x-vertex" id="vertexShader">
-        varying vec2 vUv;
-        void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-    </script>
-
-    <!-- Fragment Shader cho Thiên Thạch Rực Lửa -->
-    <script type="x-shader/x-fragment" id="fragmentShader">
-        uniform float uTime;
-        varying vec2 vUv;
-
-        // Hàm tạo nhiễu 2D (Perlin Noise-like)
-        float random(vec2 st) {
-            return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
-        }
-        float noise(vec2 st) {
-            vec2 i = floor(st);
-            vec2 f = fract(st);
-            float a = random(i);
-            float b = random(i + vec2(1.0, 0.0));
-            float c = random(i + vec2(0.0, 1.0));
-            float d = random(i + vec2(1.0, 1.0));
-            vec2 u = f * f * (3.0 - 2.0 * f);
-            return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.y * u.x;
-        }
-
-        void main() {
-            vec2 p = vUv * 5.0;
-            float t = uTime * 0.5;
-            float n = noise(p + t); // Tạo nhiễu chuyển động
-            
-            // Tạo màu sắc dung nham
-            vec3 color = mix(vec3(0.8, 0.2, 0.0), vec3(1.0, 0.9, 0.0), n);
-            
-            // Thêm các đường nứt tối hơn
-            float cracks = noise(p * 2.0 - t * 0.5);
-            if (cracks < 0.2) {
-                color *= 0.5;
-            }
-            
-            gl_FragColor = vec4(color, 1.0);
-        }
-    </script>
-
-    <!-- Fragment Shader Dành Riêng Cho MẶT TRỜI (sử dụng texture) -->
-    <script type="x-shader/x-fragment" id="sunFragmentShader">
-        uniform float uTime;
-        uniform sampler2D uTexture;
-        varying vec2 vUv;
-
-        float random(vec2 st) {
-            return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
-        }
-        float noise(vec2 st) {
-            vec2 i = floor(st);
-            vec2 f = fract(st);
-            float a = random(i);
-            float b = random(i + vec2(1.0, 0.0));
-            float c = random(i + vec2(0.0, 1.0));
-            float d = random(i + vec2(1.0, 1.0));
-            vec2 u = f * f * (3.0 - 2.0 * f);
-            return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.y * u.x;
-        }
-
-        void main() {
-            vec4 baseColor = texture2D(uTexture, vUv);
-            vec2 motion = vec2(uTime * 0.05);
-            float n = noise((vUv + motion) * 5.0) * 0.4 + noise((vUv - motion) * 8.0) * 0.2;
-            gl_FragColor = baseColor * vec4(vec3(1.0 + n * 1.5), 1.0);
-        }
-    </script>
 </head>
 <body>
-    <!-- Canvas để vẽ thế giới 3D -->
+    <!-- ========= PHẦN NỀN VÀ 3D ========= -->
     <canvas id="webgl-canvas"></canvas>
-
-    <!-- Container cho các hiệu ứng chữ rơi -->
     <div id="galaxy"></div>
+    <audio id="ambient-sound" src="https://treuah.netlify.app/space-ambient.mp3" loop></audio>
 
-    <!-- Màn hình tải -->
+    <!-- ========= MÀN HÌNH CHỜ ========= -->
     <div id="loading-screen">
         <div class="loading-content">
-            <p>Preparing galaxy universe...</p>
             <div class="loading-heart"></div>
+            <p>Đang dệt nên vũ trụ của chúng ta...</p>
             <div class="progress-container">
                 <div id="progress-bar"></div>
             </div>
-            <span id="progress-text">0%</span>
+            <p id="progress-text">0%</p>
         </div>
     </div>
 
-    <!-- Lớp phủ ban đầu để bắt đầu phát nhạc -->
+    <!-- ========= LỚP PHỦ BẮT ĐẦU NHẠC ========= -->
     <div id="music-overlay">
         <div class="start-prompt">
-            <h1>Preparing Galaxy Universe...</h1>
-            <p>Click to enter</p>
+            <h1>Our Little Universe</h1>
+            <p>chạm để bước vào</p>
         </div>
     </div>
 
-    <!-- Bảng điều khiển trình phát nhạc -->
-    <div id="waveform-controls" class="hidden">
-        <div id="waveform"></div>
-        <div class="player-info">
-            <span id="song-title">Đang tải...</span>
-            <div class="player-buttons">
-                <span id="current-time">0:00</span>
-                <button id="prev-btn">«</button>
-                <button id="play-pause-btn">▶</button>
-                <button id="next-btn">»</button>
-                <button id="favorite-btn">♡</button>
-                <span id="duration">0:00</span>
-            </div>
-        </div>
-    </div>
+    <!-- ========= CÁC THÀNH PHẦN GIAO DIỆN CHÍNH ========= -->
     
-    <!-- Các nút điều khiển nổi -->
-    <div class="floating-controls">
-        <button id="settings-toggle-btn" class="hidden">⚙️</button>
-        <button id="fly-mode-btn" class="hidden">🚀</button>
-        <button id="special-day-btn" class="hidden">💌</button>
-        <button id="flight-day-btn" class="hidden">Một hành trình mới...</button>
-    </div>
-    <!-- WIDGET THỜI TIẾT (MỚI) -->
+    <!-- WIDGET THỜI TIẾT -->
     <div id="weather-widget-container" class="floating-controls hidden">
         <button id="weather-toggle-btn">🌦️</button>
         <div id="weather-tooltip">
             <div id="weather-location">Thành Đô</div>
             <div class="weather-info-row">
-                <span>Trạng thái:</span>
+                <span>Tình trạng:</span>
                 <span id="weather-condition">Đang tải...</span>
             </div>
             <div class="weather-info-row">
@@ -171,89 +60,155 @@
             </div>
             <div class="weather-info-row">
                 <span>Chất lượng không khí:</span>
-                <span id="weather-aqi">--</span>
+                <span id="weather-aqi">Tốt</span>
             </div>
-            <div class="weather-info-row">
+             <div class="weather-info-row">
                 <span>Pha mặt trăng:</span>
-                <span id="weather-moon">--</span>
+                <span id="weather-moon">Trăng non</span>
             </div>
-            <p id="weather-quote">Vũ trụ này đang đồng bộ cùng cậu.</p>
+            <p id="weather-quote">"Dù thời tiết có ra sao, tình yêu của tớ vẫn luôn ở đây."</p>
         </div>
     </div>
 
-    <!-- Bảng cài đặt -->
-    <div id="settings-panel" class="hidden">
-        <label for="volume-slider">Âm lượng</label>
-        <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.5">
-    </div>
-
-    <!-- Thẻ thông tin hành tinh -->
-    <div id="planet-info-card" class="hidden">
-        <h2 id="info-card-title"></h2>
-        <p id="info-card-fact"></p>
-        <p id="info-card-message"></p>
-        <button id="close-info-btn">×</button>
-    </div>
-
-    <!-- Container cho các bức thư -->
-    <div id="letter-container" class="hidden">
-        <div class="letter-content">
-            <!-- Nội dung thư sẽ được tạo bởi JS -->
-        </div>
-    </div>
-
-    <!-- Lớp phủ cho chế độ lái phi thuyền -->
-    <div id="fly-mode-overlay" class="hidden">
-        <p id="fly-mode-status"></p>
+    <!-- CÁC NÚT ĐIỀU KHIỂN -->
+    <div class="floating-controls">
+        <button id="settings-toggle-btn" class="hidden">⚙️</button>
+        <button id="fly-mode-btn" class="hidden">🚀</button>
+        <button id="special-day-btn" class="hidden">💌</button>
     </div>
     
-    <!-- Bảng hướng dẫn điều khiển (sẽ được tạo bởi JS) -->
-    <!-- <div id="flight-controls-help"></div> -->
-    <!-- LỚP PHỦ CHO HIỆU ỨNG CHUYẾN BAY -->
-    <div id="flight-overlay" class="hidden">
-        <div id="flight-map">
-            <!-- Các điểm sân bay -->
-            <div class="airport-dot" id="hanoi-dot"><span>HAN</span></div>
-            <div class="airport-dot" id="chengdu-dot"><span>CTU</span></div>
+    <!-- BẢNG CÀI ĐẶT -->
+    <div id="settings-panel" class="hidden">
+        <label for="volume-slider">Âm lượng:</label>
+        <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.7">
+    </div>
 
-            <!-- SVG chứa cả đường bay và máy bay -->
-            <svg id="flight-path-svg" viewbox="0 0 100 100" preserveAspectRatio="none">
-                <path id="flight-path" d="M 80 58 Q 75 45 77 48" stroke="rgba(255, 255, 255, 0.6)" stroke-width="0.3" fill="none" />
-                <g id="airplane-icon-svg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="2.5" height="2.5" viewBox="0 0 24 24" fill="white">
-                        <path id="flight-path" d="M 80 62 Q 70 50 78 48" stroke="rgba(255, 255, 255, 0.7)" stroke-width="0.3" fill="none" />
-                    </svg>
-                    <animateMotion id="fly-animation" dur="8s" begin="indefinite" fill="freeze" rotate="auto">
-                        <mpath href="#flight-path" />
-                    </animateMotion>
-                </g>
-            </svg>
+    <!-- THẺ THÔNG TIN HÀNH TINH -->
+    <div id="planet-info-card" class="hidden">
+        <button id="close-info-btn">&times;</button>
+        <h2 id="info-card-title">Hành tinh</h2>
+        <p id="info-card-fact">Đây là một sự thật thú vị.</p>
+        <p id="info-card-message">Đây là lời nhắn gửi đến cậu.</p>
+    </div>
+
+    <!-- TRÌNH PHÁT NHẠC -->
+    <div id="waveform-controls" class="hidden">
+        <div id="waveform"></div>
+        <div class="player-info">
+            <p id="song-title">Chọn một bài hát...</p>
+            <div class="player-buttons">
+                <span id="current-time">0:00</span>
+                <button id="prev-btn">⏮</button>
+                <button id="play-pause-btn">▶</button>
+                <button id="next-btn">⏭</button>
+                <button id="favorite-btn">♡</button>
+                <span id="duration">0:00</span>
+            </div>
         </div>
+        <audio id="bg-music" crossorigin="anonymous"></audio>
+    </div>
 
-            <!-- THÔNG BÁO THƯ MỚI (THÊM MỚI) -->
+    <!-- KHUNG ĐỌC THƯ -->
+    <div id="letter-container" class="hidden">
+        <div class="letter-content">
+            <!-- Nội dung thư sẽ được JS chèn vào đây -->
+        </div>
+    </div>
+
+    <!-- ========= CÁC LỚP PHỦ CHO SỰ KIỆN ĐẶC BIỆT ========= -->
+
+    <!-- LỚP PHỦ CHẾ ĐỘ BAY -->
+    <div id="fly-mode-overlay" class="hidden">
+        <p id="fly-mode-status">Đã bật chế độ bay</p>
+    </div>
+    <div id="flight-controls-help" style="display: none;"></div>
+
+
+    <!-- LỚP PHỦ SINH NHẬT -->
+    <div id="birthday-celebration">
+        <p>Chúc mừng sinh nhật cậu!</p>
+    </div>
+
+    <!-- LỚP PHỦ NGÀY BAY -->
+    <button id="flight-day-btn" class="hidden">Một hành trình đặc biệt...</button>
+    <div id="flight-overlay">
+        <div id="flight-map"></div>
         <div id="flight-notification" class="hidden">
             <p>Bạn có một lá thư từ người thương...</p>
             <button id="read-flight-letter-btn">Đọc ngay</button>
         </div>
     </div>
-    <!-- Hiệu ứng chúc mừng sinh nhật -->
-    <div id="birthday-celebration">
-        <p>Happy Birthday!</p>
-    </div>
 
-    <!-- Các thẻ audio -->
-    <audio id="bg-music" crossOrigin="anonymous"></audio>
-    <audio id="ambient-sound" src="https://treuah.netlify.app/space-ambient.mp3" loop></audio>
+    <!-- ========= SHADER SCRIPTS (DÙNG CHO THREE.JS) ========= -->
+    <script type="x-shader/x-vertex" id="vertexShader">
+        uniform float uTime;
+        varying vec2 vUv;
+        void main() {
+            vUv = uv;
+            vec3 pos = position;
+            float displacement = sin(pos.x * 5.0 + uTime * 0.5) * 0.1 + cos(pos.y * 5.0 + uTime * 0.5) * 0.1;
+            pos += normal * displacement;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+        }
+    </script>
+    <script type="x-shader/x-fragment" id="fragmentShader">
+        uniform float uTime;
+        varying vec2 vUv;
+        void main() {
+            float time = uTime * 0.5;
+            vec2 uv = vUv * 2.0 - 1.0;
+            vec2 uv0 = uv;
+            float i0 = 1.0;
+            float i1 = 1.0;
+            float i2 = 1.0;
+            float i4 = 0.0;
+            for (int s = 0; s < 7; s++) {
+                vec2 r;
+                r = vec2(cos(uv.y * i0 - i4 + time / i1), sin(uv.x * i0 - i4 + time / i1)) / i2;
+                r += vec2(-r.y, r.x) * 0.3;
+                uv.xy += r;
+                i0 *= 1.93;
+                i1 *= 1.15;
+                i2 *= 1.7;
+                i4 += 0.05 + 0.1 * time * i1;
+            }
+            float r = sin(uv.x - time) * 0.5 + 0.5;
+            float b = sin(uv.y + time) * 0.5 + 0.5;
+            float g = sin((uv.x + uv.y + sin(time)) * 0.5) * 0.5 + 0.5;
+            gl_FragColor = vec4(r, g, b, 1.0);
+        }
+    </script>
+     <script type="x-shader/x-fragment" id="sunFragmentShader">
+        uniform float uTime;
+        uniform sampler2D uTexture;
+        varying vec2 vUv;
+        void main() {
+            vec2 uv = vUv;
+            float noise = (texture2D(uTexture, uv + uTime * 0.01).r + texture2D(uTexture, uv - uTime * 0.01).b) / 2.0;
+            float colorNoise = clamp(noise * 3.0, 0.0, 1.0);
+            vec3 baseColor = vec3(1.0, 0.6, 0.2);
+            vec3 finalColor = baseColor + colorNoise * vec3(0.5, 0.2, 0.0);
+            gl_FragColor = vec4(finalColor, 1.0);
+        }
+    </script>
+    
 
-    <!-- THƯ VIỆN BÊN THỨ BA -->
-    <!-- GSAP (cho hoạt ảnh) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <!-- WaveSurfer.js (cho sóng âm) -->
-    <script src="https://unpkg.com/wavesurfer.js@7"></script>
+    <!-- ========= CÁC THƯ VIỆN JAVASCRIPT ========= -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+        }
+    }
+    </script>
 
-    <!-- CÁC FILE SCRIPT CỦA BẠN (QUAN TRỌNG: PHẢI LÀ type="module") -->
-    <script type="module" src="data.js"></script>
-    <script type="module" src="weather.js"></script>
-    <script type="module" src="script.js"></script>
+    <!-- Các thư viện khác không phải module có thể giữ nguyên -->
+    <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- ========= CÁC FILE SCRIPT CỦA DỰ ÁN ========= -->
+    <script src="./data.js" type="module"></script>
+    <script src="./weather.js" type="module"></script>
+    <script src="./script.js" type="module"></script>
 </body>
 </html>
