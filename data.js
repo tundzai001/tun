@@ -1,6 +1,11 @@
        // =================================================================
     // PHẦN 2: DỮ LIỆU CÁ NHÂN HÓA VÀ CÀI ĐẶT
     // =================================================================
+    export const airportData = {
+        'HAN': { name: "Sân bay Quốc tế Nội Bài", city: "Hà Nội", coords: [21.2215, 105.8072] },
+        'CTU': { name: "Sân bay Quốc tế Thiên Phủ Thành Đô", city: "Thành Đô", coords: [30.3135, 104.4452] },
+        'SGN': { name: "Sân bay Quốc tế Tân Sơn Nhất", city: "TP. Hồ Chí Minh", coords: [10.8188, 106.6582] },
+    };
     /* --- DỮ LIỆU SINH NHẬT --- */
     export const birthdayData = {
         day: 9, month: 6,
@@ -163,7 +168,7 @@
         { day: 12, title: "Nhanh thật đâu đó còn mỗi hơn 17 tiếng nữa là bắt đầu lên đồ rồi...", 
             content: `<p>Cố lên, mạnh mẽ lên không được buồn nhớ chưa, tớ yêu cậu nhiều lắm, không được khóc, nhớ lời tớ dặn đấy, tớ không muốn cậu khóc đâu biết là sang bên đấy cũng một mình kiểu cô đơn kiểu không có ai bầu bạn cả nhưng mà không sao cả luôn có mọi người bên cạnh mà, còn gia đình, còn bạn Vy, bạn Chi, còn tớ nữa cơ mà. Cố lên, không buồn nhaaa, tớ yêu cậu nhiều lắm so so much luôn. I love u, bae </p>` },
         { day: 13, title: "Haizzz, ngày cuối bên này rồi sao mà nhanh v kbt nữa???? ", 
-            content: `<p>Không muốn bae đi một chút nào đâu huhu, muốn bae ở đây cơ, i mít u so much, ilu2, ước gì có thêm thời gian, tớ sẽ dành nhiều thời gian hơn cho cậu, không ngờ mới quen thế này kiểu cũng đang vui tự nhiên lại di du học bị buồn vl ấy chứ :(( chắc chiều mà ra sân bay cùng chắc đứng đấy không nỡ để b Hà đi mất, bị thương b Hà nhiều chút, xa nhà để đi học mà lại còn một mình, xung quanh toàn người lạ, không biết nhìn hiền thế có ai bắt nạt không nữa mong là không... th kệ dii bae ơi, i love u so much, cố lên im alws by ur side.</p>` },
+            content: `<p>Không muốn bae đi một chút nào đâu huhu, muốn bae ở đây cơ, i mít u so much, ilu2, ước gì có thêm thời gian, tớ sẽ dành nhiều thời gian hơn cho cậu, không ngờ mới quen thế này kiểu cũng đang vui tự nhiên lại di du học bị buồn vl ấy chứ :(( chắc tí mà ra sân bay thật thì chắc đứng đấy không nỡ để b Hà đi mất, mà cũng không nỡ để bạn Hà học cao đẳng du lịch =)))) dyeu tht tf kbt nữa, bị thương b Hà nhiều chút, xa nhà để đi học mà lại còn một mình, xung quanh toàn người lạ, không biết nhìn hiền thế có ai bắt nạt không nữa mong là không... th kệ dii bae ơi, i love u so much, cố lên im alws by ur side. let me know when u arrive, ok</p>` },
         { day: 14, title: "Giờ này, chắc cậu đang nghỉ ngơi rồi nhỉ....", 
             content: `<p>Hôm nay bên đấy của bae có mệt mỏi khhoonggg khi mà phải kiểu sắp xếp đồ đạc chuẩn bị các thứ đó.... èo oi sao mà nghe đã thấy mệt rồi ấy =)))) bae nhớ phải ăn uống đầy đủ nha. bae sang bên đấy cố gắng nha, mạnh mẽ leennn keep fighting!!!!! mệt thì có tớ bên cạnh cậu, tớ luôn bên cạnh cậu nhaa alws luôn. I love u so much bae ạ</p>` },
         { day: 15, title: "Gửi cậu, ngày giữa tháng!", 
@@ -376,6 +381,9 @@
         "Đoàn kết tốt, kỷ luật tốt", 
         "Giữ gìn vệ sinh thật tốt", 
         "Khiêm tốn, thật thà, dũng cảm",
+        "tớ luôn bên cạnh cậu",
+        "Stay positive",
+
     ];
 
     // =================================================================
@@ -383,8 +391,8 @@
 // =================================================================
 export const flightDayLetter = {
     title: "Gửi cậu, cô gái dũng cảm của tớ =)) èo nghe sến nhỉ",
-    content: `<p>Khi cậu đọc được những dòng này, có lẽ chiếc máy bay cũng đang đợi cậu để bắt đầu một hành trình mới. Tớ biết cảm giác của cậu lúc này có lẽ rất hỗn loạn, buồn một chút hoặc nhiều chút =)))): một chút háo hức cho chặng đường mới, một chút lo lắng, và cả một chút buồn khi phải rời xa Hà Nội thân thương, rời xa gia đình cũng như những người bạn thân, người thân quen hàng ngày của mình.</p>
-              <p>Nhưng mà cậu oiii, hãy cố lênn. Cậu đang tiến đến một quãng đường mới, một tương lai mà cậ đã nỗ lực rất nhiều để có được. Tớ tự hào về cậu vô cùng.</p>
-              <p>Hà Nội và gia đình, bạn bè và tớ sẽ luôn ở đây, đợi cậu. Hành trình này có thể dài, nhưng mà tình cảm thì không thẻ phai nhạt nha =))) mọi người alws bên cạnh cậu. Hãy thật mạnh mẽ, chăm sóc bản thân chu đáo và tận hưởng từng khoảnh khắc nhé.</p>
+    content: `<p>Khi cậu đọc được những dòng này, có lẽ cậu cũng đang chuẩn bị đến sân bay, sang một nơi lạ lẫm bắt đầu một hành trình mới. Tớ biết cảm giác của cậu lúc này có lẽ rất hỗn loạn, buồn một chút hoặc nhiều chút =)))), một chút háo hức cho chặng đường mới, một chút lo lắng, và cả một chút buồn khi phải rời xa Hà Nội, rời xa gia đình cũng như người thân quen hàng ngày của mình, xa em bánh mì, bạn Chi, bạn Vy, bạn Nấm và nhiều người thân khác nữa </p>
+              <p>Nhưng mà cậu oiii, hãy cố lênn, sẽ làm được thôi. Tớ tin cậu có thể làm được, cậu rất mạnh mẽ mà. Cậu đang tiến đến một quãng đường mới, một tương lai mà cậu đã rất nỗ lực, mệt mỏi rất nhiều để có được. Tớ tự hào về cậu vô cùng.</p>
+              <p>Hà Nội,gia đình, bạn bè và tớ sẽ luôn ở đây, đợi cậu. Hành trình này có thể dài, có thể sẽ gặp nhiều khó khăn nhưng mà luôn nhớ mọi người alws bên cạnh cậu. Hãy thật mạnh mẽ, chăm sóc bản thân chu đáo và tận hưởng từng khoảnh khắc nhé.</p>
               <p>Tớ yêu cậu. Hẹn gặp lại cậu ở Thành Đô, hoặc sớm thôi, ở Hà Nội nhé.</p>`
 };
