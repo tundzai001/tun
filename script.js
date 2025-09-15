@@ -6,6 +6,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'; 
 
 // Import DỮ LIỆU TĨNH từ file data.js
 import { 
@@ -19,7 +20,8 @@ import {
     birthdayMessages, 
     shootingStarMessages,
     flightDayLetter,
-    airportData // <<--- QUAN TRỌNG: Đảm bảo dòng này tồn tại
+    airportData,
+    memoriesData 
 } from './data.js';
 
 // Import HÀM LẤY DỮ LIỆU THỜI TIẾT
@@ -30,13 +32,10 @@ import { getWeatherData } from './weather.js';
 // PHẦN 1: KHAI BÁO BIẾN VÀ DOM ELEMENTS
 // =================================================================
 const bodyEl = document.body;
-const flyModeBtn = document.getElementById('fly-mode-btn');
 const ambientAudio = document.getElementById('ambient-sound');
 const progressBar = document.getElementById('progress-bar');
 const progressText = document.getElementById('progress-text');
 let composer;
-let isFlyMode = false;
-const keyState = {};
 const galaxy = document.getElementById('galaxy');
 const audio = document.getElementById('bg-music');
 const overlay = document.getElementById('music-overlay');
@@ -79,11 +78,6 @@ let isAutoRotating = false;
 let autoRotateAngle = 0;
 const cameraSettings = { autoRotateSpeed: 0.002, verticalArcAmount: 1.5, lookAtHeightOffset: 0.15 };
 let spaceship;
-const flyModeOverlay = document.getElementById('fly-mode-overlay');
-const flyModeStatus = document.getElementById('fly-mode-status');
-const thrustSpeed = 20000.0;
-const strafeSpeed = 18000.0;
-const mouseSensitivity = 0.002;
 
 const heartSymbols = ["♥", "💖", "💕", "🌟", "✨"];
 const textStyles = ['love', 'date', 'special'];
@@ -106,10 +100,6 @@ let activeAsteroids = [];
 let activeComets = [];
 let sunEffects = {};
 const clock = new THREE.Clock();
-let cameraViewMode = 'thirdPerson';
-let cameraOrbitYaw = 0;
-let cameraOrbitPitch = 0.2;
-const cameraOrbitDistance = 80;
 let saturnRing;
 let asteroidBelt;
 let preFocusCameraState = {
@@ -122,6 +112,14 @@ let weatherEffects = { rain: null, snow: null };
 let activeWeatherEffect = 'none';
 let timeOfDayState = 'day';
 let cinematicOrbitSpeed = 0.002; 
+
+// Biến cho hành trình điện ảnh
+let isJourneyActive = false;
+let isJourneyPaused = false;
+let currentJourneySegment = 0;
+const journeyPathVisuals = [];
+const memoryStars = {};
+
 
 // =================================================================
 // PHẦN 2: CÁC HÀM QUẢN LÝ VÀ HIỆU ỨNG THỜI TIẾT
@@ -143,6 +141,14 @@ function updateWeatherUI(weather) {
     weatherTempEl.textContent = `${weather.temperature}°C`;
     weatherAqiEl.textContent = weather.aqi.category;
     weatherMoonEl.textContent = weather.moon.phase;
+}
+
+function createProceduralTexture(gradientCallback, size = 256) {
+    const canvas = document.createElement('canvas');
+    canvas.width = size; canvas.height = size;
+    const context = canvas.getContext('2d');
+    gradientCallback(context, size);
+    return new THREE.CanvasTexture(canvas);
 }
 
 function createRainEffect() {
@@ -237,38 +243,18 @@ function updateUniverseAmbiance(weather, delta) {
 
     switch (timeOfDayState) {
         case 'dawn':
-            targetSunIntensity = 1.0;
-            targetAmbientColor.set("#ff8c69");
-            targetSunColor.set("#ffae8b");
-            targetFogColor.set("#4a2a3a");
-            break;
+            targetSunIntensity = 1.0; targetAmbientColor.set("#ff8c69"); targetSunColor.set("#ffae8b"); targetFogColor.set("#4a2a3a"); break;
         case 'day':
-            targetSunIntensity = 1.7;
-            targetAmbientColor.set("#ffffff");
-            targetSunColor.set("#ffffff");
-            targetFogColor.set("#050a15");
-            break;
+            targetSunIntensity = 1.7; targetAmbientColor.set("#ffffff"); targetSunColor.set("#ffffff"); targetFogColor.set("#050a15"); break;
         case 'dusk':
-            targetSunIntensity = 1.2;
-            targetAmbientColor.set("#ff6a00");
-            targetSunColor.set("#ff8a35");
-            targetFogColor.set("#3b1e25");
-            break;
+            targetSunIntensity = 1.2; targetAmbientColor.set("#ff6a00"); targetSunColor.set("#ff8a35"); targetFogColor.set("#3b1e25"); break;
         case 'night':
-            targetSunIntensity = 0.3;
-            targetAmbientColor.set("#4a5a8a");
-            targetSunColor.set("#b5c5ff");
-            targetFogColor.set("#020207");
-            break;
+            targetSunIntensity = 0.3; targetAmbientColor.set("#4a5a8a"); targetSunColor.set("#b5c5ff"); targetFogColor.set("#020207"); break;
     }
 
     const condition = weather.conditionText.toLowerCase();
-    if (condition.includes('cloudy') || condition.includes('overcast') || condition.includes('fog')) {
-        targetSunIntensity *= 0.6;
-    }
-    if (weather.is_raining) {
-        targetSunIntensity *= 0.4;
-    }
+    if (condition.includes('cloudy') || condition.includes('overcast') || condition.includes('fog')) { targetSunIntensity *= 0.6; }
+    if (weather.is_raining) { targetSunIntensity *= 0.4; }
     
     sunLight.intensity = THREE.MathUtils.lerp(sunLight.intensity, targetSunIntensity, 0.05);
     ambientLight.color.lerp(targetAmbientColor, 0.05);
@@ -291,11 +277,10 @@ function updateUniverseAmbiance(weather, delta) {
     if (scene.fog) scene.fog.density = THREE.MathUtils.lerp(scene.fog.density, targetFogDensity, 0.05);
 }
 
-// =================================================================
-// SPECIAL PERSON - PHIÊN BẢN SỬA LỖI ĐÓNG BĂNG THỜI GIAN
-// =================================================================
 
-// Khai báo các biến trạng thái ở phạm vi rộng hơn
+// =================================================================
+// PHẦN 3: SỰ KIỆN NGÀY BAY ĐẶC BIỆT (LEAFLET.JS)
+// =================================================================
 let map = null;
 let animatedMarker = null;
 let animationFrameId = null;
@@ -303,7 +288,7 @@ let isFlightInProgress = false;
 let isNotificationShown = false;
 let isPlanePaused = false;
 let flightStartTime = 0;
-let timePausedAt = 0; // <<-- BIẾN MỚI: Ghi lại thời điểm tạm dừng
+let timePausedAt = 0;
 const FLIGHT_DURATION_MS = 25000;
 
 function setupFlightDayExperience() {
@@ -323,8 +308,6 @@ function setupFlightDayExperience() {
             return;
         }
 
-        // <<-- THAY ĐỔI QUAN TRỌNG: XỬ LÝ VIỆC TẠM DỪNG NGAY TỪ ĐẦU -->>
-        // Nếu đang bị tạm dừng, không làm gì cả, chỉ chờ khung hình tiếp theo.
         if (isPlanePaused) {
             animationFrameId = requestAnimationFrame(() => animateMap(pathPoints));
             return;
@@ -333,12 +316,10 @@ function setupFlightDayExperience() {
         let progress = (Date.now() - flightStartTime) / FLIGHT_DURATION_MS;
 
         if (progress >= 1.0) {
-            // Xử lý khi kết thúc chuyến bay (logic này bây giờ sẽ chạy đúng lúc)
             progress = 1.0;
             isFlightInProgress = false;
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
             animationFrameId = null;
-            console.log("Flight Finished!");
             setTimeout(() => {
                 flightOverlay.classList.remove('visible');
                 setTimeout(() => {
@@ -346,11 +327,10 @@ function setupFlightDayExperience() {
                     flightBtn.style.display = 'block';
                     if (map) { map.remove(); map = null; }
                 }, 1500);
-            }, 1000); // Giảm thời gian chờ một chút
-            return; // Dừng vòng lặp
+            }, 1000);
+            return;
         }
 
-        // Nội suy vị trí của máy bay
         let currentLatLng;
         if (progress < 0.5) {
             const segmentProgress = progress * 2;
@@ -368,19 +348,16 @@ function setupFlightDayExperience() {
         
         animatedMarker.setLatLng(currentLatLng);
         
-        console.log(`Flight Progress: ${progress.toFixed(2)}`);
-
         const startZoom = 8;
         const endZoom = 11;
         const currentZoom = startZoom + (endZoom - startZoom) * progress;
         map.setView(currentLatLng, currentZoom, { animate: false });
 
         if (progress >= 0.5 && !isNotificationShown) {
-            console.log("!!! HALFWAY POINT REACHED - PAUSING LOGIC !!!");
             isNotificationShown = true;
             flightNotification.classList.remove('hidden');
-            isPlanePaused = true; // <<-- Đặt cờ tạm dừng
-            timePausedAt = Date.now(); // <<-- Ghi lại thời điểm chính xác khi tạm dừng
+            isPlanePaused = true;
+            timePausedAt = Date.now();
         }
         
         animationFrameId = requestAnimationFrame(() => animateMap(pathPoints));
@@ -394,25 +371,21 @@ function setupFlightDayExperience() {
             closeBtn.onclick = () => {
                 letterContainer.classList.add('hidden');
                 if (isFlightInProgress) {
-                    // <<-- THAY ĐỔI QUAN TRỌNG: ĐIỀU CHỈNH LẠI THỜI GIAN BẮT ĐẦU -->>
-                    // Tính khoảng thời gian đã bị tạm dừng
                     const pausedDuration = Date.now() - timePausedAt;
-                    // "Bù" khoảng thời gian này vào thời gian bắt đầu
                     flightStartTime += pausedDuration;
-                    isPlanePaused = false; // <<-- Cho phép logic chạy tiếp
+                    isPlanePaused = false;
                 }
             };
         }
     };
 
     const startFlightSequence = () => {
-        // ... Hàm này giữ nguyên như phiên bản trước, không cần thay đổi ...
         if (typeof L === 'undefined' || !airportData || isFlightInProgress) return;
 
         isFlightInProgress = true;
         isNotificationShown = false;
         isPlanePaused = false;
-        timePausedAt = 0; // Reset
+        timePausedAt = 0;
         flightBtn.style.display = 'none';
         musicControls?.classList.add('hidden');
         flightOverlay.classList.add('visible');
@@ -420,14 +393,14 @@ function setupFlightDayExperience() {
         const originCode = 'HAN', destCode = 'CTU';
         const origin = airportData[originCode], dest = airportData[destCode];
 
-        if (!origin || !dest) { /* ... xử lý lỗi ... */ return; }
+        if (!origin || !dest) { return; }
 
         if (map) map.remove();
-        map = L.map('flight-map', { /* ... cấu hình map ... */ }).setView(origin.coords, 5);
+        map = L.map('flight-map').setView(origin.coords, 5);
         
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { /* ... */ }).addTo(map);
-        L.circleMarker(origin.coords, { /* ... */ }).addTo(map).bindPopup(`<b>${origin.city} (${originCode})</b>`).openPopup();
-        L.circleMarker(dest.coords, { /* ... */ }).addTo(map).bindPopup(`<b>${dest.city} (${destCode})</b>`);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+        L.circleMarker(origin.coords).addTo(map).bindPopup(`<b>${origin.city} (${originCode})</b>`).openPopup();
+        L.circleMarker(dest.coords).addTo(map).bindPopup(`<b>${dest.city} (${destCode})</b>`);
 
         const latlngs = [
             origin.coords,
@@ -463,8 +436,10 @@ function setupFlightDayExperience() {
     flightBtn.addEventListener('click', startFlightSequence);
     readLetterBtn.addEventListener('click', showFlightLetter);
 }
+
+
 // =================================================================
-// PHẦN 3: CÁC HÀM TIỆN ÍCH VÀ HIỆU ỨNG
+// PHẦN 4: CÁC HÀM TIỆN ÍCH VÀ HIỆU ỨNG NỀN
 // =================================================================
 let ambientFadeInterval = null;
 function controlAmbientSound(shouldPlay) {
@@ -486,13 +461,6 @@ function controlAmbientSound(shouldPlay) {
     }
 }
 
-function createProceduralTexture(gradientCallback, size = 256) {
-    const canvas = document.createElement('canvas');
-    canvas.width = size; canvas.height = size;
-    const context = canvas.getContext('2d');
-    gradientCallback(context, size);
-    return new THREE.CanvasTexture(canvas);
-}
 
 function createPeakRocket() {
     const rocketGroup = new THREE.Group();
@@ -751,9 +719,8 @@ function checkAndPreloadNightlySong() {
     const dailySongData = dailySongs.find(s => s.day === day);
     if (dailySongData) { const preloader = new Audio(); preloader.src = dailySongData.song.file; }
 }
-
 // =================================================================
-// PHẦN 4: HỆ THỐNG ÂM NHẠC NÂNG CAO & GIAO DIỆN NGƯỜI DÙNG (UI)
+// PHẦN 5: HỆ THỐNG ÂM NHẠC VÀ GIAO DIỆN NGƯỜI DÙNG (UI)
 // =================================================================
 function savePlaybackState() {
     if (!wavesurfer?.getMediaElement().src) return;
@@ -984,11 +951,11 @@ function setupUIEventListeners() {
         overlay.classList.add('hidden-overlay');
         waveformControls.classList.remove('hidden');
         settingsToggleBtn.classList.remove('hidden');
-        flyModeBtn.classList.remove('hidden');
         weatherWidgetContainer.classList.remove('hidden');
-        adjustLetterButtonPosition();
     };
+
     overlay.addEventListener('click', startAudio, { once: true });
+
     closeInfoBtn.addEventListener('click', resetCameraToDefault);
     nextBtn.addEventListener('click', playNext);
     prevBtn.addEventListener('click', playPrev);
@@ -1007,7 +974,7 @@ function setupUIEventListeners() {
 }
 
 // =================================================================
-// PHẦN 5: THẾ GIỚI 3D (THREE.JS)
+// PHẦN 6: THẾ GIỚI 3D (THREE.JS)
 // =================================================================
 function setupLoadingManager() {
     loadingManager = new THREE.LoadingManager();
@@ -1019,207 +986,41 @@ function setupLoadingManager() {
     loadingManager.onLoad = () => { setTimeout(() => loadingScreen.classList.add('loaded'), 500); };
 }
 
-function setupFlyControls() {
-    function onMouseMove(event) {
-        if (!isFlyMode) return;
-        const movementX = event.movementX || 0; const movementY = event.movementY || 0;
-        if (cameraViewMode === 'thirdPerson') {
-            cameraOrbitYaw -= movementX * mouseSensitivity;
-            cameraOrbitPitch -= movementY * mouseSensitivity;
-            cameraOrbitPitch = Math.max(-Math.PI / 4, Math.min(Math.PI / 2, cameraOrbitPitch));
-        } else {
-            const euler = new THREE.Euler(0, 0, 0, 'YXZ');
-            euler.setFromQuaternion(camera.quaternion);
-            euler.y -= movementX * mouseSensitivity; euler.x -= movementY * mouseSensitivity;
-            euler.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, euler.x));
-            camera.quaternion.setFromEuler(euler);
-        }
-    }
-    function showFlyModeNotification(message, duration = 1500) {
-        flyModeStatus.textContent = message; flyModeOverlay.classList.remove('hidden');
-        setTimeout(() => { flyModeOverlay.classList.add('hidden'); }, duration);
-    }
-    function enterFlyMode() { document.body.requestPointerLock(); }
-    function exitFlyMode() { if (document.pointerLockElement) document.exitPointerLock(); }
-    function activateFlyMode() { isFlyMode = true; controls.enabled = false; flyModeBtn.classList.add('fly-mode-active'); flyModeBtn.innerHTML = '🚀<span>Thoát (F)</span>'; showFlyModeNotification('Đã bật chế độ bay'); }
-    function deactivateFlyMode() { isFlyMode = false; controls.enabled = true; flyModeBtn.classList.remove('fly-mode-active'); flyModeBtn.innerHTML = '🚀'; showFlyModeNotification('Đã tắt chế độ bay'); }
-    window.addEventListener('keydown', (e) => {
-        keyState[e.code] = true;
-        if (e.code === 'KeyF') { e.preventDefault(); if (!isFlyMode) enterFlyMode(); else exitFlyMode(); }
-        if (e.code === 'Escape' && isFlyMode) exitFlyMode();
-        if (e.code === 'KeyC' && isFlyMode) cameraViewMode = (cameraViewMode === 'thirdPerson') ? 'firstPerson' : 'thirdPerson';
-    });
-    window.addEventListener('keyup', (e) => { keyState[e.code] = false; });
-    flyModeBtn.addEventListener('click', () => { if (!isFlyMode) enterFlyMode(); else exitFlyMode(); });
-    document.addEventListener('pointerlockchange', () => { if (document.pointerLockElement === document.body) activateFlyMode(); else deactivateFlyMode(); });
-    document.addEventListener('mousemove', onMouseMove);
-}
+async function createSpaceship() {
+    const loader = new GLTFLoader();
+    
+    // Sử dụng Promise để xử lý việc tải bất đồng bộ
+    const gltf = await loader.loadAsync('models/uss_enterprise.glb'); // <<<--- Đảm bảo đường dẫn chính xác
 
-function updateFlyModeLogic(delta) {
-    if (!isFlyMode || !spaceship) return;
-    if (cameraViewMode === 'thirdPerson') {
-        const cameraOffset = new THREE.Vector3();
-        cameraOffset.x = cameraOrbitDistance * Math.sin(cameraOrbitYaw) * Math.cos(cameraOrbitPitch);
-        cameraOffset.y = cameraOrbitDistance * Math.sin(cameraOrbitPitch);
-        cameraOffset.z = cameraOrbitDistance * Math.cos(cameraOrbitYaw) * Math.cos(cameraOrbitPitch);
-        const targetPosition = spaceship.position.clone().add(cameraOffset);
-        camera.position.lerp(targetPosition, 0.15);
-        const lookAtPosition = spaceship.position.clone().add(new THREE.Vector3(0, 3, 0));
-        camera.lookAt(lookAtPosition);
-        const movementDirection = new THREE.Vector3();
-        let isMoving = false;
-        const cameraForward = new THREE.Vector3();
-        camera.getWorldDirection(cameraForward); cameraForward.y = 0; cameraForward.normalize();
-        const cameraRight = new THREE.Vector3().crossVectors(camera.up, cameraForward).negate();
-        if (keyState['KeyW']) { movementDirection.add(cameraForward); isMoving = true; }
-        if (keyState['KeyS']) { movementDirection.sub(cameraForward); isMoving = true; }
-        if (keyState['KeyA']) { movementDirection.sub(cameraRight); isMoving = true; }
-        if (keyState['KeyD']) { movementDirection.add(cameraRight); isMoving = true; }
-        if (keyState['Space']) spaceship.position.y += strafeSpeed * delta * 0.5;
-        if (keyState['ShiftLeft'] || keyState['ShiftRight']) spaceship.position.y -= strafeSpeed * delta * 0.5;
-        if (isMoving) {
-            movementDirection.normalize();
-            let finalThrust = thrustSpeed;
-            if(currentWeatherData?.is_snowing) finalThrust *= 1.2;
-            spaceship.position.addScaledVector(movementDirection, finalThrust * delta);
-            const targetQuaternion = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), movementDirection);
-            spaceship.quaternion.slerp(targetQuaternion, 0.1);
-        }
-        if(currentWeatherData && currentWeatherData.windScale > 4) {
-            const windForce = (currentWeatherData.windScale - 4) * 2000.0;
-            spaceship.position.x += windForce * delta * delta;
-        }
-    } else {
-        const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
-        const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
-        const movement = new THREE.Vector3();
-        if (keyState['KeyW']) movement.add(forward);
-        if (keyState['KeyS']) movement.sub(forward);
-        if (keyState['KeyA']) movement.sub(right);
-        if (keyState['KeyD']) movement.add(right);
-        if (movement.length() > 0) movement.normalize();
-        camera.position.addScaledVector(movement, thrustSpeed * delta);
-        const verticalSpeed = strafeSpeed * delta * 0.5;
-        if (keyState['Space']) camera.position.y += verticalSpeed;
-        if (keyState['ShiftLeft'] || keyState['ShiftRight']) camera.position.y -= verticalSpeed;
-        spaceship.quaternion.copy(camera.quaternion);
-        const cockpitOffset = new THREE.Vector3(0, 1.5, 3.5);
-        const shipCenterOffset = cockpitOffset.clone().negate().applyQuaternion(camera.quaternion);
-        spaceship.position.copy(camera.position).add(shipCenterOffset);
-    }
-}
+    const spaceshipModel = gltf.scene; 
+    const engineParts = []; // Mảng để lưu trữ tất cả các bộ phận phát sáng của động cơ
 
-function createSpaceship() {
-    function createNacelle(materials) {
-        const nacelleGroup = new THREE.Group();
-        const nacelleBodyGeom = new THREE.CapsuleGeometry(1, 15, 16, 32);
-        const nacelleBody = new THREE.Mesh(nacelleBodyGeom, materials.hull);
-        nacelleBody.rotation.z = Math.PI / 2;
-        nacelleGroup.add(nacelleBody);
-        const warpGlowGeom = new THREE.BoxGeometry(10, 1, 0.5);
-        const warpGlow = new THREE.Mesh(warpGlowGeom, materials.warp);
-        warpGlow.position.x = 1;
-        nacelleBody.add(warpGlow);
-        const bussardGeom = new THREE.SphereGeometry(1.05, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2);
-        const bussardCollector = new THREE.Mesh(bussardGeom, materials.bussard);
-        bussardCollector.position.x = 7.5;
-        bussardCollector.rotation.z = -Math.PI / 2;
-        nacelleBody.add(bussardCollector);
-        return nacelleGroup;
-    }
-    const spaceshipGroup = new THREE.Group();
-    const materials = {
-        hull: new THREE.MeshStandardMaterial({ color: 0xe0e0e0, metalness: 0.9, roughness: 0.4 }),
-        accent: new THREE.MeshStandardMaterial({ color: 0x404040, metalness: 0.95, roughness: 0.5 }),
-        warp: new THREE.MeshStandardMaterial({ color: 0x00ffff, emissive: 0x33ffff, emissiveIntensity: 3.0, toneMapped: false }),
-        bussard: new THREE.MeshStandardMaterial({ color: 0xff6020, emissive: 0xff6020, emissiveIntensity: 3.5, toneMapped: false })
-    };
-    const saucerGeom = new THREE.CylinderGeometry(10, 10, 1.2, 64);
-    const saucer = new THREE.Mesh(saucerGeom, materials.hull);
-    saucer.scale.y = 1.5;
-    spaceshipGroup.add(saucer);
-    const bridgeGeom = new THREE.CylinderGeometry(2, 2.5, 0.8, 32);
-    const bridge = new THREE.Mesh(bridgeGeom, materials.hull);
-    bridge.position.y = 1;
-    saucer.add(bridge);
-    const neckGeom = new THREE.CylinderGeometry(1.5, 1, 6, 32);
-    const neck = new THREE.Mesh(neckGeom, materials.accent);
-    neck.position.set(0, -2, -3);
-    neck.rotation.x = -Math.PI / 6;
-    spaceshipGroup.add(neck);
-    const secondaryHullGeom = new THREE.CapsuleGeometry(2.2, 12, 32, 64);
-    const secondaryHull = new THREE.Mesh(secondaryHullGeom, materials.hull);
-    secondaryHull.rotation.z = Math.PI / 2;
-    secondaryHull.position.set(0, -7, 0);
-    spaceshipGroup.add(secondaryHull);
-    const pylonGeom = new THREE.BoxGeometry(0.4, 6, 1.5);
-    const pylonRight = new THREE.Mesh(pylonGeom, materials.accent);
-    pylonRight.position.set(0, -5, 4);
-    pylonRight.rotation.x = Math.PI / 8;
-    pylonRight.rotation.z = -Math.PI / 5;
-    spaceshipGroup.add(pylonRight);
-    const pylonLeft = pylonRight.clone();
-    pylonLeft.position.z = -4;
-    pylonLeft.rotation.z *= -1;
-    spaceshipGroup.add(pylonLeft);
-    const nacelleRight = createNacelle(materials);
-    nacelleRight.position.set(0, -2, 8);
-    spaceshipGroup.add(nacelleRight);
-    const nacelleLeft = createNacelle(materials);
-    nacelleLeft.position.set(0, -2, -8);
-    spaceshipGroup.add(nacelleLeft);
-    spaceshipGroup.userData.nacelleLeft = nacelleLeft;
-    spaceshipGroup.userData.nacelleRight = nacelleRight;
-    spaceshipGroup.scale.setScalar(5);
-    spaceshipGroup.position.set(0, 0, 350);
-    spaceshipGroup.rotation.y = -Math.PI/2;
-    return spaceshipGroup;
-}
+    spaceshipModel.traverse(function (child) {
+        if (child.isMesh) {
+            child.material.metalness = 0.8;
+            child.material.roughness = 0.4;
 
-function createWarpTrail() {
-    const particleCount = 250;
-    const trailMaterial = new THREE.PointsMaterial({ color: 0x00ffff, size: 0.5, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, sizeAttenuation: true });
-    ['Left', 'Right'].forEach(side => {
-        const geometry = new THREE.BufferGeometry();
-        const positions = new Float32Array(particleCount * 3);
-        const velocities = new Float32Array(particleCount * 3);
-        const lifetimes = new Float32Array(particleCount);
-        for (let i = 0; i < particleCount; i++) lifetimes[i] = 0;
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        const trail = new THREE.Points(geometry, trailMaterial);
-        trail.userData = { lifetimes, velocities };
-        trail.visible = false;
-        const nacelle = spaceship.userData[`nacelle${side}`];
-        if (nacelle) { nacelle.add(trail); spaceship.userData[`trail${side}`] = trail; }
-    });
-}
-
-function updateWarpTrail(delta) {
-    const isMovingForward = keyState['KeyW'];
-    ['Left', 'Right'].forEach(side => {
-        const trail = spaceship.userData[`trail${side}`];
-        if (!trail) return;
-        trail.visible = isMovingForward;
-        if (!isMovingForward) return;
-        const positions = trail.geometry.attributes.position.array;
-        const { lifetimes, velocities } = trail.userData;
-        const emissionPoint = new THREE.Vector3(-8, 0, 0);
-        for (let i = 0; i < lifetimes.length; i++) {
-            lifetimes[i] -= delta;
-            if (lifetimes[i] <= 0) {
-                positions[i * 3] = emissionPoint.x + (Math.random() - 0.5) * 0.5;
-                positions[i * 3 + 1] = emissionPoint.y + (Math.random() - 0.5) * 0.5;
-                positions[i * 3 + 2] = emissionPoint.z + (Math.random() - 0.5) * 0.5;
-                velocities[i * 3] = -20 - Math.random() * 10;
-                velocities[i * 3 + 1] = 0; velocities[i * 3 + 2] = 0;
-                lifetimes[i] = Math.random() * 2 + 1;
+            // Nếu một bộ phận có vật liệu phát sáng, chúng ta coi nó là một phần của động cơ
+            if (child.material.emissive && child.material.emissive.getHex() > 0) {
+                engineParts.push(child); // Thêm nó vào danh sách động cơ
+                // Tăng cường độ sáng mặc định để nó nổi bật hơn
+                child.material.emissiveIntensity = 5.0; 
             }
-            positions[i * 3] += velocities[i * 3] * delta;
-            positions[i * 3 + 1] += velocities[i * 3 + 1] * delta;
-            positions[i * 3 + 2] += velocities[i * 3 + 2] * delta;
         }
-        trail.geometry.attributes.position.needsUpdate = true;
     });
+
+    const spaceshipPivot = new THREE.Object3D();
+    spaceshipPivot.add(spaceshipModel);
+
+    // Lưu lại MẢNG các bộ phận động cơ vào userData
+    spaceshipPivot.userData.engineParts = engineParts;
+
+    // <<<--- THAY ĐỔI QUAN TRỌNG: Thu nhỏ phi thuyền lại rất nhiều ---
+    spaceshipPivot.scale.setScalar(0.01); // Thử giá trị này, bạn có thể chỉnh thành 0.005 nếu vẫn còn to
+    
+    spaceshipPivot.position.set(0, 0, 350);
+    
+    return spaceshipPivot;
 }
 
 function createStarfield() {
@@ -1403,17 +1204,45 @@ function animateCamera(targetPosition, targetLookAt, duration = 1.5, onComplete 
 }
 
 function resetCameraToDefault() {
+    // Ngăn chặn nếu camera đang di chuyển hoặc không có đối tượng nào được theo dõi
     if (isAnimatingCamera || !followedObject) return;
+
+    // Tắt các trạng thái đặc biệt
     isAutoRotating = false; 
     infoCard.classList.add('hidden'); 
-    const departingObject = followedObject;
+    
+    // Đánh dấu rằng không còn theo dõi đối tượng nào nữa
     followedObject = null;
+
+    // Gọi hàm animateCamera để quay về vị trí đã lưu trong preFocusCameraState
     animateCamera(preFocusCameraState.position, preFocusCameraState.target, 2.0, () => {
+        // Khôi phục lại các cài đặt camera mặc định sau khi quay về
         controls.minDistance = 20; 
         controls.maxDistance = 1200; 
         controls.enablePan = true;
+        // Đảm bảo target của controls cũng được cập nhật chính xác
         controls.target.copy(preFocusCameraState.target);
     });
+}
+
+function setupCameraLight() {
+    // Tạo một đèn SpotLight giống như đèn pha
+    const cameraLight = new THREE.SpotLight(
+        0xffffff, // Màu trắng
+        0.8,      // Cường độ vừa phải, không quá gắt
+        600,      // Khoảng cách chiếu sáng
+        Math.PI / 8, // Góc chiếu (hình nón)
+        0.5       // Độ mờ của biên đèn
+    );
+    
+    // Gắn đèn vào làm "con" của camera. Đèn sẽ luôn đi theo camera.
+    camera.add(cameraLight);
+    
+    // Đặt đèn vào cùng vị trí với camera bên trong hệ tọa độ của camera
+    cameraLight.position.set(0, 0, 0);
+    
+    // Đảm bảo đèn cũng được thêm vào scene cùng với camera
+    scene.add(camera); 
 }
 
 function showPlanetInfo(clickedMesh) {
@@ -1429,8 +1258,10 @@ function showPlanetInfo(clickedMesh) {
     followedObject = clickedMesh;
     controls.enablePan = false;
 
+    // <<<--- QUAN TRỌNG: LƯU LẠI TRẠNG THÁI CAMERA HIỆN TẠI ---
     preFocusCameraState.position.copy(camera.position);
     preFocusCameraState.target.copy(controls.target);
+    // <<<----------------------------------------------------
 
     const planetPosition = new THREE.Vector3();
     clickedMesh.getWorldPosition(planetPosition);
@@ -1454,20 +1285,6 @@ function showPlanetInfo(clickedMesh) {
     infoCard.classList.remove('hidden');
 }
 
-
-function onClick(event) {
-    if (!overlay.classList.contains('hidden-overlay') || !letterContainer.classList.contains('hidden') || isAnimatingCamera) return;
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    raycaster.setFromCamera(mouse, camera);
-    const clickableObjects = celestialObjects.map(obj => obj.mesh).filter(mesh => mesh.userData?.isClickable);
-    const intersects = raycaster.intersectObjects(clickableObjects, false);
-    if (intersects.length > 0 && infoCard.classList.contains('hidden')) {
-        const clickedMesh = intersects[0].object;
-        if (clickedMesh.userData) showPlanetInfo(clickedMesh);
-    }
-}
-
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -1475,24 +1292,278 @@ function onWindowResize() {
     composer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function showControlsHelp() {
-    let helpDiv = document.getElementById('flight-controls-help');
-    if (!helpDiv) {
-        helpDiv = document.createElement('div');
-        helpDiv.id = 'flight-controls-help';
-        helpDiv.style.cssText = `position: fixed; top: 20px; left: 20px; background: rgba(0, 0, 0, 0.8); color: white; padding: 15px; border-radius: 8px; font-size: 14px; z-index: 1000; display: none; line-height: 1.6; font-family: sans-serif;`;
-        document.body.appendChild(helpDiv);
-        window.addEventListener('keydown', (e) => { if (e.code === 'KeyH') helpDiv.style.display = helpDiv.style.display === 'none' ? 'block' : 'none'; });
-    }
-    helpDiv.innerHTML = `<h3 style="margin-bottom: 10px; color: #ff6b9d;">Hướng Dẫn (Nhấn H để Ẩn/Hiện)</h3>
-        <strong style="color: #4ecdc4;">Chế độ Quan sát:</strong><p style="margin-left: 10px;">- Chuột trái để xoay.<br>- Lăn chuột để Zoom.</p>
-        <strong style="color: #4ecdc4; margin-top: 15px; display: block;">Chế độ Lái phi thuyền:</strong>
-        <p style="margin-left: 10px;"><strong>F</strong> - Bật/Tắt | <strong>C</strong> - Đổi góc nhìn | <strong>W/A/S/D</strong> - Di chuyển | <strong>Space/Shift</strong> - Lên/xuống | <strong>ESC</strong> - Thoát</p>`;
+function createMemoryStars() {
+    const starGeometry = new THREE.SphereGeometry(15, 32, 32);
+    const starMaterial = new THREE.MeshBasicMaterial({
+        color: 0xffe48a,
+        transparent: true,
+        opacity: 0.9,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+    });
+
+    memoriesData.forEach(memory => {
+        const star = new THREE.Mesh(starGeometry, starMaterial.clone());
+        star.userData = { isMemoryButton: true, memoryData: memory };
+        star.visible = false;
+        
+        let targetObject = null;
+        if (memory.journeySegment === 0) {
+            targetObject = celestialObjects.find(obj => obj.userData.id === 'earth');
+        } else if (memory.journeySegment === 1) {
+            targetObject = celestialObjects.find(obj => obj.userData.id === 'saturn');
+        }
+
+        if (targetObject) {
+            // <<<--- SỬA LỖI QUAN TRỌNG NHẤT ---
+            // 1. Lấy bán kính của hành tinh từ dữ liệu
+            const planetRadius = targetObject.userData.size;
+            
+            // 2. Gắn ngôi sao làm "con" trực tiếp của khối MESH hành tinh
+            targetObject.mesh.add(star);
+            
+            // 3. Đặt vị trí của ngôi sao ngay phía trên "Bắc Cực" của hành tinh
+            // Vị trí này là tương đối so với tâm của hành tinh
+            star.position.set(0, planetRadius + 40, 0); 
+        } else {
+            // Với các trạm dừng không có hành tinh, đặt nó trực tiếp vào không gian
+            star.position.set(-600, 100, -600);
+            scene.add(star);
+        }
+        
+        memoryStars[memory.journeySegment] = star;
+    });
 }
+
+function onClick(event) {
+    const userLetterContainer = document.getElementById('user-letter-container');
+
+    // Ngăn chặn tất cả các click nếu có bất kỳ lớp phủ nào đang mở
+    if (!overlay.classList.contains('hidden-overlay') || 
+        !letterContainer.classList.contains('hidden') || 
+        (userLetterContainer && !userLetterContainer.classList.contains('hidden')) || 
+        isAnimatingCamera) {
+        return;
+    }
+
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+
+    // Xác định các đối tượng có thể click
+    const clickableStars = isJourneyPaused ? Object.values(memoryStars) : [];
+    const clickablePlanets = !isJourneyActive ? celestialObjects.map(obj => obj.mesh).filter(mesh => mesh.userData?.isClickable) : [];
+    
+    const clickableObjects = [...clickableStars, ...clickablePlanets];
+
+    const intersects = raycaster.intersectObjects(clickableObjects, false);
+
+    if (intersects.length > 0) {
+        const clickedObject = intersects[0].object;
+
+        if (clickedObject.userData.isMemoryButton) {
+            // Chỉ xử lý click vào ngôi sao khi chuyến đi đang tạm dừng
+            if (isJourneyPaused) {
+                showMemory(clickedObject.userData.memoryData);
+            }
+        } 
+        else if (clickedObject.userData.isClickable) {
+            // Chỉ xử lý click vào hành tinh khi chuyến đi KHÔNG hoạt động
+            if (!isJourneyActive && infoCard.classList.contains('hidden')) {
+                showPlanetInfo(clickedObject);
+            }
+        }
+    }
+}
+
 // =======================================================
-// PHẦN 6: TÍNH NĂNG TƯƠNG TÁC HAI CHIỀU
+// PHẦN 7: LOGIC HÀNH TRÌNH ĐIỆN ẢNH
 // =======================================================
 
+function createJourneyPathVisualizer(startVec, endVec) {
+    clearJourneyPathVisuals();
+    journeyPathVisuals.forEach(visual => scene.remove(visual));
+    journeyPathVisuals.length = 0;
+
+    const curve = new THREE.CatmullRomCurve3([startVec, endVec]);
+    const points = curve.getPoints(100);
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    
+    const material = new THREE.LineBasicMaterial({
+        color: 0x4ecdc4,
+        linewidth: 2,
+        transparent: true,
+        opacity: 0.5
+    });
+
+    const curveObject = new THREE.Line(geometry, material);
+    scene.add(curveObject);
+    journeyPathVisuals.push(curveObject);
+
+    gsap.to(material, { opacity: 0, duration: 5, delay: 5, onComplete: () => scene.remove(curveObject) });
+}
+
+function clearJourneyPathVisuals() {
+    journeyPathVisuals.forEach(visual => scene.remove(visual));
+    journeyPathVisuals.length = 0;
+}
+function updateSpaceshipEffects() {
+    if (!spaceship) return;
+
+    // Áp dụng hiệu ứng cho động cơ khi đang bay
+    if (isJourneyActive && !isJourneyPaused) {
+        // 1. Kiểm tra xem mảng engineParts có tồn tại và có phần tử không
+        if (spaceship.userData.engineParts && spaceship.userData.engineParts.length > 0) {
+            const pulse = Math.sin(clock.getElapsedTime() * 8) * 0.5 + 0.5; // Dao động 0-1
+            
+            // 2. Lặp qua TẤT CẢ các bộ phận động cơ đã tìm thấy và áp dụng hiệu ứng
+            spaceship.userData.engineParts.forEach(part => {
+                part.material.emissiveIntensity = 5.0 + pulse * 4.0; // Tăng cường độ sáng theo nhịp
+            });
+        }
+    }
+
+    // Hiệu ứng bay lơ lửng tại chỗ khi đang tạm dừng
+    if (isJourneyPaused) {
+        spaceship.position.y += Math.sin(clock.getElapsedTime() * 1.5) * 0.05;
+    }
+}
+
+function startNextJourneySegment(segmentIndex) {
+    if (segmentIndex >= memoriesData.length) {
+        endJourney();
+        return;
+    }
+
+    currentJourneySegment = segmentIndex;
+    isJourneyPaused = false;
+    Object.values(memoryStars).forEach(star => star.visible = false);
+
+    const memory = memoriesData[segmentIndex];
+    let targetObject = null;
+    let fallbackPosition = null;
+
+    if (memory.journeySegment === 0) {
+        targetObject = celestialObjects.find(obj => obj.userData.id === 'earth');
+    } else if (memory.journeySegment === 1) {
+        targetObject = celestialObjects.find(obj => obj.userData.id === 'saturn');
+    } else {
+        fallbackPosition = new THREE.Vector3(-600, 100, -600);
+    }
+    
+    const startPosition = spaceship.position.clone();
+    const tweenProxy = { progress: 0 };
+
+    gsap.to(tweenProxy, {
+        progress: 1,
+        duration: 20,
+        ease: "power1.inOut",
+        onUpdate: () => {
+            // --- CẬP NHẬT VỊ TRÍ (Không thay đổi) ---
+            const currentTargetPosition = new THREE.Vector3();
+            if (targetObject) {
+                targetObject.mesh.getWorldPosition(currentTargetPosition);
+            } else {
+                currentTargetPosition.copy(fallbackPosition);
+            }
+            spaceship.position.lerpVectors(startPosition, currentTargetPosition, tweenProxy.progress);
+            
+            // --- LOGIC XOAY TÀU HOÀN TOÀN MỚI ---
+            // 1. Vector chỉ hướng từ tàu đến mục tiêu
+            const direction = new THREE.Vector3().subVectors(currentTargetPosition, spaceship.position).normalize();
+
+            // 2. Vector "phía trước" mặc định của mô hình. Dựa trên hình ảnh, đó là trục +X.
+            const modelForward = new THREE.Vector3(1, 0, 0); 
+            
+            // 3. Tính toán phép quay (quaternion) cần thiết để hướng "phía trước" của mô hình
+            // thẳng theo vector chỉ hướng.
+            const targetQuaternion = new THREE.Quaternion().setFromUnitVectors(modelForward, direction);
+
+            // 4. Dùng slerp để xoay phi thuyền một cách mượt mà về phía hướng quay mục tiêu.
+            // Con số 0.1 là tốc độ xoay, giúp nó có cảm giác tự nhiên.
+            spaceship.quaternion.slerp(targetQuaternion, 0.1);
+        },
+        onComplete: () => {
+            isJourneyPaused = true;
+            showMemoryStar(segmentIndex);
+        }
+    });
+}
+
+function startJourney() {
+    isJourneyActive = true;
+    controls.enabled = false;
+    
+    document.getElementById('start-journey-btn').classList.add('hidden');
+    document.getElementById('open-letter-form-btn').classList.add('hidden');
+    
+    spaceship.position.set(150, 50, 300); // Vị trí xuất phát
+
+    // <<<--- THÊM MỚI: Xoay tàu đúng hướng ngay từ đầu ---
+    // Tìm vị trí của Trái Đất (điểm đến đầu tiên)
+    const firstTargetObject = celestialObjects.find(obj => obj.userData.id === 'earth');
+    if (firstTargetObject) {
+        const firstTargetPosition = new THREE.Vector3();
+        firstTargetObject.mesh.getWorldPosition(firstTargetPosition);
+        spaceship.lookAt(firstTargetPosition); // Xoay tàu nhìn vào đó ngay lập tức
+    }
+    // <<<----------------------------------------------
+    
+    // Bắt đầu chặng đầu tiên
+    startNextJourneySegment(0);
+}
+
+function endJourney() {
+    isJourneyActive = false;
+    controls.enabled = true;
+    isJourneyPaused = false;
+    
+    document.getElementById('start-journey-btn').classList.remove('hidden');
+    document.getElementById('open-letter-form-btn').classList.remove('hidden');
+    
+    gsap.to(spaceship.position, { x: 0, y: 0, z: 350, duration: 5, ease: "power2.out" });
+    clearJourneyPathVisuals();
+}
+
+function showMemoryStar(segmentIndex) {
+    const star = memoryStars[segmentIndex];
+    if (star) {
+        star.visible = true;
+        star.scale.set(0, 0, 0);
+        gsap.to(star.scale, { x: 1, y: 1, z: 1, duration: 1.5, ease: "elastic.out(1, 0.5)" });
+    }
+}
+
+function showMemory(memory) {
+    if (!letterContainer?.classList.contains('hidden')) return;
+
+    const letterContentDiv = letterContainer.querySelector('.letter-content');
+    letterContentDiv.innerHTML = ''; 
+
+    const titleEl = document.createElement('h1');
+    titleEl.textContent = memory.title;
+    const imageEl = document.createElement('img');
+    imageEl.src = memory.image;
+    imageEl.className = 'memory-image';
+    const contentEl = document.createElement('p');
+    contentEl.textContent = memory.content;
+    const continueBtn = document.createElement('button');
+    continueBtn.textContent = 'Tiếp tục hành trình';
+    continueBtn.className = 'continue-journey-btn';
+
+    letterContentDiv.append(titleEl, imageEl, contentEl, continueBtn);
+    letterContainer.classList.remove('hidden');
+
+    continueBtn.addEventListener('click', () => {
+        letterContainer.classList.add('hidden');
+        startNextJourneySegment(currentJourneySegment + 1);
+    }, { once: true });
+}
+
+function setupJourneyButton() {
+    const btn = document.getElementById('start-journey-btn');
+    if (btn) btn.addEventListener('click', startJourney);
+}
 function setupUserLetterForm() {
     const openBtn = document.getElementById('open-letter-form-btn');
     const closeBtn = document.getElementById('close-user-letter-btn');
@@ -1520,7 +1591,6 @@ function setupUserLetterForm() {
         sendBtn.disabled = true;
         sendBtn.textContent = 'Đang gửi...';
 
-        // <<<--- QUAN TRỌNG: DÁN URL TỪ KỊCH BẢN 2 (NHẬN THƯ) VÀO ĐÂY
         const webhookUrl = 'https://hook.us2.make.com/njm3r71sllwmkeiutvjjg3js5kzs9li2'; 
 
         try {
@@ -1546,8 +1616,9 @@ function setupUserLetterForm() {
         }
     });
 }
+
 // =======================================================
-// PHẦN 7: VÒNG LẶP CHÍNH VÀ KHỞI TẠO
+// PHẦN 8: VÒNG LẶP CHÍNH VÀ KHỞI TẠO
 // =======================================================
 function animate() {
     requestAnimationFrame(animate);
@@ -1560,6 +1631,7 @@ function animate() {
         if (obj.pivot) obj.pivot.rotation.y += (obj.orbitSpeed || 0) * 0.3 * delta;
         obj.mesh.rotation.y += (obj.spinSpeed || 0) * delta;
     });
+    
     if (saturnRing) saturnRing.material.uniforms.uTime.value = elapsedTime;
     if (asteroidBelt) asteroidBelt.children.forEach(rock => {
         rock.userData.orbitAngle += rock.userData.orbitSpeed * delta;
@@ -1567,31 +1639,35 @@ function animate() {
         rock.position.z = rock.userData.orbitRadius * Math.sin(rock.userData.orbitAngle);
         rock.rotation.y += 0.5 * delta;
     });
+
     if (isAutoRotating && followedObject) {
         const planetData = followedObject.userData;
         const lookAtOffset = planetData.camera.lookAtOffset;
-        
         const planetPosition = new THREE.Vector3();
         followedObject.getWorldPosition(planetPosition);
-        
         const lookAtTargetPosition = planetPosition.clone().add(lookAtOffset);
-        
         const distance = camera.position.distanceTo(lookAtTargetPosition);
         autoRotateAngle += cinematicOrbitSpeed; 
-        
         const newX = lookAtTargetPosition.x + distance * Math.cos(autoRotateAngle);
         const newZ = lookAtTargetPosition.z + distance * Math.sin(autoRotateAngle);
-        
         const relativeCamY = camera.position.y - lookAtTargetPosition.y;
-
         camera.position.x = newX;
         camera.position.z = newZ;
         camera.position.y = lookAtTargetPosition.y + relativeCamY;
-
         camera.lookAt(lookAtTargetPosition);
         controls.target.copy(lookAtTargetPosition);
     }
-    if (isFlyMode) updateWarpTrail(delta);
+
+    if (isJourneyActive && spaceship) {
+        const cameraOffset = new THREE.Vector3(0, 50, 150); 
+        cameraOffset.applyQuaternion(spaceship.quaternion);
+        const targetCameraPosition = spaceship.position.clone().add(cameraOffset);
+        camera.position.lerp(targetCameraPosition, 0.05);
+        camera.lookAt(spaceship.position);
+    }
+    
+    updateSpaceshipEffects();
+
     if (sunEffects.uniforms) sunEffects.uniforms.uTime.value = elapsedTime;
     activeAsteroids.forEach(a => { if (a.uniforms) a.uniforms.uTime.value = elapsedTime; a.group.rotation.y += 0.005 * delta * 60; a.group.rotation.x += 0.002 * delta * 60; });
     activeComets.forEach(c => {
@@ -1602,35 +1678,50 @@ function animate() {
         }
         c.tail.geometry.attributes.position.needsUpdate = true;
     });
-    updateFlyModeLogic(delta);
     activePeakRockets.forEach(rocket => updatePeakRocketTrail(rocket, delta));
     if (starfield) starfield.rotation.y -= 0.00005;
     
     const sunObj = celestialObjects.find(obj => obj.userData.id === 'sun');
     if (sunLight && sunObj) sunLight.position.copy(sunObj.mesh.position);
     
-    if (!isAnimatingCamera && controls.enabled) controls.update();
+    if (!isJourneyActive && !isAnimatingCamera && controls.enabled) {
+        controls.update();
+    }
+    
     composer.render();
 }
 
-function initThreeJS() {
+async function initThreeJS() {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 4000);
     camera.position.set(0, 150, 400);
+
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setClearColor(0x000000, 0);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     
-    ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    // <<<--- NÂNG CẤP HỆ THỐNG ÁNH SÁNG ---
+    // 1. Tăng cường Ánh sáng Môi trường (Ambient Light)
+    // Ánh sáng này đảm bảo không có phần nào của tàu bị tối đen hoàn toàn.
+    ambientLight = new THREE.AmbientLight(0xffffff, 1.2); 
     scene.add(ambientLight);
-    sunLight = new THREE.PointLight(0xffffff, 1.5, 4000);
+
+    // 2. Tăng cường Ánh sáng Mặt Trời (Point Light)
+    // Ánh sáng này tạo ra các vùng sáng và bóng đổ chính.
+    sunLight = new THREE.PointLight(0xffffff, 2.0, 4000); 
     scene.add(sunLight);
+    
+    // 3. Thêm một đèn Hemisphere Light
+    // Đèn này giả lập ánh sáng phản chiếu từ vũ trụ, làm cho tàu có chiều sâu hơn.
+    const hemisphereLight = new THREE.HemisphereLight(0x6080ff, 0x303050, 1.0);
+    scene.add(hemisphereLight);
+    // <<<-------------------------------------
+
     scene.fog = new THREE.FogExp2(0x050a15, 0.0001);
 
-    spaceship = createSpaceship();
+    spaceship = await createSpaceship();
     scene.add(spaceship);
-    createWarpTrail();
     
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true; controls.dampingFactor = 0.05;
@@ -1649,10 +1740,10 @@ function initThreeJS() {
     controls.addEventListener('start', () => { isAutoRotating = false; });
     createStarfield();
     createSolarSystem(textureLoader);
+    createMemoryStars();
     createRainEffect();
     createSnowEffect();
     createBackgroundNebulae();
-    setupFlyControls();
     window.addEventListener('resize', onWindowResize);
     window.addEventListener('click', onClick);
     animate();
@@ -1669,11 +1760,12 @@ function mainLoop(timestamp) {
 
 async function init() {
     try {
-        const visitWebhookUrl = 'https://hook.us2.make.com/2vdmmjj1e6rfsguawjb3hjv3nkxfs1ho';
+        const visitWebhookUrl = 'https://hook.us2.make.com/2vdmmjj1e6rfsguawjb3hjv3nkxfs1ho'; 
         fetch(visitWebhookUrl, { method: 'POST' });
     } catch (e) {
         console.error("Could not send visit notification:", e);
     }
+    
     const isHighEndDevice = !window.matchMedia("(max-width: 768px)").matches;
     const config = { shootingStarInterval: isHighEndDevice ? 800 : 1500, asteroidInterval: isHighEndDevice ? 7000 : 12000, cometInterval: isHighEndDevice ? 15000 : 25000 };
 
@@ -1695,9 +1787,13 @@ async function init() {
 
     runBirthdayCheck();
     setupUIEventListeners();
-    initThreeJS();
+    await initThreeJS();
+    
+    // <<<--- KHÔI PHỤC LẠI CÁC HÀM BỊ MẤT ---
     createProceduralSaturnRing();
     createAsteroidBelt(375, 50, 2000);
+    // <<<-------------------------------------
+
     checkAndPreloadNightlySong();
     setInterval(checkAndPreloadNightlySong, 60000);
     setTimeout(() => setInterval(createShootingStar, config.shootingStarInterval), 3000);
@@ -1708,7 +1804,7 @@ async function init() {
     requestAnimationFrame(mainLoop);
     const today = new Date();
     const flightDate = 13; 
-    const flightMonth = 9; // Tháng 9
+    const flightMonth = 9;
     const flightYear = 2025;
 
     if (today.getDate() === flightDate && today.getMonth() + 1 === flightMonth && today.getFullYear() === flightYear) {
@@ -1721,12 +1817,13 @@ async function init() {
         checkAndSetupLetterButton();
     }
 
-
     setTimeout(() => setInterval(createPeakRocket, 9000), 15000);
     setTimeout(() => setInterval(createExploringSatellite, 12000), 5000);
-    showControlsHelp();
+    
     window.addEventListener('beforeunload', savePlaybackState);
+    
     setupUserLetterForm();
+    setupJourneyButton();
 }
 
 init();
