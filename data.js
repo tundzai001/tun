@@ -105,8 +105,8 @@
             content: `<p>Buồn quá, bae đi rồi buồn vl, không dám nói tại sao không gặp sớm hơn, nhưng mà biết đâu số phận sắp đặt để lần này có thể tiến xa hơn idk bỏ di không biết nữa kệ diii =))) but i want to say that  i love u so much, i miss u. Nhưng mà sang đấy phải cố gắng lên nhé, mạnh mẽ lên, chăm ngoan, học giỏi và đặc biệt phải ăn uống đầy đủ nhaaa tớ luôn ở bên cạnh cậu mà. À với cả sang đấy, có vẻ như cậu vừa đáp sân bay đúng khoongg !!!!, hay là về ktx rùi, tớ kbt nữa :))) nma th kệ dii ngủ sớm dii nha, hnay cậu mệt rồi. Tớ yêu cậu nhiều lắm đấy.</p>` },
         { day: 14, title: "Thế nào rùi, hôm nay của cậu bên đấy thế nào?", 
             content: `<p>Mới hôm qua còn gặp, mà giờ đã bên nước khác rồi omg sao mà nhanh v trời ơi, ê í là bị buồn í, cảm giác hụt hẫng vl =)) bị nhớ nhiều chút cậu ơi... i miss u so much luôn, sang bên đấy nhớ ăn uống đầy đủ nhé đặc biệt là nhớ phải uống nước đầy đủ nhé tại bae bị đau dạ dày đấy !!! nhớ nhee, yêu lắm í .</p>` },
-        { day: 15, title: "Gửi cậu, giữa tháng rồi này...", 
-            content: `<p>Nửa tháng rồi! Mỗi tối đọc thư là một lần tớ cảm thấy chúng ta gần nhau hơn. Đừng ngần ngại kể cho tớ nghe mọi thứ nhé, tớ luôn ở đây. Hôm nay của cậu thế nào?</p>` },
+        { day: 15, title: "Hello bae, hôm nay của bae thế nào?", 
+            content: `<p>Sao? Tớ nhìn map nhìn trường cậu to vãi, đi bộ chắc què chân mất, rộng v, chỉ biết ước =)) Hôm nay cậu có mệt không? kiểu thấy đi khám phá xung quanh trường các thứ, trông cũng có vẻ mệt mỏi tại di chuyển liên tục =)) à với cả nhớ để ý đồ ăn cay nhaa, cậu bị đau dạ dày đó, để í cả nguồn nước nữa sợ bae sang xong kiểu nguồn nước mới xong sẽ kiểu bị này bị nó ấy =)) kbt nói nnao nữa nma nhớ để í nha. lo cho bae nhiều qs nhưng mà rất yêu cậu. it's real nhaaa, yêu cậu so much!</p>` },
         { day: 16, title: "Gửi cậu, tối thứ Bảy an lành", 
             content: `<p>Ngày nghỉ thứ Bảy của cậu trôi qua vui vẻ chứ? Có khám phá được điều gì mới mẻ không? Kể tớ nghe với, tớ muốn được nhìn Thành Đô qua lời kể của cậu.</p>` },
         { day: 17, title: "Gửi cậu, tối Chủ nhật, sẵn sàng cho tuần mới", 
@@ -396,4 +396,3 @@ export const flightDayLetter = {
               <p>Hà Nội,gia đình, bạn bè và tớ sẽ luôn ở đây, đợi cậu. Hành trình này có thể dài, có thể sẽ gặp nhiều khó khăn nhưng mà luôn nhớ mọi người alws bên cạnh cậu. Hãy thật mạnh mẽ, chăm sóc bản thân chu đáo và tận hưởng từng khoảnh khắc nhé.</p>
               <p>Tớ yêu cậu. Hẹn gặp lại cậu ở Thành Đô, hoặc sớm thôi, ở Hà Nội nhé.</p>`
 };
-
