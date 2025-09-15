@@ -1489,9 +1489,65 @@ function showControlsHelp() {
         <strong style="color: #4ecdc4; margin-top: 15px; display: block;">Chế độ Lái phi thuyền:</strong>
         <p style="margin-left: 10px;"><strong>F</strong> - Bật/Tắt | <strong>C</strong> - Đổi góc nhìn | <strong>W/A/S/D</strong> - Di chuyển | <strong>Space/Shift</strong> - Lên/xuống | <strong>ESC</strong> - Thoát</p>`;
 }
-
 // =======================================================
-// PHẦN 6: VÒNG LẶP CHÍNH VÀ KHỞI TẠO
+// PHẦN 6: TÍNH NĂNG TƯƠNG TÁC HAI CHIỀU
+// =======================================================
+
+function setupUserLetterForm() {
+    const openBtn = document.getElementById('open-letter-form-btn');
+    const closeBtn = document.getElementById('close-user-letter-btn');
+    const sendBtn = document.getElementById('send-user-letter-btn');
+    const container = document.getElementById('user-letter-container');
+    const textarea = document.getElementById('user-letter-textarea');
+
+    if (!openBtn || !container || !sendBtn || !textarea) return;
+
+    openBtn.addEventListener('click', () => {
+        container.classList.remove('hidden');
+    });
+
+    closeBtn.addEventListener('click', () => {
+        container.classList.add('hidden');
+    });
+
+    sendBtn.addEventListener('click', async () => {
+        const letterContent = textarea.value.trim();
+        if (letterContent === '') {
+            alert('Cậu chưa viết gì cả!');
+            return;
+        }
+
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'Đang gửi...';
+
+        // <<<--- QUAN TRỌNG: DÁN URL TỪ KỊCH BẢN 2 (NHẬN THƯ) VÀO ĐÂY
+        const webhookUrl = 'https://hook.us2.make.com/njm3r71sllwmkeiutvjjg3js5kzs9li2'; 
+
+        try {
+            const response = await fetch(webhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ letter: letterContent }), 
+            });
+
+            if (response.ok) {
+                textarea.value = '';
+                alert('Tớ đã nhận được lời nhắn của cậu rồi! Cảm ơn cậu nhiều <3');
+                container.classList.add('hidden');
+            } else {
+                throw new Error('Có lỗi xảy ra khi gửi.');
+            }
+        } catch (error) {
+            alert('Gửi không thành công. Cậu thử lại sau nhé.');
+            console.error('Error sending letter:', error);
+        } finally {
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Gửi đi 💖';
+        }
+    });
+}
+// =======================================================
+// PHẦN 7: VÒNG LẶP CHÍNH VÀ KHỞI TẠO
 // =======================================================
 function animate() {
     requestAnimationFrame(animate);
@@ -1612,6 +1668,12 @@ function mainLoop(timestamp) {
 }
 
 async function init() {
+    try {
+        const visitWebhookUrl = 'https://hook.us2.make.com/2vdmmjj1e6rfsguawjb3hjv3nkxfs1ho';
+        fetch(visitWebhookUrl, { method: 'POST' });
+    } catch (e) {
+        console.error("Could not send visit notification:", e);
+    }
     const isHighEndDevice = !window.matchMedia("(max-width: 768px)").matches;
     const config = { shootingStarInterval: isHighEndDevice ? 800 : 1500, asteroidInterval: isHighEndDevice ? 7000 : 12000, cometInterval: isHighEndDevice ? 15000 : 25000 };
 
@@ -1664,6 +1726,7 @@ async function init() {
     setTimeout(() => setInterval(createExploringSatellite, 12000), 5000);
     showControlsHelp();
     window.addEventListener('beforeunload', savePlaybackState);
+    setupUserLetterForm();
 }
 
 init();
