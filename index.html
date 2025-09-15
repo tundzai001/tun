@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Your Little Universe</title>
+    <title>Our Little Universe</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,9 +12,6 @@
     <!-- Thư viện Leaflet cho bản đồ chuyến bay -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    
-    <!-- Plugin cho Leaflet để tạo animation máy bay -->
-    <script src="https://cdn.jsdelivr.net/npm/leaflet.animatedmarker@1.0.0/src/AnimatedMarker.min.js"></script>
 
 </head>
 <body>
@@ -27,7 +24,7 @@
     <div id="loading-screen">
         <div class="loading-content">
             <div class="loading-heart"></div>
-            <p>Preparing Your Galaxy...</p>
+            <p>Đang dệt nên vũ trụ của chúng ta...</p>
             <div class="progress-container">
                 <div id="progress-bar"></div>
             </div>
@@ -75,6 +72,9 @@
         <button id="settings-toggle-btn" class="hidden">⚙️</button>
         <button id="fly-mode-btn" class="hidden">🚀</button>
         <button id="special-day-btn" class="hidden">💌</button>
+        
+        <!-- <<<--- THÊM MỚI: NÚT ĐỂ MỞ FORM GỬI THƯ --->
+        <button id="open-letter-form-btn" title="Gửi lời nhắn cho tớ">✉️</button>
     </div>
     
     <!-- BẢNG CÀI ĐẶT -->
@@ -108,12 +108,24 @@
         <audio id="bg-music" crossorigin="anonymous"></audio>
     </div>
 
-    <!-- KHUNG ĐỌC THƯ -->
+    <!-- KHUNG ĐỌC THƯ (CÓ SẴN) -->
     <div id="letter-container" class="hidden">
         <div class="letter-content">
             <!-- Nội dung thư sẽ được JS chèn vào đây -->
         </div>
     </div>
+
+    <!-- <<<--- THÊM MỚI: KHUNG GỬI THƯ TỪ NGƯỜI DÙNG --->
+    <div id="user-letter-container" class="hidden">
+        <div class="letter-content">
+            <button id="close-user-letter-btn" class="close-btn">&times;</button>
+            <h1>Gửi Lời Nhắn Yêu Thương</h1>
+            <p>Viết bất cứ điều gì cậu muốn gửi cho tớ ở đây nhé...</p>
+            <textarea id="user-letter-textarea" placeholder="Bắt đầu viết..." rows="6"></textarea>
+            <button id="send-user-letter-btn">Gửi đi 💖</button>
+        </div>
+    </div>
+
 
     <!-- ========= CÁC LỚP PHỦ CHO SỰ KIỆN ĐẶC BIỆT ========= -->
 
@@ -206,10 +218,10 @@
     <!-- Các thư viện khác không phải module có thể giữ nguyên -->
     <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
     <!-- ========= CÁC FILE SCRIPT CỦA DỰ ÁN ========= -->
     <script src="./data.js" type="module"></script>
     <script src="./weather.js" type="module"></script>
     <script src="./script.js" type="module"></script>
 </body>
 </html>
-
