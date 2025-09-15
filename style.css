@@ -149,6 +149,13 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
     font-size: 1.8rem;
     color: #ffae8b;
 }
+.letter-content .memory-image {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 25px;
+}
 #close-letter-btn {
     position: absolute; top: 15px; right: 20px; background: none;
     border: none; color: #fff; font-size: 2rem; cursor: pointer;
@@ -160,40 +167,61 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
 /* 5A. CÁC NÚT ĐIỀU KHIỂN NỔI (FLOATING CONTROLS)        */
 /* ======================================================= */
 .floating-controls button {
-    position: fixed; z-index: 1001; background: rgba(25, 25, 35, 0.6);
+    background: rgba(25, 25, 35, 0.6);
     color: #fff; border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 50%; width: 44px; height: 44px; font-size: 1.25rem; cursor: pointer;
     display: flex; justify-content: center; align-items: center;
     backdrop-filter: blur(10px); transition: background-color 0.3s, transform 0.3s;
 }
 .floating-controls button:hover { background-color: rgba(45, 45, 55, 0.8); transform: scale(1.1); }
-#settings-toggle-btn { top: 20px; right: 20px; }
-#fly-mode-btn { top: 75px; right: 20px; }
+
+.top-right-controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.bottom-right-controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 15px;
+}
+
+#settings-toggle-btn, #special-day-btn, #open-letter-form-btn, #start-journey-btn {
+    position: static;
+}
+
 #special-day-btn {
-    bottom: 20px; right: 20px;
     background: linear-gradient(145deg, var(--theme-color-primary), var(--theme-color-secondary));
     border: none; animation: pulse 2s infinite; font-size: 1.5rem;
     transition: background 0.8s ease;
 }
-/* <<<--- THÊM MỚI: Style cho nút gửi thư ---*/
 #open-letter-form-btn {
-    bottom: 130px;
-    right: 20px;
     background: linear-gradient(145deg, #4ecdc4, #5c67e3);
     border: none;
     font-size: 1.25rem;
     animation: pulse 2.5s infinite;
 }
-
-#fly-mode-btn.fly-mode-active {
-    border-color: var(--theme-color-primary);
-    background-color: rgba(255, 107, 157, 0.3);
-    box-shadow: 0 0 10px rgba(255, 107, 157, 0.5);
-    transition: border-color 0.8s ease;
+#start-journey-btn {
+    background: linear-gradient(145deg, #4ecdc4, #5c67e3);
+    border: none;
+    font-size: 1.5rem;
+    animation: pulse 2.5s infinite;
 }
-#fly-mode-btn span { margin-left: 8px; font-size: 0.8rem; }
+
 #settings-panel { position: fixed; top: 75px; right: 20px; z-index: 1001; background: rgba(25, 25, 35, 0.7); backdrop-filter: blur(12px); border-radius: 12px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.1); }
 #settings-panel input[type="range"] { width: 120px; }
+
 
 /* ======================================================= */
 /* 5B. WIDGET THỜI TIẾT                            */
@@ -225,7 +253,6 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
     transition: color 0.8s ease;
 }
 
-/* <<<--- THÊM MỚI: SECTION CHO FORM GỬI THƯ NGƯỜI DÙNG ---*/
 /* ======================================================= */
 /* 5C. KHUNG GỬI THƯ TỪ NGƯỜI DÙNG                       */
 /* ======================================================= */
@@ -316,6 +343,27 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
 @keyframes slideInFromLeft { to { left: 30px; } }
 @keyframes fadeInScaleUp { from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
 
+/* <<<--- THÊM MỚI: Style cho nút "Tiếp tục hành trình" ---*/
+.continue-journey-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-top: 30px;
+    background: var(--theme-color-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
+}
+.continue-journey-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 15px var(--theme-color-primary);
+}
+
+
 /* ======================================================= */
 /* 8. MEDIA QUERIES (RESPONSIVE DESIGN)                  */
 /* ======================================================= */
@@ -325,17 +373,12 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
     #song-title { font-size: 0.75rem; }
     .letter-content { padding: 30px 20px; }
     #planet-info-card { left: 10px; right: 10px; width: auto; bottom: 10px; padding: 15px; }
-    #special-day-btn { bottom: 15px; right: 15px; }
-    .floating-controls button { width: 40px; height: 40px; }
-    #settings-toggle-btn { top: 15px; right: 15px; }
-    #fly-mode-btn { top: 65px; right: 15px; }
-    #weather-widget-container { top: 15px; left: 15px; }
     
-    /* <<<--- THÊM MỚI: Điều chỉnh cho mobile ---*/
-    #open-letter-form-btn {
-        bottom: 125px;
-        right: 15px;
-    }
+    .floating-controls button { width: 40px; height: 40px; }
+    .top-right-controls { top: 15px; right: 15px; }
+    .bottom-right-controls { bottom: 15px; right: 15px; }
+    
+    #weather-widget-container { top: 15px; left: 15px; }
 }
 
 /* ======================================================= */
