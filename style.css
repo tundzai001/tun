@@ -175,6 +175,16 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
     border: none; animation: pulse 2s infinite; font-size: 1.5rem;
     transition: background 0.8s ease;
 }
+/* <<<--- THÊM MỚI: Style cho nút gửi thư ---*/
+#open-letter-form-btn {
+    bottom: 130px;
+    right: 20px;
+    background: linear-gradient(145deg, #4ecdc4, #5c67e3);
+    border: none;
+    font-size: 1.25rem;
+    animation: pulse 2.5s infinite;
+}
+
 #fly-mode-btn.fly-mode-active {
     border-color: var(--theme-color-primary);
     background-color: rgba(255, 107, 157, 0.3);
@@ -213,6 +223,71 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
     color: var(--theme-text-special);
     margin-top: 5px; text-align: center;
     transition: color 0.8s ease;
+}
+
+/* <<<--- THÊM MỚI: SECTION CHO FORM GỬI THƯ NGƯỜI DÙNG ---*/
+/* ======================================================= */
+/* 5C. KHUNG GỬI THƯ TỪ NGƯỜI DÙNG                       */
+/* ======================================================= */
+#user-letter-container {
+    position: fixed; inset: 0; z-index: 10003; background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    display: flex; justify-content: center; align-items: center;
+    padding: 20px; opacity: 0; transform: scale(0.95);
+    transition: opacity 0.5s ease, transform 0.5s ease; pointer-events: none;
+}
+#user-letter-container:not(.hidden) {
+    opacity: 1; transform: scale(1); pointer-events: auto;
+}
+#user-letter-container .close-btn {
+    position: absolute; top: 15px; right: 20px; background: none;
+    border: none; color: #fff; font-size: 2rem; cursor: pointer;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+#user-letter-container .close-btn:hover {
+     transform: rotate(90deg); color: #ff6b9d;
+}
+#user-letter-textarea {
+    width: 100%;
+    min-height: 150px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 15px;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #e0e0e0;
+    margin-top: 10px;
+    font-family: 'Poppins', sans-serif;
+    resize: vertical;
+}
+#user-letter-textarea:focus {
+    outline: none;
+    border-color: #4ecdc4;
+    box-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+}
+#send-user-letter-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+    background: var(--theme-color-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
+}
+#send-user-letter-btn:hover:not(:disabled) {
+    transform: scale(1.02);
+    box-shadow: 0 0 15px var(--theme-color-primary);
+}
+#send-user-letter-btn:disabled {
+    background: #555;
+    cursor: not-allowed;
+    opacity: 0.7;
 }
 
 /* ======================================================= */
@@ -255,6 +330,12 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
     #settings-toggle-btn { top: 15px; right: 15px; }
     #fly-mode-btn { top: 65px; right: 15px; }
     #weather-widget-container { top: 15px; left: 15px; }
+    
+    /* <<<--- THÊM MỚI: Điều chỉnh cho mobile ---*/
+    #open-letter-form-btn {
+        bottom: 125px;
+        right: 15px;
+    }
 }
 
 /* ======================================================= */
