@@ -404,21 +404,21 @@ export const memoriesData = [
         id: 1,
         title: "Trạm dừng: Trái Đất",
         content: "Nơi tất cả bắt đầu. Một hành tinh xanh nhỏ bé nhưng chứa đựng cả một thế giới to lớn same như nỗi nhớ =)) ",
-        image: "https://i.pinimg.com/564x/c9/2b/95/c92b95c32d39642687132857449a5789.jpg",
+        image: "images/xinh1.jpg",
         journeySegment: 0 // <<--- Gắn với chặng đầu tiên
     },
     {
         id: 2,
         title: "Trạm dừng: Sao Thổ",
         content: "Giống như vành đai kia luôn xoay quanh một hành tinh, tớ cũng sẽ luôn ở đây, alws by ur side.",
-        image: "https://i.pinimg.com/564x/c7/2a/a2/c72aa249343ca1523a59332501a34a17.jpg",
+        image: "images/tay.jpg",
         journeySegment: 1 // <<--- Gắn với chặng thứ hai
     },
     {
         id: 3,
         title: "Trạm dừng: Một Tinh vân xa",
         content: "Và hành trình sẽ còn tiếp tục, đến những nơi chúng ta chưa từng biết, những chuyện chúng ta chưa từng trải qua.... .",
-        image: "https://i.pinimg.com/564x/24/c4/f4/24c4f4339836336f322a36b06385311e.jpg",
+        image: "images/giangsinh.jpg",
         journeySegment: 2 // <<--- Gắn với chặng cuối
     }
 ];
