@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Our Little Universe</title>
+    <link rel="icon" type="image/png" href="./favicon.png"> <!-- Tùy chọn: Thêm icon cho tab trình duyệt -->
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +13,6 @@
     <!-- Thư viện Leaflet cho bản đồ chuyến bay -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
 </head>
 <body>
     <!-- ========= PHẦN NỀN VÀ 3D ========= -->
@@ -24,7 +24,7 @@
     <div id="loading-screen">
         <div class="loading-content">
             <div class="loading-heart"></div>
-            <p>Preparing Your Galaxy...</p>
+            <p>Preparing Galaxy...</p>
             <div class="progress-container">
                 <div id="progress-bar"></div>
             </div>
@@ -69,12 +69,17 @@
 
     <!-- CÁC NÚT ĐIỀU KHIỂN -->
     <div class="floating-controls">
-        <button id="settings-toggle-btn" class="hidden">⚙️</button>
-        <button id="fly-mode-btn" class="hidden">🚀</button>
-        <button id="special-day-btn" class="hidden">💌</button>
-        
-        <!-- <<<--- THÊM MỚI: NÚT ĐỂ MỞ FORM GỬI THƯ --->
-        <button id="open-letter-form-btn" title="Gửi lời nhắn cho tớ">✉️</button>
+        <!-- Nhóm các nút ở góc trên bên phải -->
+        <div class="top-right-controls">
+            <button id="settings-toggle-btn" class="hidden">⚙️</button>
+        </div>
+
+        <!-- Nhóm các nút ở góc dưới bên phải -->
+        <div class="bottom-right-controls">
+             <button id="start-journey-btn" title="Bắt đầu hành trình">🚀</button>
+             <button id="open-letter-form-btn" title="Gửi lời nhắn cho tớ">✉️</button>
+             <button id="special-day-btn" class="hidden">💌</button>
+        </div>
     </div>
     
     <!-- BẢNG CÀI ĐẶT -->
@@ -108,14 +113,14 @@
         <audio id="bg-music" crossorigin="anonymous"></audio>
     </div>
 
-    <!-- KHUNG ĐỌC THƯ (CÓ SẴN) -->
+    <!-- KHUNG ĐỌC THƯ / KỈ NIỆM -->
     <div id="letter-container" class="hidden">
         <div class="letter-content">
-            <!-- Nội dung thư sẽ được JS chèn vào đây -->
+            <!-- Nội dung sẽ được JS chèn vào đây -->
         </div>
     </div>
 
-    <!-- <<<--- THÊM MỚI: KHUNG GỬI THƯ TỪ NGƯỜI DÙNG --->
+    <!-- KHUNG GỬI THƯ TỪ NGƯỜI DÙNG -->
     <div id="user-letter-container" class="hidden">
         <div class="letter-content">
             <button id="close-user-letter-btn" class="close-btn">&times;</button>
@@ -126,16 +131,8 @@
         </div>
     </div>
 
-
     <!-- ========= CÁC LỚP PHỦ CHO SỰ KIỆN ĐẶC BIỆT ========= -->
-
-    <!-- LỚP PHỦ CHẾ ĐỘ BAY -->
-    <div id="fly-mode-overlay" class="hidden">
-        <p id="fly-mode-status">Đã bật chế độ bay</p>
-    </div>
-    <div id="flight-controls-help" style="display: none;"></div>
-
-
+    
     <!-- LỚP PHỦ SINH NHẬT -->
     <div id="birthday-celebration">
         <p>Chúc mừng sinh nhật cậu!</p>
@@ -204,7 +201,6 @@
         }
     </script>
     
-
     <!-- ========= CÁC THƯ VIỆN JAVASCRIPT ========= -->
     <script type="importmap">
     {
@@ -214,8 +210,6 @@
         }
     }
     </script>
-
-    <!-- Các thư viện khác không phải module có thể giữ nguyên -->
     <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     
@@ -225,4 +219,3 @@
     <script src="./script.js" type="module"></script>
 </body>
 </html>
-
