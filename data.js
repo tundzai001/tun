@@ -427,7 +427,7 @@ export const memoryShardsData = [
 export const unlockedMemory = {
     title: "Bức Tranh Hoàn Chỉnh",
     image: "images/giangsinh.jpg", // <<--- Thay bằng ảnh đặc biệt của bạn
-    content: "Cảm ơn cậu đã cùng tớ tìm lại những mảnh ghép này. Mỗi mảnh là một khoảnh khắc quý giá, và khi ghép lại, chúng tạo nên câu chuyện hoàn chỉnh về chúng ta...",
+    content: "Cảm ơn cậu đã cùng tớ tìm lại những mảnh ghép này. Mỗi mảnh là một khoảnh khắc quý giá, và khi ghép lại, chúng tạo nên bức ảnh mà tớ cảm thấy thích nhất =)) ê í là xinh vkl bị yêu ấy, yêu cậu vl  ...",
 };
 // =======================================================
 // DỮ LIỆU CHO CÁC HÀNH TRÌNH TẠO HÌNH 3D
