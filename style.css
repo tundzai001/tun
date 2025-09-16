@@ -111,9 +111,7 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
 #info-card-fact { font-style: italic; color: #ccc; margin-bottom: 15px; font-size: 0.9rem; }
 #info-card-message { font-size: 1rem; line-height: 1.5; }
 
-/* ======================================================= */
-/* STYLE NÂNG CẤP CHO KHUNG THƯ                          */
-/* ======================================================= */
+/* STYLE NÂNG CẤP CHO KHUNG THƯ */
 #letter-container {
     position: fixed; inset: 0; z-index: 10002; background-color: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
@@ -197,7 +195,7 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
     gap: 15px;
 }
 
-#settings-toggle-btn, #special-day-btn, #open-letter-form-btn, #start-journey-btn {
+#settings-toggle-btn, #special-day-btn, #open-letter-form-btn, #start-journey-btn, #shape-toggle-btn {
     position: static;
 }
 
@@ -219,15 +217,103 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
     animation: pulse 2.5s infinite;
 }
 
-#settings-panel { position: fixed; top: 75px; right: 20px; z-index: 1001; background: rgba(25, 25, 35, 0.7); backdrop-filter: blur(12px); border-radius: 12px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.1); }
+#settings-panel {
+    position: fixed; top: 75px; right: 20px; z-index: 1001;
+    background: rgba(25, 25, 35, 0.7); backdrop-filter: blur(12px);
+    border-radius: 12px; padding: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
 #settings-panel input[type="range"] { width: 120px; }
 
+.settings-divider {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 15px 0;
+}
+.settings-action-btn {
+    width: 100%;
+    background-color: rgba(255, 82, 82, 0.3);
+    border: 1px solid rgba(255, 82, 82, 0.5);
+    color: white;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.settings-action-btn:hover {
+    background-color: rgba(255, 82, 82, 0.5);
+}
+
+#shape-selection-panel {
+    position: fixed;
+    top: 130px;
+    right: 20px;
+    z-index: 1001;
+    background: rgba(25, 25, 35, 0.7);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: white;
+}
+#shape-selection-panel h4 {
+    margin-bottom: 5px;
+    text-align: center;
+    color: #a8e6cf;
+}
+.shape-choice-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.shape-choice-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+.shape-choice-btn:disabled {
+    background-color: var(--theme-color-primary);
+    color: white;
+    cursor: not-allowed;
+    border-color: var(--theme-color-primary);
+}
+
 
 /* ======================================================= */
-/* 5B. WIDGET THỜI TIẾT                            */
+/* 5B. WIDGETS GÓC TRÁI (ĐÃ SỬA LỖI)                      */
 /* ======================================================= */
-#weather-widget-container { position: fixed; top: 20px; left: 20px; z-index: 1001; }
-#weather-toggle-btn { position: relative; }
+.top-left-widgets {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+#weather-widget-container {
+    position: relative;
+    z-index: 1001;
+}
+
+#shard-collector-widget {
+    position: relative;
+    background: rgba(25, 25, 35, 0.7);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    padding: 8px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 0.9rem;
+}
+
 #weather-tooltip {
     position: absolute; top: 100%; left: 0; margin-top: 10px; width: 220px;
     background: rgba(25, 25, 35, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -326,11 +412,6 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
 .text-particle.special { color: #a8e6cf; }
 .text-particle.heart { background: none; font-size: 1.5rem; }
 .text-particle.birthday { color: #4ecdc4; }
-.shooting-star { position: fixed; top: -50px; width: 250px; height: 2px; background: linear-gradient(to left, rgba(255, 255, 255, 0.6), transparent); border-radius: 50%; filter: drop-shadow(0 0 6px white); z-index: 3; pointer-events: auto; cursor: pointer; }
-.star-message { position: fixed; transform: translate(-50%, -50%); background: rgba(255, 105, 180, 0.85); color: white; padding: 8px 15px; border-radius: 20px; font-size: 14px; z-index: 9999; pointer-events: none; animation: fade-in-out 2.5s ease-in-out forwards; }
-#fly-mode-overlay { position: fixed; inset: 0; z-index: 10002; display: flex; justify-content: center; align-items: center; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.5s ease; pointer-events: none; }
-#fly-mode-overlay:not(.hidden) { opacity: 1; }
-#fly-mode-overlay p { color: white; font-size: 1.8rem; padding: 20px 40px; background: rgba(20, 20, 25, 0.7); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); text-shadow: 0 0 10px #fff; }
 
 /* ======================================================= */
 /* 7. ANIMATIONS                                         */
@@ -338,12 +419,8 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
 @keyframes beat { 0%, 100% { transform: scale(1) rotate(45deg); } 50% { transform: scale(1.1) rotate(45deg); } }
 @keyframes pulse { 0%, 100% { box-shadow: 0 0 15px var(--theme-color-primary), 0 0 25px var(--theme-color-secondary); } 50% { box-shadow: 0 0 25px var(--theme-color-primary), 0 0 40px var(--theme-color-secondary); } }
 @keyframes birthday-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-@keyframes fade-in-out { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); } 80% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } }
 @keyframes glow-border { 0% { border-image: linear-gradient(145deg, #4ecdc4, #5c67e3) 1; } 50% { border-image: linear-gradient(145deg, #5c67e3, #4ecdc4) 1; } 100% { border-image: linear-gradient(145deg, #4ecdc4, #5c67e3) 1; } }
-@keyframes slideInFromLeft { to { left: 30px; } }
-@keyframes fadeInScaleUp { from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
 
-/* <<<--- THÊM MỚI: Style cho nút "Tiếp tục hành trình" ---*/
 .continue-journey-btn {
     display: block;
     width: 100%;
@@ -378,7 +455,7 @@ body { background-color: #000; font-family: 'Poppins', sans-serif; cursor: defau
     .top-right-controls { top: 15px; right: 15px; }
     .bottom-right-controls { bottom: 15px; right: 15px; }
     
-    #weather-widget-container { top: 15px; left: 15px; }
+    .top-left-widgets { top: 15px; left: 15px; }
 }
 
 /* ======================================================= */
@@ -399,6 +476,7 @@ body.state-night { --theme-color-primary: #b5c5ff; --theme-color-secondary: #4a5
     animation: slideInFromLeft 2s ease-out 3s forwards;
     box-shadow: 0 0 15px rgba(78, 205, 196, 0.7);
 }
+@keyframes slideInFromLeft { to { left: 30px; } }
 
 #flight-overlay {
     position: fixed; inset: 0; z-index: 10001;
@@ -418,7 +496,6 @@ body.state-night { --theme-color-primary: #b5c5ff; --theme-color-secondary: #4a5
 .leaflet-popup-close-button { color: #fff !important; }
 .leaflet-popup-close-button:hover { background-color: transparent !important; color: #ff6b9d !important; }
 
-/* Thông báo đọc thư trong chuyến bay */
 #flight-notification {
     position: absolute;
     bottom: 50px;
@@ -441,3 +518,27 @@ body.state-night { --theme-color-primary: #b5c5ff; --theme-color-secondary: #4a5
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 #read-flight-letter-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px #4ecdc4; }
+
+/* Hộp Hướng dẫn Chòm sao */
+#constellation-helper {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1001;
+    background: rgba(25, 25, 35, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    padding: 12px 18px;
+    border: 1px solid rgba(78, 205, 196, 0.5);
+    color: #a8e6cf;
+    font-size: 0.9rem;
+    max-width: 300px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    pointer-events: none;
+}
+#constellation-helper:not(.hidden) {
+    opacity: 1;
+    transform: translateY(0);
+}
