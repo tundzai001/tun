@@ -107,7 +107,7 @@
             content: `<p>Mới hôm qua còn gặp, mà giờ đã bên nước khác rồi omg sao mà nhanh v trời ơi, ê í là bị buồn í, cảm giác hụt hẫng vl =)) bị nhớ nhiều chút cậu ơi... i miss u so much luôn, sang bên đấy nhớ ăn uống đầy đủ nhé đặc biệt là nhớ phải uống nước đầy đủ nhé tại bae bị đau dạ dày đấy !!! nhớ nhee, yêu lắm í .</p>` },
         { day: 15, title: "Hello bae, hôm nay của bae thế nào? trông mệt mỏi ác =))", 
             content: `<p>Sao tớ nhìn map nhìn trường cậu to vãi, đi bộ chắc què chân mất, rộng v, chỉ biết ước =)) Hôm nay cậu có mệt không? chắc là có rồi =)) kiểu thấy đi khám phá xung quanh trường các thứ, trông cũng có vẻ mệt mỏi tại di chuyển liên tục =)) à với cả nhớ để ý đồ ăn cay nhaa, cậu bị đau dạ dày đó, để í cả nguồn nước nữa sợ bae sang xong kiểu nguồn nước mới xong sẽ kiểu bị này bị nó ấy =)) kbt nói nnao nữa nma nhớ để í nha. lo cho bae nhiều qs nhưng mà rất yêu cậu. it's real nhaaa, yêu cậu so much!</p>` },
-        { day: 16, title: "Ê í là không có gì, chỉ là thấy yêu thôi hihiiii", 
+         { day: 16, title: "Ê í là không có gì, chỉ là thấy yêu thôi hihiiii", 
             content: `<p>Không biết nữa nhưng mà thật sự hôm nay tớ đã suy nghĩ kiểu vẫn thắc mắc tại sao cậu lại dám cược như vậy, í là tối hôm trước đọc xong cậu bảo tớ cậu sẽ cược vào, thật sự là rất sốc, đến giờ tớ vẫn không thể ngờ được luôn ấy bae ạ,nhưng mà thôi ksao tại tớ cug muốn xây dựng mqh này =)) thấy cậu akelo qs mà th không biết nói như thế nào. Hôm nay của bae có mệt mỏi không?? thấy di chuyển hoài luôn ấy, với cả bên đấy đang là mùa thu, nhớ have some pics nhaaa, tại muốn ngắm bae =))) thấy yêu vchuong luôn ấy, ê nma dài quá thôi để mình call rồi nói chuyện hoặc ib cug được.. i love you so much bae ạ</p>` },
         { day: 17, title: "Gửi cậu, tối Chủ nhật, sẵn sàng cho tuần mới", 
             content: `<p>Hy vọng cậu đã có một cuối tuần thật ý nghĩa. Giờ thì sạc đầy pin và chuẩn bị cho tuần mới nhé. Đừng lo, dù tuần mới có thế nào thì tối nào cũng có tớ ở đây đợi cậu. Ngủ ngon.</p>` },
@@ -175,8 +175,8 @@
             content: `<p>Nhanh thật, đã đến ngày thứ hai rồi thì 4 tháng nhanh thôi, chớp mắt là hết. bae nhớ không được buồn cả khóc nhaaa, cố lên diii, mạnh mẽ lên, mệt mỏi, buồn bã thì gọi cho tớ, tớ sẵn sàng nghe máy của cậu mà, cậu không được buồn bởi vì bây giờ cậu với tớ đang xa nhau nên là i can't do anything so please do not cry okay!! i miss u so much, i love u babe❤️</p>` },
         { day: 16, title: "Gửi cậu, ngày thứ 3 bên bển =))) ê thấy cũng nhanh phết đấy chứ", 
             content: `<p>Hôm nay bên bển trời mưa, có vẻ hơi lạnh một chút nên để í sức khoẻ, lạnh thì mặc hơi ấm một chút lại nhé =))) ê bên này trời ẩm ương lắm lúc nắng lúc mưa... chắc tại ông trời thấy vui vì cậu bên đấy cũng vui, buồn vì không còn ở đây nữa =))) haizzz không biết nữa nhưng mà yes cố lên hôm nay của cậu sẽ rất là okayy, tớ tin là như vậy. tớ yêu cậu so so much... have a good day okayy</p>` },
-        { day: 17, title: "Gửi cậu, ngày chủ nhật an lành", 
-            content: `<p>Hôm nay hãy cho phép bản thân được "lười" một chút nhé. Nạp thật nhiều năng lượng cho tuần mới nha cậu.</p>` },
+        { day: 17, title: "Hello babyy, ê tối qua thấy nói chuyện thích vl =)) ", 
+            content: `<p>Chắc tại lâu không call hay sao ấy, thấy nhớ vãi chưởng thật sự là rất nhớ, kiểu như là bị quen thuộc à =))) kbt nx chỉ muốn nói là nhớ bae nhiều lắm bae ơi, ước gì bae ở đâyy, yêu bae nhiều lắm bae oiiii, yêu so much, nhớ để ý sức khỏe nữa đấy nhé, tớ yêu cậu nhiều  </p>` },
         { day: 18, title: "Gửi cậu, ngày thứ mười tám...", 
             content: `<p>Lại một tuần mới bắt đầu. Chúc cậu mọi sự hanh thông. Nhớ ăn trưa đúng bữa đó!</p>` },
         { day: 19, title: "Gửi cậu, ngày thứ mười chín...", 
@@ -374,17 +374,6 @@
     ];
     export const birthdayMessages = ["Happy Birthday!", "Chúc mừng sinh nhật!", "🎂", "🎉", "Tuổi mới vui vẻ!"];
 
-    /* --- CÁC THÔNG ĐIỆP SAO BĂNG Ở ĐÂY --- */
-    export const shootingStarMessages = [
-        "Yêu tổ quốc, yêu đồng bào", 
-        "Học tập tốt, lao động tốt", 
-        "Đoàn kết tốt, kỷ luật tốt", 
-        "Giữ gìn vệ sinh thật tốt", 
-        "Khiêm tốn, thật thà, dũng cảm",
-        "tớ luôn bên cạnh cậu",
-        "Stay positive",
-
-    ];
 
     // =================================================================
 // DỮ LIỆU ĐẶC BIỆT CHO NGÀY BAY (CHỈ DÙNG HÔM NAY)
@@ -397,7 +386,6 @@ export const flightDayLetter = {
               <p>Tớ yêu cậu. Hẹn gặp lại cậu ở Thành Đô, hoặc sớm thôi, ở Hà Nội nhé.</p>`
 };
 
-// Dán đoạn code này vào cuối file data.js
 
 export const memoriesData = [
     {
@@ -422,3 +410,98 @@ export const memoriesData = [
         journeySegment: 2 // <<--- Gắn với chặng cuối
     }
 ];
+// =================================================================
+// DỮ LIỆU CHO TÍNH NĂNG MỚI: SƯU TẦM KÝ ỨC
+// =================================================================
+
+import * as THREE from 'three';
+
+export const memoryShardsData = [
+    { id: 0, position: new THREE.Vector3(0, 15, 0), attachedTo: 'earth' }, // Gần Trái Đất
+    { id: 1, position: new THREE.Vector3(12, 0, 0), attachedTo: 'mars' }, // Gần Sao Hỏa
+    { id: 2, position: new THREE.Vector3(0, 40, 0), attachedTo: 'saturn' }, // Phía trên Sao Thổ
+    { id: 3, position: new THREE.Vector3(380, 5, 10), attachedTo: 'scene' }, // Trong vành đai tiểu hành tinh
+    { id: 4, position: new THREE.Vector3(10, 5, 0), attachedTo: 'venus' }, // Gần Sao Kim
+];
+
+export const unlockedMemory = {
+    title: "Bức Tranh Hoàn Chỉnh",
+    image: "images/giangsinh.jpg", // <<--- Thay bằng ảnh đặc biệt của bạn
+    content: "Cảm ơn cậu đã cùng tớ tìm lại những mảnh ghép này. Mỗi mảnh là một khoảnh khắc quý giá, và khi ghép lại, chúng tạo nên câu chuyện hoàn chỉnh về chúng ta...",
+};
+// =======================================================
+// DỮ LIỆU CHO CÁC HÀNH TRÌNH TẠO HÌNH 3D
+// =======================================================
+export const constellationsData = {
+    // ---- HÌNH DẠNG 1: NGÔI SAO 5 CÁNH ----
+    star: {
+        name: "Ngôi Sao Dẫn Lối",
+        vertices: [
+            new THREE.Vector3(0, 500, 50),     // 0: Đỉnh trên cùng
+            new THREE.Vector3(380, 150, 50),   // 1: Cánh phải trên
+            new THREE.Vector3(235, -200, 50),  // 2: Cánh phải dưới
+            new THREE.Vector3(-235, -200, 50), // 3: Cánh trái dưới
+            new THREE.Vector3(-380, 150, 50),  // 4: Cánh trái trên
+            new THREE.Vector3(0, 0, 150),      // 5: Tâm mặt trước (lồi ra)
+
+            new THREE.Vector3(0, 500, -50),    // 6: Đỉnh trên cùng (mặt sau)
+            new THREE.Vector3(380, 150, -50),  // 7: Cánh phải trên (mặt sau)
+            new THREE.Vector3(235, -200, -50), // 8: Cánh phải dưới (mặt sau)
+            new THREE.Vector3(-235, -200, -50),// 9: Cánh trái dưới (mặt sau)
+            new THREE.Vector3(-380, 150, -50), // 10: Cánh trái trên (mặt sau)
+            new THREE.Vector3(0, 0, -150)      // 11: Tâm mặt sau (lõm vào)
+        ],
+        faces: [
+            // 5 mặt tam giác của mặt trước (nối các đỉnh với tâm 5)
+            [5, 1, 0], [5, 2, 1], [5, 3, 2], [5, 4, 3], [5, 0, 4],
+            // 5 mặt tam giác của mặt sau (nối các đỉnh với tâm 11)
+            [11, 6, 7], [11, 7, 8], [11, 8, 9], [11, 9, 10], [11, 10, 6],
+            // 10 mặt tam giác nối cạnh bên
+            [0, 1, 7], [0, 7, 6], [1, 2, 8], [1, 8, 7], [2, 3, 9], [2, 9, 8],
+            [3, 4, 10], [3, 10, 9], [4, 0, 6], [4, 6, 10]
+        ],
+        hints: [
+            "Điểm đầu tiên là đỉnh cao nhất. Ngôi sao tiếp theo nằm ở phía trên bên phải...",
+            "Chính xác. Giờ hãy tìm điểm ở phía dưới bên phải...",
+            "Tuyệt vời. Điểm tiếp theo ở phía dưới bên trái...",
+            "Gần xong rồi! Tìm nốt điểm ở phía trên bên trái...",
+            "Đây là tâm của mặt trước, nó hơi nhô ra một chút...",
+            "Bây giờ chúng ta bắt đầu mặt sau. Tìm đỉnh cao nhất một lần nữa...",
+            "Đúng rồi. Tiếp tục với đỉnh trên bên phải của mặt sau...",
+            "Tìm đỉnh dưới bên phải của mặt sau...",
+            "Đỉnh dưới bên trái của mặt sau...",
+            "Đỉnh cuối cùng của các cánh! Phía trên bên trái...",
+            "Hoàn hảo! Cậu đã tìm thấy tất cả các điểm. Hãy xem điều kỳ diệu!"
+        ],
+        specialMessage: {
+             title: "Vì Sao Lấp Lánh",
+             content: `<p>Từ những điểm sáng cậu kiên nhẫn tìm kiếm, một ngôi sao hoàn chỉnh đã được tạo nên.</p><p>Nó là biểu tượng cho sự kiên nhẫn và sáng tạo, từ những thứ nhỏ nhất có thể định hình nên sự hoàn hảo cho nên là cố gắng lên nhé !! Tớ tin ở cậu.</p>`
+        }
+    },
+
+    // ---- HÌNH DẠNG 2: KIM TỰ THÁP ----
+    pyramid: {
+        name: "Kim Tự Tháp Ký Ức",
+        vertices: [
+            new THREE.Vector3(0, 300, 0),      // 0: Đỉnh
+            new THREE.Vector3(-150, 0, -150),  // 1: Góc đáy 1
+            new THREE.Vector3(150, 0, -150),   // 2: Góc đáy 2
+            new THREE.Vector3(150, 0, 150),    // 3: Góc đáy 3
+            new THREE.Vector3(-150, 0, 150)    // 4: Góc đáy 4
+        ],
+        faces: [
+            [0, 1, 2], [0, 2, 3], [0, 3, 4], [0, 4, 1], // 4 mặt bên
+            [1, 3, 2], [1, 4, 3] // 2 mặt đáy
+        ],
+        hints: [
+            "Bắt đầu từ đỉnh cao nhất. Giờ tìm một góc của mặt đáy...",
+            "Đúng rồi, tìm góc tiếp theo theo chiều kim đồng hồ...",
+            "Tuyệt vời, góc thứ ba...",
+            "Chính xác! Cậu đã tìm thấy tất cả các điểm. Điều gì sẽ hiện ra đây?"
+        ],
+        specialMessage: {
+             title: "Nền Tảng Vững Chắc",
+             content: `<p>Giống như kim tự tháp này, liên tưởng đến hồi xa xưa nhiều người cực nhọc mới xây dựng nên cái này =))) giống như thầy cle dạy không làm thì làm gì có ăn th troll !!! í là cậu phải cố gắng xây dựng được nền móng vững chắc same như kim tự tháp thì tớ tin mọi việc sau này của cậu cũng sẽ có thể phát triển thuận lợi và dễ dàng hơn. TỚ TIN CẬU !!! You can do it...</p>`
+        }
+    }
+};
