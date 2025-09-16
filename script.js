@@ -6,22 +6,24 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'; 
-
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { Lensflare, LensflareElement } from 'three/addons/objects/Lensflare.js';
 // Import DỮ LIỆU TĨNH từ file data.js
-import { 
-    birthdayData, 
-    mainPlaylist, 
-    dailySongs, 
-    dailyLetters, 
-    daytimeLetters, 
-    celestialData, 
-    messages, 
-    birthdayMessages, 
-    shootingStarMessages,
+import {
+    birthdayData,
+    mainPlaylist,
+    dailySongs,
+    dailyLetters,
+    daytimeLetters,
+    celestialData,
+    messages,
+    birthdayMessages,
     flightDayLetter,
     airportData,
-    memoriesData 
+    memoriesData,
+    memoryShardsData,
+    unlockedMemory,
+    constellationsData
 } from './data.js';
 
 // Import HÀM LẤY DỮ LIỆU THỜI TIẾT
@@ -35,9 +37,10 @@ const bodyEl = document.body;
 const ambientAudio = document.getElementById('ambient-sound');
 const progressBar = document.getElementById('progress-bar');
 const progressText = document.getElementById('progress-text');
-let composer;
+let composer, bloomPass;
 const galaxy = document.getElementById('galaxy');
 const audio = document.getElementById('bg-music');
+let audioAnalyser, audioDataArray;
 const overlay = document.getElementById('music-overlay');
 const songTitleEl = document.getElementById('song-title');
 const prevBtn = document.getElementById('prev-btn');
@@ -59,16 +62,10 @@ const infoCardMessage = document.getElementById('info-card-message');
 const closeInfoBtn = document.getElementById('close-info-btn');
 const canvas = document.getElementById('webgl-canvas');
 const letterContainer = document.getElementById('letter-container');
-const weatherWidgetContainer = document.getElementById('weather-widget-container');
-const weatherConditionEl = document.getElementById('weather-condition');
-const weatherTempEl = document.getElementById('weather-temp');
-const weatherAqiEl = document.getElementById('weather-aqi');
-const weatherMoonEl = document.getElementById('weather-moon');
 
 let isNightlyPlaylistActive = false;
-let mainPlaylistState = { index: 0, time: 0 };
-let preloadedNextAudio = null;
 let saveStateInterval = null;
+let preloadedNextAudio = null;
 
 const HOME_CAMERA_POSITION = new THREE.Vector3(0, 150, 450);
 const HOME_CONTROLS_TARGET = new THREE.Vector3(0, 0, 0);
@@ -76,7 +73,6 @@ let activeSatellites = [];
 let activePeakRockets = [];
 let isAutoRotating = false;
 let autoRotateAngle = 0;
-const cameraSettings = { autoRotateSpeed: 0.002, verticalArcAmount: 1.5, lookAtHeightOffset: 0.15 };
 let spaceship;
 
 const heartSymbols = ["♥", "💖", "💕", "🌟", "✨"];
@@ -111,32 +107,47 @@ let currentWeatherData = null;
 let weatherEffects = { rain: null, snow: null };
 let activeWeatherEffect = 'none';
 let timeOfDayState = 'day';
-let cinematicOrbitSpeed = 0.002; 
+let cinematicOrbitSpeed = 0.002;
 
 // Biến cho hành trình điện ảnh
 let isJourneyActive = false;
 let isJourneyPaused = false;
 let currentJourneySegment = 0;
-const journeyPathVisuals = [];
 const memoryStars = {};
 
-
+// Biến cho các tính năng tương tác
+let memoryShards = [];
+let collectedShards = new Set(JSON.parse(localStorage.getItem('collectedShards')) || []);
+let constellationStars = [];
+let nextConstellationStar = null;
+let currentShapeKey = 'star';
+let activeConstellation = {
+    data: null,
+    clickedIndices: [],
+    lines: [],
+    constellationIndex: -1
+};
 // =================================================================
 // PHẦN 2: CÁC HÀM QUẢN LÝ VÀ HIỆU ỨNG THỜI TIẾT
 // =================================================================
 function updateWeatherUI(weather) {
     if (!weather) return;
+    const weatherConditionEl = document.getElementById('weather-condition');
+    const weatherTempEl = document.getElementById('weather-temp');
+    const weatherAqiEl = document.getElementById('weather-aqi');
+    const weatherMoonEl = document.getElementById('weather-moon');
+
     const conditionText = weather.conditionText.toLowerCase();
     let conditionDisplay = weather.is_day ? "Trời quang" : "Trời quang";
     let conditionEmoji = weather.is_day ? "☀️" : "🌙";
 
-    if (conditionText.includes("rain") || conditionText.includes("shower")) { conditionDisplay = "Đang có mưa"; conditionEmoji = "🌧️"; } 
-    else if (conditionText.includes("cloudy")) { conditionDisplay = "Trời nhiều mây"; conditionEmoji = "☁️"; } 
-    else if (conditionText.includes("overcast")) { conditionDisplay = "Trời u ám"; conditionEmoji = "🌥️"; } 
-    else if (conditionText.includes("mist") || conditionText.includes("fog")) { conditionDisplay = "Có sương mù"; conditionEmoji = "🌫️"; } 
-    else if (conditionText.includes("snow")) { conditionDisplay = "Đang có tuyết"; conditionEmoji = "❄️"; } 
+    if (conditionText.includes("rain") || conditionText.includes("shower")) { conditionDisplay = "Đang có mưa"; conditionEmoji = "🌧️"; }
+    else if (conditionText.includes("cloudy")) { conditionDisplay = "Trời nhiều mây"; conditionEmoji = "☁️"; }
+    else if (conditionText.includes("overcast")) { conditionDisplay = "Trời u ám"; conditionEmoji = "🌥️"; }
+    else if (conditionText.includes("mist") || conditionText.includes("fog")) { conditionDisplay = "Có sương mù"; conditionEmoji = "🌫️"; }
+    else if (conditionText.includes("snow")) { conditionDisplay = "Đang có tuyết"; conditionEmoji = "❄️"; }
     else if (conditionText.includes("thunder")) { conditionDisplay = "Có sấm sét"; conditionEmoji = "⛈️"; }
-    
+
     weatherConditionEl.textContent = `${conditionDisplay} ${conditionEmoji}`;
     weatherTempEl.textContent = `${weather.temperature}°C`;
     weatherAqiEl.textContent = weather.aqi.category;
@@ -235,7 +246,7 @@ function updateUniverseAmbiance(weather, delta) {
         timeOfDayState = newTimeOfDayState;
         updateUIAmbiance(timeOfDayState);
     }
-    
+
     let targetSunIntensity = 1.5;
     const targetAmbientColor = new THREE.Color();
     const targetSunColor = new THREE.Color();
@@ -255,7 +266,7 @@ function updateUniverseAmbiance(weather, delta) {
     const condition = weather.conditionText.toLowerCase();
     if (condition.includes('cloudy') || condition.includes('overcast') || condition.includes('fog')) { targetSunIntensity *= 0.6; }
     if (weather.is_raining) { targetSunIntensity *= 0.4; }
-    
+
     sunLight.intensity = THREE.MathUtils.lerp(sunLight.intensity, targetSunIntensity, 0.05);
     ambientLight.color.lerp(targetAmbientColor, 0.05);
     sunLight.color.lerp(targetSunColor, 0.05);
@@ -296,8 +307,6 @@ function setupFlightDayExperience() {
     const flightOverlay = document.getElementById('flight-overlay');
     const flightNotification = document.getElementById('flight-notification');
     const readLetterBtn = document.getElementById('read-flight-letter-btn');
-    const letterContainer = document.getElementById('letter-container');
-    const musicControls = document.getElementById('waveform-controls');
 
     flightBtn.classList.remove('hidden');
 
@@ -323,7 +332,7 @@ function setupFlightDayExperience() {
             setTimeout(() => {
                 flightOverlay.classList.remove('visible');
                 setTimeout(() => {
-                    musicControls?.classList.remove('hidden');
+                    waveformControls?.classList.remove('hidden');
                     flightBtn.style.display = 'block';
                     if (map) { map.remove(); map = null; }
                 }, 1500);
@@ -345,9 +354,9 @@ function setupFlightDayExperience() {
                 pathPoints[1].lng + (pathPoints[2].lng - pathPoints[1].lng) * segmentProgress
             );
         }
-        
+
         animatedMarker.setLatLng(currentLatLng);
-        
+
         const startZoom = 8;
         const endZoom = 11;
         const currentZoom = startZoom + (endZoom - startZoom) * progress;
@@ -359,7 +368,7 @@ function setupFlightDayExperience() {
             isPlanePaused = true;
             timePausedAt = Date.now();
         }
-        
+
         animationFrameId = requestAnimationFrame(() => animateMap(pathPoints));
     };
 
@@ -387,7 +396,7 @@ function setupFlightDayExperience() {
         isPlanePaused = false;
         timePausedAt = 0;
         flightBtn.style.display = 'none';
-        musicControls?.classList.add('hidden');
+        waveformControls?.classList.add('hidden');
         flightOverlay.classList.add('visible');
 
         const originCode = 'HAN', destCode = 'CTU';
@@ -397,7 +406,7 @@ function setupFlightDayExperience() {
 
         if (map) map.remove();
         map = L.map('flight-map').setView(origin.coords, 5);
-        
+
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
         L.circleMarker(origin.coords).addTo(map).bindPopup(`<b>${origin.city} (${originCode})</b>`).openPopup();
         L.circleMarker(dest.coords).addTo(map).bindPopup(`<b>${dest.city} (${destCode})</b>`);
@@ -410,7 +419,7 @@ function setupFlightDayExperience() {
         L.polyline(latlngs, {
             color: 'rgba(255, 255, 255, 0.6)', weight: 2, dashArray: '5, 10'
         }).addTo(map);
-        
+
         map.fitBounds(L.polyline(latlngs).getBounds().pad(0.3));
         const pathPoints = latlngs.map(coord => L.latLng(coord[0], coord[1]));
         const planeIcon = L.divIcon({ html: '✈️', className: 'plane-icon', iconSize: [24, 24] });
@@ -421,10 +430,10 @@ function setupFlightDayExperience() {
 
             setTimeout(() => {
                 if (!isFlightInProgress) return;
-                
+
                 animatedMarker = L.marker(origin.coords, { icon: planeIcon });
                 map.addLayer(animatedMarker);
-                
+
                 flightStartTime = Date.now();
                 animateMap(pathPoints);
 
@@ -627,34 +636,46 @@ function getRandomItem(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function createShootingStar() {
-    const star = document.createElement('div');
-    star.className = 'shooting-star';
-    document.body.appendChild(star);
-    const startX = Math.random() * window.innerWidth * 1.5 - window.innerWidth * 0.25;
-    const startY = Math.random() * window.innerHeight * 1.5 - window.innerHeight * 0.25;
-    const angle = Math.random() * 360;
-    const distance = window.innerWidth * 1.2;
-    const endX = startX + Math.cos(angle * Math.PI / 180) * distance;
-    const endY = startY + Math.sin(angle * Math.PI / 180) * distance;
-    const duration = Math.random() * 3000 + 4000;
-    star.style.transform = `translate(${startX}px, ${startY}px) rotate(${angle}deg)`;
-    const animation = star.animate(
-        [{ transform: `translate(${startX}px, ${startY}px) rotate(${angle}deg)`, opacity: 0 }, { opacity: 1, offset: 0.1 }, { opacity: 0, offset: 0.9 }, { transform: `translate(${endX}px, ${endY}px) rotate(${angle}deg)`, opacity: 0 }],
-        { duration: duration, easing: 'linear' }
-    );
-    const onStarCaught = (e) => {
-        e.stopPropagation();
-        const messageEl = document.createElement('div');
-        messageEl.className = 'star-message';
-        messageEl.textContent = getRandomItem(shootingStarMessages);
-        messageEl.style.left = `${e.clientX}px`; messageEl.style.top = `${e.clientY}px`;
-        document.body.appendChild(messageEl);
-        setTimeout(() => messageEl.remove(), 2500);
-        animation.cancel(); star.remove();
-    };
-    star.addEventListener('click', onStarCaught, { once: true });
-    animation.onfinish = () => star.remove();
+function createDramaticShootingStar() {
+    const starGroup = new THREE.Group();
+    const core = new THREE.Mesh(new THREE.SphereGeometry(2, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffe48a, toneMapped: false }));
+    const glowTexture = createProceduralTexture((ctx, size) => {
+        const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+        gradient.addColorStop(0, 'rgba(255, 228, 138, 0.8)');
+        gradient.addColorStop(1, 'rgba(255, 150, 0, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, size, size);
+    });
+    const glowSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture, blending: THREE.AdditiveBlending }));
+    glowSprite.scale.set(20, 20, 1);
+    core.add(glowSprite);
+    const tailGeometry = new THREE.CylinderGeometry(0.1, 2.5, 150, 16);
+    tailGeometry.translate(0, -75, 0);
+    const tailMaterial = new THREE.MeshBasicMaterial({ color: 0x87ceeb, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending });
+    const tail = new THREE.Mesh(tailGeometry, tailMaterial);
+    starGroup.add(core, tail);
+    const startY = Math.random() * 400 - 200;
+    const startX = (Math.random() > 0.5 ? 1 : -1) * 1500;
+    const startZ = Math.random() * 2000 - 1000;
+    starGroup.position.set(startX, startY, startZ);
+    const target = new THREE.Vector3((Math.random() - 0.5) * 500, (Math.random() - 0.5) * 200, 0);
+    starGroup.lookAt(target);
+    scene.add(starGroup);
+    gsap.to(starGroup.position, {
+        x: -startX * 1.2,
+        y: startY + (Math.random() - 0.5) * 300,
+        z: -startZ * 1.2,
+        duration: Math.random() * 2 + 2,
+        ease: "power1.in",
+        onComplete: () => scene.remove(starGroup)
+    });
+}
+
+function startMeteorShower() {
+    const count = Math.floor(Math.random() * 10) + 5;
+    for (let i = 0; i < count; i++) {
+        setTimeout(createDramaticShootingStar, i * (Math.random() * 300 + 100));
+    }
 }
 
 function createTextParticle() {
@@ -669,7 +690,7 @@ function createTextParticle() {
     }
     const isHeart = isBirthdayMode ? Math.random() > 0.5 : Math.random() > 0.7;
     const particle = document.createElement('div');
-    if (isHeart) { particle.className = 'text-particle heart'; particle.textContent = isBirthdayMode ? getRandomItem(["🎉", "🎂", "💖"]) : getRandomItem(heartSymbols); } 
+    if (isHeart) { particle.className = 'text-particle heart'; particle.textContent = isBirthdayMode ? getRandomItem(["🎉", "🎂", "💖"]) : getRandomItem(heartSymbols); }
     else { particle.className = `text-particle ${isBirthdayMode ? 'birthday' : getRandomItem(textStyles)}`; particle.textContent = getRandomItem(messagesToUse); }
     const xPos = Math.random() * 100;
     const zPos = (Math.random() - 0.5) * 500;
@@ -719,6 +740,309 @@ function checkAndPreloadNightlySong() {
     const dailySongData = dailySongs.find(s => s.day === day);
     if (dailySongData) { const preloader = new Audio(); preloader.src = dailySongData.song.file; }
 }
+// =======================================================
+// PHẦN LOGIC TƯƠNG TÁC CHÍNH (KÝ ỨC, CHÒM SAO)
+// =======================================================
+
+function createMemoryShards() {
+    console.log("Bắt đầu tạo các mảnh ký ức..."); // Log để xác nhận hàm được gọi
+
+    const shardGeometry = new THREE.IcosahedronGeometry(5, 0);
+    const shardMaterial = new THREE.MeshStandardMaterial({
+        color: 0xa8e6cf,
+        emissive: 0x4ecdc4,
+        emissiveIntensity: 2,
+        metalness: 0.5,
+        roughness: 0.2,
+        toneMapped: false
+    });
+
+    if (!memoryShardsData || memoryShardsData.length === 0) {
+        console.warn("Dữ liệu memoryShardsData trống hoặc không tồn tại.");
+        return;
+    }
+
+    memoryShardsData.forEach(data => {
+        const shard = new THREE.Mesh(shardGeometry, shardMaterial.clone());
+        shard.userData = { isMemoryShard: true, id: data.id };
+        shard.position.copy(data.position);
+
+        let parentObject = null;
+        if (data.attachedTo === 'scene') {
+            parentObject = scene;
+        } else {
+            const parentPlanet = celestialObjects.find(obj => obj.userData.id === data.attachedTo);
+            if (parentPlanet) {
+                parentObject = parentPlanet.mesh;
+            } else {
+                console.error(`CẢNH BÁO: Không tìm thấy đối tượng cha có ID là '${data.attachedTo}' để gắn mảnh ký ức '${data.id}'. Mảnh ký ức này sẽ không được hiển thị.`);
+            }
+        }
+
+        // Chỉ thêm vào scene nếu tìm thấy đối tượng cha
+        if (parentObject) {
+            parentObject.add(shard);
+        }
+
+        // Kiểm tra xem mảnh ký ức này đã được thu thập chưa
+        if (collectedShards.has(data.id)) {
+            shard.visible = false;
+        }
+
+        // Luôn thêm vào mảng để quản lý, kể cả khi không tìm thấy parent
+        // Điều này giúp hàm reset hoạt động đúng
+        memoryShards.push(shard);
+    });
+
+    console.log(`Đã xử lý ${memoryShards.length} mảnh ký ức.`);
+}
+function resetMemoryShards() {
+    const isConfirmed = confirm('Bạn có chắc chắn muốn xóa tất cả ký ức đã thu thập không? Hành động này không thể hoàn tác.');
+
+    if (isConfirmed) {
+        localStorage.removeItem('collectedShards');
+        collectedShards.clear();
+        memoryShards.forEach(shard => {
+            shard.visible = true;
+            shard.scale.set(0, 0, 0);
+            gsap.to(shard.scale, { x: 1, y: 1, z: 1, duration: 0.5, delay: Math.random() * 0.5 });
+        });
+        updateShardCollectorUI();
+        console.log("Đã xóa và reset tất cả mảnh ký ức.");
+    }
+}
+function collectMemoryShard(shard) {
+    const shardId = shard.userData.id;
+    if (collectedShards.has(shardId)) return;
+
+    gsap.to(shard.scale, {
+        x: 0, y: 0, z: 0, duration: 0.5, ease: "back.in", onComplete: () => {
+            shard.visible = false;
+        }
+    });
+
+    collectedShards.add(shardId);
+    localStorage.setItem('collectedShards', JSON.stringify(Array.from(collectedShards)));
+    updateShardCollectorUI();
+
+    if (collectedShards.size === memoryShardsData.length) {
+        setTimeout(() => {
+            const letterData = {
+                title: unlockedMemory.title,
+                content: `<img src="${unlockedMemory.image}" class="memory-image"><p>${unlockedMemory.content}</p>`
+            };
+            openLetter(letterData, null, false);
+        }, 1000);
+    }
+}
+
+function updateShardCollectorUI() {
+    const widget = document.getElementById('shard-collector-widget');
+    if (widget) {
+        widget.classList.remove('hidden');
+        document.getElementById('shard-count').textContent = collectedShards.size;
+        document.getElementById('shard-total').textContent = memoryShardsData.length;
+    }
+}
+function destroyConstellations() {
+    constellationStars.forEach(star => scene.remove(star));
+    constellationStars = [];
+    resetActiveConstellation();
+}
+function setupShapeSelector() {
+    const toggleBtn = document.getElementById('shape-toggle-btn');
+    const panel = document.getElementById('shape-selection-panel');
+    const choiceBtns = panel.querySelectorAll('.shape-choice-btn');
+
+    toggleBtn.classList.remove('hidden');
+
+    toggleBtn.addEventListener('click', () => {
+        panel.classList.toggle('hidden');
+    });
+
+    choiceBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const selectedShape = btn.dataset.shape;
+            if (selectedShape === currentShapeKey) return;
+
+            currentShapeKey = selectedShape;
+            choiceBtns.forEach(b => b.disabled = (b.dataset.shape === selectedShape));
+
+            destroyConstellations();
+            createConstellations();
+
+            showConstellationHelper(`Đã chuyển sang hành trình "${constellationsData[currentShapeKey].name}". Hãy tìm ngôi sao đầu tiên!`, 5000);
+            panel.classList.add('hidden');
+        });
+    });
+}
+function createConstellations() {
+    const starGeometry = new THREE.SphereGeometry(4, 16, 16);
+    const starMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 1.0, toneMapped: false });
+
+    const currentConstellation = constellationsData[currentShapeKey];
+    currentConstellation.vertices.forEach((pos, starIndex) => {
+        const star = new THREE.Mesh(starGeometry, starMaterial.clone());
+        star.position.copy(pos);
+        star.userData = {
+            isConstellationStar: true,
+            constellationIndex: 0,
+            starIndex: starIndex
+        };
+        const glow = createStarGlow();
+        star.add(glow);
+        star.userData.glow = glow;
+        const hitboxGeometry = new THREE.SphereGeometry(20, 8, 8);
+        const hitboxMaterial = new THREE.MeshBasicMaterial({ visible: false });
+        const hitbox = new THREE.Mesh(hitboxGeometry, hitboxMaterial);
+        star.add(hitbox);
+        scene.add(star);
+        constellationStars.push(star);
+    });
+}
+function resetActiveConstellation() {
+    if (activeConstellation.constellationIndex !== -1) {
+        activeConstellation.lines.forEach(line => scene.remove(line));
+        const constIndexToReset = activeConstellation.constellationIndex;
+        constellationStars.forEach(s => {
+            if (s.userData.constellationIndex === constIndexToReset) {
+                s.material.color.set(0xffffff);
+            }
+        });
+    }
+    nextConstellationStar = null;
+    activeConstellation = {
+        data: null,
+        clickedIndices: [],
+        lines: [],
+        constellationIndex: -1
+    };
+}
+function handleConstellationClick(star) {
+    const { constellationIndex, starIndex } = star.userData;
+    const clickedConstellationData = constellationsData[currentShapeKey];
+
+    if (nextConstellationStar) {
+        nextConstellationStar = null;
+    }
+
+    if (activeConstellation.constellationIndex === -1 && starIndex === 0) {
+        activeConstellation.data = clickedConstellationData;
+        activeConstellation.constellationIndex = constellationIndex;
+        activeConstellation.clickedIndices.push(starIndex);
+        star.material.color.set(0x4ecdc4);
+        showConstellationHelper(`Cậu đã bắt đầu... ${clickedConstellationData.hints[0]}`, 7000);
+        nextConstellationStar = constellationStars.find(s => s.userData.starIndex === 1);
+        return;
+    }
+
+    if (activeConstellation.constellationIndex === constellationIndex && starIndex === activeConstellation.clickedIndices.length) {
+        activeConstellation.clickedIndices.push(starIndex);
+        star.material.color.set(0x4ecdc4);
+
+        const lastStarIndex = activeConstellation.clickedIndices[activeConstellation.clickedIndices.length - 2];
+        const lastStarPos = clickedConstellationData.vertices[lastStarIndex];
+        const currentStarPos = clickedConstellationData.vertices[starIndex];
+        const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([lastStarPos, currentStarPos]), new THREE.LineBasicMaterial({ color: 0x4ecdc4, transparent: true, opacity: 0.8 }));
+        scene.add(line);
+        activeConstellation.lines.push(line);
+
+        if (activeConstellation.clickedIndices.length === clickedConstellationData.vertices.length) {
+            showConstellationHelper(clickedConstellationData.hints[starIndex], 5000);
+            setTimeout(() => triggerConstellationCompletion(clickedConstellationData), 2000);
+        } else {
+            const nextHintIndex = activeConstellation.clickedIndices.length - 1;
+            showConstellationHelper(clickedConstellationData.hints[nextHintIndex], 7000);
+            const nextStarIndexToFind = activeConstellation.clickedIndices.length;
+            nextConstellationStar = constellationStars.find(s => s.userData.starIndex === nextStarIndexToFind);
+        }
+        return;
+    }
+
+    if (activeConstellation.constellationIndex !== -1) {
+        showConstellationHelper("Sai rồi! Hãy thử lại từ đầu nhé.", 3000);
+        resetActiveConstellation();
+    } else {
+        showConstellationHelper("Hãy tìm và bắt đầu từ ngôi sao đầu tiên của hành trình nhé!");
+    }
+}
+
+function triggerConstellationCompletion(constellationData) {
+    controls.enabled = false;
+    infoCard.classList.add('hidden');
+    document.getElementById('constellation-helper').classList.add('hidden');
+
+    const geometry = new THREE.BufferGeometry();
+    const flatVertices = constellationData.vertices.flatMap(v => [v.x, v.y, v.z]);
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(flatVertices, 3));
+    const indices = constellationData.faces.flat();
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    geometry.computeBoundingBox();
+    const center = new THREE.Vector3();
+    geometry.boundingBox.getCenter(center);
+
+    const cinematicPosition = new THREE.Vector3(center.x, center.y + 500, center.z + 1200);
+    animateCamera(cinematicPosition, center, 4.0, () => {
+        constellationStars.forEach(s => { gsap.to(s.scale, { x: 0, y: 0, z: 0, duration: 1.0 }); });
+        activeConstellation.lines.forEach(line => { gsap.to(line.material, { opacity: 0, duration: 1.0, onComplete: () => scene.remove(line) }); });
+
+        const material = new THREE.MeshStandardMaterial({ color: 0xffe48a, emissive: 0xffd700, emissiveIntensity: 1.5, metalness: 0.7, roughness: 0.3, side: THREE.DoubleSide, transparent: true, opacity: 0 });
+        const finalShape = new THREE.Mesh(geometry, material);
+        scene.add(finalShape);
+
+        gsap.to(material, { opacity: 1, duration: 2.0, delay: 1.0 });
+        finalShape.scale.set(0, 0, 0);
+        gsap.to(finalShape.scale, { x: 1, y: 1, z: 1, duration: 3.0, ease: "elastic.out(1, 0.7)", delay: 1.0 });
+
+        const orbitProxy = { angle: 0 };
+        gsap.to(orbitProxy, {
+            angle: Math.PI * 2,
+            duration: 10.0,
+            delay: 3.0,
+            ease: "power1.inOut",
+            onUpdate: () => {
+                const radius = 1200;
+                camera.position.x = center.x + Math.sin(orbitProxy.angle) * radius;
+                camera.position.z = center.z + Math.cos(orbitProxy.angle) * radius;
+                camera.lookAt(center);
+            },
+            onComplete: () => {
+                openLetter(constellationData.specialMessage, null, false);
+                setTimeout(() => {
+                    gsap.to(finalShape.scale, { x: 0, y: 0, z: 0, duration: 2.0, ease: "power2.in", onComplete: () => scene.remove(finalShape) });
+                    returnCameraToHome();
+                    resetActiveConstellation();
+                }, 8000);
+            }
+        });
+    });
+}
+
+function showConstellationHelper(message, duration = 4000) {
+    const helper = document.getElementById('constellation-helper');
+    const helperText = document.getElementById('constellation-helper-text');
+    helperText.textContent = message;
+    helper.classList.remove('hidden');
+    setTimeout(() => {
+        helper.classList.add('hidden');
+    }, duration);
+}
+
+function createStarGlow() {
+    const texture = createProceduralTexture((ctx, size) => {
+        const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+        gradient.addColorStop(0.1, 'rgba(173, 216, 230, 0.7)');
+        gradient.addColorStop(1, 'rgba(78, 205, 196, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, size, size);
+    });
+    const material = new THREE.SpriteMaterial({ map: texture, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true });
+    const sprite = new THREE.Sprite(material);
+    sprite.scale.set(30, 30, 1);
+    return sprite;
+}
+
 // =================================================================
 // PHẦN 5: HỆ THỐNG ÂM NHẠC VÀ GIAO DIỆN NGƯỜI DÙNG (UI)
 // =================================================================
@@ -807,7 +1131,8 @@ function fadeIn() {
 
 function playTrack(track, playlist, index, startTime = 0) {
     if (!track?.file) { playNext(); return; }
-    upNextPlaylist = playlist; upNextIndex = index;
+    upNextPlaylist = playlist;
+    let upNextIndex = index;
     if (!wavesurfer) {
         wavesurfer = WaveSurfer.create({ container: waveformContainer, waveColor: 'rgba(200, 200, 200, 0.5)', progressColor: 'var(--theme-color-primary)', height: 50, barWidth: 2, barRadius: 3, cursorWidth: 0, responsive: true, hideScrollbar: true, media: audio, backend: 'MediaElement' });
         wavesurfer.on('finish', playNext);
@@ -913,7 +1238,7 @@ function openLetter(letterData, specialSong = null, isBirthday = false) {
     letterContainer.classList.remove('hidden');
     typewriterEffect(elementsToType);
     if (specialSong && !isNightlyPlaylistActive && !isBirthday) {
-        mainPlaylistState.index = upNextIndex; mainPlaylistState.time = wavesurfer.getCurrentTime();
+        let mainPlaylistState = { index: upNextIndex, time: wavesurfer.getCurrentTime() };
         isNightlyPlaylistActive = true;
         const allNightlySongs = dailySongs.map(item => item.song);
         const remainingNightlySongs = allNightlySongs.filter(song => song.file !== specialSong.file);
@@ -951,7 +1276,16 @@ function setupUIEventListeners() {
         overlay.classList.add('hidden-overlay');
         waveformControls.classList.remove('hidden');
         settingsToggleBtn.classList.remove('hidden');
-        weatherWidgetContainer.classList.remove('hidden');
+        document.getElementById('weather-widget-container').classList.remove('hidden');
+        if (!audioAnalyser) {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const source = audioCtx.createMediaElementSource(audio);
+            audioAnalyser = audioCtx.createAnalyser();
+            source.connect(audioAnalyser);
+            audioAnalyser.connect(audioCtx.destination);
+            audioAnalyser.fftSize = 128;
+            audioDataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
+        }
     };
 
     overlay.addEventListener('click', startAudio, { once: true });
@@ -971,6 +1305,10 @@ function setupUIEventListeners() {
     });
     settingsToggleBtn.addEventListener('click', () => settingsPanel.classList.toggle('hidden'));
     volumeSlider.addEventListener('input', e => wavesurfer?.setVolume(e.target.value));
+    const resetBtn = document.getElementById('reset-shards-btn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetMemoryShards);
+    }
 }
 
 // =================================================================
@@ -988,38 +1326,24 @@ function setupLoadingManager() {
 
 async function createSpaceship() {
     const loader = new GLTFLoader();
-    
-    // Sử dụng Promise để xử lý việc tải bất đồng bộ
-    const gltf = await loader.loadAsync('models/uss_enterprise.glb'); // <<<--- Đảm bảo đường dẫn chính xác
-
-    const spaceshipModel = gltf.scene; 
-    const engineParts = []; // Mảng để lưu trữ tất cả các bộ phận phát sáng của động cơ
-
+    const gltf = await loader.loadAsync('models/uss_enterprise.glb');
+    const spaceshipModel = gltf.scene;
+    const engineParts = [];
     spaceshipModel.traverse(function (child) {
         if (child.isMesh) {
             child.material.metalness = 0.8;
             child.material.roughness = 0.4;
-
-            // Nếu một bộ phận có vật liệu phát sáng, chúng ta coi nó là một phần của động cơ
             if (child.material.emissive && child.material.emissive.getHex() > 0) {
-                engineParts.push(child); // Thêm nó vào danh sách động cơ
-                // Tăng cường độ sáng mặc định để nó nổi bật hơn
-                child.material.emissiveIntensity = 5.0; 
+                engineParts.push(child);
+                child.material.emissiveIntensity = 5.0;
             }
         }
     });
-
     const spaceshipPivot = new THREE.Object3D();
     spaceshipPivot.add(spaceshipModel);
-
-    // Lưu lại MẢNG các bộ phận động cơ vào userData
     spaceshipPivot.userData.engineParts = engineParts;
-
-    // <<<--- THAY ĐỔI QUAN TRỌNG: Thu nhỏ phi thuyền lại rất nhiều ---
-    spaceshipPivot.scale.setScalar(0.01); // Thử giá trị này, bạn có thể chỉnh thành 0.005 nếu vẫn còn to
-    
+    spaceshipPivot.scale.setScalar(0.01);
     spaceshipPivot.position.set(0, 0, 350);
-    
     return spaceshipPivot;
 }
 
@@ -1204,47 +1528,28 @@ function animateCamera(targetPosition, targetLookAt, duration = 1.5, onComplete 
 }
 
 function resetCameraToDefault() {
-    // Ngăn chặn nếu camera đang di chuyển hoặc không có đối tượng nào được theo dõi
     if (isAnimatingCamera || !followedObject) return;
-
-    // Tắt các trạng thái đặc biệt
-    isAutoRotating = false; 
-    infoCard.classList.add('hidden'); 
-    
-    // Đánh dấu rằng không còn theo dõi đối tượng nào nữa
+    isAutoRotating = false;
+    infoCard.classList.add('hidden');
     followedObject = null;
-
-    // Gọi hàm animateCamera để quay về vị trí đã lưu trong preFocusCameraState
     animateCamera(preFocusCameraState.position, preFocusCameraState.target, 2.0, () => {
-        // Khôi phục lại các cài đặt camera mặc định sau khi quay về
-        controls.minDistance = 20; 
-        controls.maxDistance = 1200; 
+        controls.minDistance = 20;
+        controls.maxDistance = 1200;
         controls.enablePan = true;
-        // Đảm bảo target của controls cũng được cập nhật chính xác
         controls.target.copy(preFocusCameraState.target);
     });
 }
 
-function setupCameraLight() {
-    // Tạo một đèn SpotLight giống như đèn pha
-    const cameraLight = new THREE.SpotLight(
-        0xffffff, // Màu trắng
-        0.8,      // Cường độ vừa phải, không quá gắt
-        600,      // Khoảng cách chiếu sáng
-        Math.PI / 8, // Góc chiếu (hình nón)
-        0.5       // Độ mờ của biên đèn
-    );
-    
-    // Gắn đèn vào làm "con" của camera. Đèn sẽ luôn đi theo camera.
-    camera.add(cameraLight);
-    
-    // Đặt đèn vào cùng vị trí với camera bên trong hệ tọa độ của camera
-    cameraLight.position.set(0, 0, 0);
-    
-    // Đảm bảo đèn cũng được thêm vào scene cùng với camera
-    scene.add(camera); 
+function returnCameraToHome() {
+    if (isAnimatingCamera) return;
+    followedObject = null;
+    isAutoRotating = false;
+    animateCamera(HOME_CAMERA_POSITION, HOME_CONTROLS_TARGET, 2.5, () => {
+        controls.minDistance = 20;
+        controls.maxDistance = 1200;
+        controls.enablePan = true;
+    });
 }
-
 function showPlanetInfo(clickedMesh) {
     if (isAnimatingCamera || !clickedMesh?.userData) return;
 
@@ -1258,10 +1563,8 @@ function showPlanetInfo(clickedMesh) {
     followedObject = clickedMesh;
     controls.enablePan = false;
 
-    // <<<--- QUAN TRỌNG: LƯU LẠI TRẠNG THÁI CAMERA HIỆN TẠI ---
     preFocusCameraState.position.copy(camera.position);
     preFocusCameraState.target.copy(controls.target);
-    // <<<----------------------------------------------------
 
     const planetPosition = new THREE.Vector3();
     clickedMesh.getWorldPosition(planetPosition);
@@ -1273,7 +1576,7 @@ function showPlanetInfo(clickedMesh) {
     animateCamera(cameraTargetPosition, lookAtTargetPosition, 2.0, () => {
         controls.minDistance = 0;
         controls.maxDistance = 10000;
-        
+
         const startAngleVec = new THREE.Vector3().subVectors(camera.position, lookAtTargetPosition);
         autoRotateAngle = Math.atan2(startAngleVec.z, startAngleVec.x);
         isAutoRotating = true;
@@ -1306,7 +1609,7 @@ function createMemoryStars() {
         const star = new THREE.Mesh(starGeometry, starMaterial.clone());
         star.userData = { isMemoryButton: true, memoryData: memory };
         star.visible = false;
-        
+
         let targetObject = null;
         if (memory.journeySegment === 0) {
             targetObject = celestialObjects.find(obj => obj.userData.id === 'earth');
@@ -1315,33 +1618,22 @@ function createMemoryStars() {
         }
 
         if (targetObject) {
-            // <<<--- SỬA LỖI QUAN TRỌNG NHẤT ---
-            // 1. Lấy bán kính của hành tinh từ dữ liệu
             const planetRadius = targetObject.userData.size;
-            
-            // 2. Gắn ngôi sao làm "con" trực tiếp của khối MESH hành tinh
             targetObject.mesh.add(star);
-            
-            // 3. Đặt vị trí của ngôi sao ngay phía trên "Bắc Cực" của hành tinh
-            // Vị trí này là tương đối so với tâm của hành tinh
-            star.position.set(0, planetRadius + 40, 0); 
+            star.position.set(0, planetRadius + 40, 0);
         } else {
-            // Với các trạm dừng không có hành tinh, đặt nó trực tiếp vào không gian
             star.position.set(-600, 100, -600);
             scene.add(star);
         }
-        
+
         memoryStars[memory.journeySegment] = star;
     });
 }
-
 function onClick(event) {
     const userLetterContainer = document.getElementById('user-letter-container');
-
-    // Ngăn chặn tất cả các click nếu có bất kỳ lớp phủ nào đang mở
-    if (!overlay.classList.contains('hidden-overlay') || 
-        !letterContainer.classList.contains('hidden') || 
-        (userLetterContainer && !userLetterContainer.classList.contains('hidden')) || 
+    if (!overlay.classList.contains('hidden-overlay') ||
+        !letterContainer.classList.contains('hidden') ||
+        (userLetterContainer && !userLetterContainer.classList.contains('hidden')) ||
         isAnimatingCamera) {
         return;
     }
@@ -1350,32 +1642,42 @@ function onClick(event) {
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
 
-    // Xác định các đối tượng có thể click
     const clickableStars = isJourneyPaused ? Object.values(memoryStars) : [];
-    const clickablePlanets = !isJourneyActive ? celestialObjects.map(obj => obj.mesh).filter(mesh => mesh.userData?.isClickable) : [];
-    
-    const clickableObjects = [...clickableStars, ...clickablePlanets];
+    const clickableObjects = [
+        ...clickableStars,
+        ...celestialObjects.map(obj => obj.mesh).filter(mesh => mesh.userData?.isClickable),
+        ...memoryShards.filter(s => s.visible),
+        ...constellationStars
+    ];
 
-    const intersects = raycaster.intersectObjects(clickableObjects, false);
+    const intersects = raycaster.intersectObjects(clickableObjects, true);
 
     if (intersects.length > 0) {
-        const clickedObject = intersects[0].object;
+        const clickedObject = intersects.find(intersect => intersect.object.parent?.userData.isConstellationStar)?.object.parent ?? intersects[0].object;
 
+        if (clickedObject.userData.isConstellationStar) {
+            handleConstellationClick(clickedObject);
+            return;
+        }
+        if (clickedObject.userData.isMemoryShard) {
+            collectMemoryShard(clickedObject);
+            return;
+        }
         if (clickedObject.userData.isMemoryButton) {
-            // Chỉ xử lý click vào ngôi sao khi chuyến đi đang tạm dừng
-            if (isJourneyPaused) {
-                showMemory(clickedObject.userData.memoryData);
-            }
-        } 
-        else if (clickedObject.userData.isClickable) {
-            // Chỉ xử lý click vào hành tinh khi chuyến đi KHÔNG hoạt động
+            if (isJourneyPaused) { showMemory(clickedObject.userData.memoryData); }
+            return;
+        }
+        if (clickedObject.userData.isClickable) {
             if (!isJourneyActive && infoCard.classList.contains('hidden')) {
                 showPlanetInfo(clickedObject);
             }
         }
+    } else {
+        if (activeConstellation.constellationIndex !== -1) {
+            showConstellationHelper("Hãy tìm ngôi sao đang phát sáng nhé...", 2000);
+        }
     }
 }
-
 // =======================================================
 // PHẦN 7: LOGIC HÀNH TRÌNH ĐIỆN ẢNH
 // =======================================================
@@ -1388,7 +1690,7 @@ function createJourneyPathVisualizer(startVec, endVec) {
     const curve = new THREE.CatmullRomCurve3([startVec, endVec]);
     const points = curve.getPoints(100);
     const geometry = new THREE.BufferGeometry().setFromPoints(points);
-    
+
     const material = new THREE.LineBasicMaterial({
         color: 0x4ecdc4,
         linewidth: 2,
@@ -1410,20 +1712,15 @@ function clearJourneyPathVisuals() {
 function updateSpaceshipEffects() {
     if (!spaceship) return;
 
-    // Áp dụng hiệu ứng cho động cơ khi đang bay
     if (isJourneyActive && !isJourneyPaused) {
-        // 1. Kiểm tra xem mảng engineParts có tồn tại và có phần tử không
         if (spaceship.userData.engineParts && spaceship.userData.engineParts.length > 0) {
-            const pulse = Math.sin(clock.getElapsedTime() * 8) * 0.5 + 0.5; // Dao động 0-1
-            
-            // 2. Lặp qua TẤT CẢ các bộ phận động cơ đã tìm thấy và áp dụng hiệu ứng
+            const pulse = Math.sin(clock.getElapsedTime() * 8) * 0.5 + 0.5;
             spaceship.userData.engineParts.forEach(part => {
-                part.material.emissiveIntensity = 5.0 + pulse * 4.0; // Tăng cường độ sáng theo nhịp
+                part.material.emissiveIntensity = 5.0 + pulse * 4.0;
             });
         }
     }
 
-    // Hiệu ứng bay lơ lửng tại chỗ khi đang tạm dừng
     if (isJourneyPaused) {
         spaceship.position.y += Math.sin(clock.getElapsedTime() * 1.5) * 0.05;
     }
@@ -1450,7 +1747,7 @@ function startNextJourneySegment(segmentIndex) {
     } else {
         fallbackPosition = new THREE.Vector3(-600, 100, -600);
     }
-    
+
     const startPosition = spaceship.position.clone();
     const tweenProxy = { progress: 0 };
 
@@ -1459,7 +1756,6 @@ function startNextJourneySegment(segmentIndex) {
         duration: 20,
         ease: "power1.inOut",
         onUpdate: () => {
-            // --- CẬP NHẬT VỊ TRÍ (Không thay đổi) ---
             const currentTargetPosition = new THREE.Vector3();
             if (targetObject) {
                 targetObject.mesh.getWorldPosition(currentTargetPosition);
@@ -1467,20 +1763,10 @@ function startNextJourneySegment(segmentIndex) {
                 currentTargetPosition.copy(fallbackPosition);
             }
             spaceship.position.lerpVectors(startPosition, currentTargetPosition, tweenProxy.progress);
-            
-            // --- LOGIC XOAY TÀU HOÀN TOÀN MỚI ---
-            // 1. Vector chỉ hướng từ tàu đến mục tiêu
+
             const direction = new THREE.Vector3().subVectors(currentTargetPosition, spaceship.position).normalize();
-
-            // 2. Vector "phía trước" mặc định của mô hình. Dựa trên hình ảnh, đó là trục +X.
-            const modelForward = new THREE.Vector3(1, 0, 0); 
-            
-            // 3. Tính toán phép quay (quaternion) cần thiết để hướng "phía trước" của mô hình
-            // thẳng theo vector chỉ hướng.
+            const modelForward = new THREE.Vector3(1, 0, 0);
             const targetQuaternion = new THREE.Quaternion().setFromUnitVectors(modelForward, direction);
-
-            // 4. Dùng slerp để xoay phi thuyền một cách mượt mà về phía hướng quay mục tiêu.
-            // Con số 0.1 là tốc độ xoay, giúp nó có cảm giác tự nhiên.
             spaceship.quaternion.slerp(targetQuaternion, 0.1);
         },
         onComplete: () => {
@@ -1493,23 +1779,19 @@ function startNextJourneySegment(segmentIndex) {
 function startJourney() {
     isJourneyActive = true;
     controls.enabled = false;
-    
+
     document.getElementById('start-journey-btn').classList.add('hidden');
     document.getElementById('open-letter-form-btn').classList.add('hidden');
-    
-    spaceship.position.set(150, 50, 300); // Vị trí xuất phát
 
-    // <<<--- THÊM MỚI: Xoay tàu đúng hướng ngay từ đầu ---
-    // Tìm vị trí của Trái Đất (điểm đến đầu tiên)
+    spaceship.position.set(150, 50, 300);
+
     const firstTargetObject = celestialObjects.find(obj => obj.userData.id === 'earth');
     if (firstTargetObject) {
         const firstTargetPosition = new THREE.Vector3();
         firstTargetObject.mesh.getWorldPosition(firstTargetPosition);
-        spaceship.lookAt(firstTargetPosition); // Xoay tàu nhìn vào đó ngay lập tức
+        spaceship.lookAt(firstTargetPosition);
     }
-    // <<<----------------------------------------------
-    
-    // Bắt đầu chặng đầu tiên
+
     startNextJourneySegment(0);
 }
 
@@ -1517,10 +1799,10 @@ function endJourney() {
     isJourneyActive = false;
     controls.enabled = true;
     isJourneyPaused = false;
-    
+
     document.getElementById('start-journey-btn').classList.remove('hidden');
     document.getElementById('open-letter-form-btn').classList.remove('hidden');
-    
+
     gsap.to(spaceship.position, { x: 0, y: 0, z: 350, duration: 5, ease: "power2.out" });
     clearJourneyPathVisuals();
 }
@@ -1538,7 +1820,7 @@ function showMemory(memory) {
     if (!letterContainer?.classList.contains('hidden')) return;
 
     const letterContentDiv = letterContainer.querySelector('.letter-content');
-    letterContentDiv.innerHTML = ''; 
+    letterContentDiv.innerHTML = '';
 
     const titleEl = document.createElement('h1');
     titleEl.textContent = memory.title;
@@ -1591,13 +1873,13 @@ function setupUserLetterForm() {
         sendBtn.disabled = true;
         sendBtn.textContent = 'Đang gửi...';
 
-        const webhookUrl = 'https://hook.us2.make.com/njm3r71sllwmkeiutvjjg3js5kzs9li2'; 
+        const webhookUrl = 'https://hook.us2.make.com/njm3r71sllwmkeiutvjjg3js5kzs9li2';
 
         try {
             const response = await fetch(webhookUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ letter: letterContent }), 
+                body: JSON.stringify({ letter: letterContent }),
             });
 
             if (response.ok) {
@@ -1626,12 +1908,10 @@ function animate() {
     const delta = clock.getDelta();
 
     if (currentWeatherData) updateUniverseAmbiance(currentWeatherData, delta);
-
     celestialObjects.forEach(obj => {
         if (obj.pivot) obj.pivot.rotation.y += (obj.orbitSpeed || 0) * 0.3 * delta;
         obj.mesh.rotation.y += (obj.spinSpeed || 0) * delta;
     });
-    
     if (saturnRing) saturnRing.material.uniforms.uTime.value = elapsedTime;
     if (asteroidBelt) asteroidBelt.children.forEach(rock => {
         rock.userData.orbitAngle += rock.userData.orbitSpeed * delta;
@@ -1639,7 +1919,6 @@ function animate() {
         rock.position.z = rock.userData.orbitRadius * Math.sin(rock.userData.orbitAngle);
         rock.rotation.y += 0.5 * delta;
     });
-
     if (isAutoRotating && followedObject) {
         const planetData = followedObject.userData;
         const lookAtOffset = planetData.camera.lookAtOffset;
@@ -1647,7 +1926,7 @@ function animate() {
         followedObject.getWorldPosition(planetPosition);
         const lookAtTargetPosition = planetPosition.clone().add(lookAtOffset);
         const distance = camera.position.distanceTo(lookAtTargetPosition);
-        autoRotateAngle += cinematicOrbitSpeed; 
+        autoRotateAngle += cinematicOrbitSpeed;
         const newX = lookAtTargetPosition.x + distance * Math.cos(autoRotateAngle);
         const newZ = lookAtTargetPosition.z + distance * Math.sin(autoRotateAngle);
         const relativeCamY = camera.position.y - lookAtTargetPosition.y;
@@ -1657,17 +1936,14 @@ function animate() {
         camera.lookAt(lookAtTargetPosition);
         controls.target.copy(lookAtTargetPosition);
     }
-
     if (isJourneyActive && spaceship) {
-        const cameraOffset = new THREE.Vector3(0, 50, 150); 
+        const cameraOffset = new THREE.Vector3(0, 50, 150);
         cameraOffset.applyQuaternion(spaceship.quaternion);
         const targetCameraPosition = spaceship.position.clone().add(cameraOffset);
         camera.position.lerp(targetCameraPosition, 0.05);
         camera.lookAt(spaceship.position);
     }
-    
     updateSpaceshipEffects();
-
     if (sunEffects.uniforms) sunEffects.uniforms.uTime.value = elapsedTime;
     activeAsteroids.forEach(a => { if (a.uniforms) a.uniforms.uTime.value = elapsedTime; a.group.rotation.y += 0.005 * delta * 60; a.group.rotation.x += 0.002 * delta * 60; });
     activeComets.forEach(c => {
@@ -1680,14 +1956,40 @@ function animate() {
     });
     activePeakRockets.forEach(rocket => updatePeakRocketTrail(rocket, delta));
     if (starfield) starfield.rotation.y -= 0.00005;
-    
     const sunObj = celestialObjects.find(obj => obj.userData.id === 'sun');
     if (sunLight && sunObj) sunLight.position.copy(sunObj.mesh.position);
-    
     if (!isJourneyActive && !isAnimatingCamera && controls.enabled) {
         controls.update();
     }
-    
+
+    memoryShards.forEach(shard => {
+        if (shard.visible) {
+            shard.rotation.y += 0.01;
+            shard.rotation.x += 0.005;
+            shard.material.emissiveIntensity = 2 + Math.sin(elapsedTime * 2 + shard.userData.id) * 1.5;
+        }
+    });
+
+    if (nextConstellationStar && nextConstellationStar.userData.glow) {
+        const pulse = 1.5 + Math.sin(elapsedTime * 5) * 0.8;
+        nextConstellationStar.userData.glow.scale.setScalar(30 * pulse);
+    }
+
+    constellationStars.forEach(star => {
+        if (star !== nextConstellationStar && star.userData.glow) {
+            const pulse = 1 + Math.sin(elapsedTime * 1.5 + star.userData.starIndex) * 0.2;
+            star.userData.glow.scale.setScalar(30 * pulse);
+        }
+    });
+
+    if (audioAnalyser && wavesurfer.isPlaying()) {
+        audioAnalyser.getByteFrequencyData(audioDataArray);
+        const bass = audioDataArray[2] / 255.0;
+        const mid = audioDataArray[20] / 255.0;
+        bloomPass.strength = 0.6 + bass * 0.4;
+        if (starfield) starfield.material.size = 1.5 + mid * 1.5;
+    }
+
     composer.render();
 }
 
@@ -1700,38 +2002,41 @@ async function initThreeJS() {
     renderer.setClearColor(0x000000, 0);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
-    
-    // <<<--- NÂNG CẤP HỆ THỐNG ÁNH SÁNG ---
-    // 1. Tăng cường Ánh sáng Môi trường (Ambient Light)
-    // Ánh sáng này đảm bảo không có phần nào của tàu bị tối đen hoàn toàn.
-    ambientLight = new THREE.AmbientLight(0xffffff, 1.2); 
+
+    ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
     scene.add(ambientLight);
 
-    // 2. Tăng cường Ánh sáng Mặt Trời (Point Light)
-    // Ánh sáng này tạo ra các vùng sáng và bóng đổ chính.
-    sunLight = new THREE.PointLight(0xffffff, 2.0, 4000); 
+    sunLight = new THREE.PointLight(0xffffff, 2.0, 4000);
     scene.add(sunLight);
-    
-    // 3. Thêm một đèn Hemisphere Light
-    // Đèn này giả lập ánh sáng phản chiếu từ vũ trụ, làm cho tàu có chiều sâu hơn.
+
     const hemisphereLight = new THREE.HemisphereLight(0x6080ff, 0x303050, 1.0);
     scene.add(hemisphereLight);
-    // <<<-------------------------------------
 
     scene.fog = new THREE.FogExp2(0x050a15, 0.0001);
 
+    setupLoadingManager();
+    textureLoader = new THREE.TextureLoader(loadingManager);
+
+    const textureFlare0 = textureLoader.load('https://threejs.org/examples/textures/lensflare/lensflare0.png');
+    const textureFlare3 = textureLoader.load('https://threejs.org/examples/textures/lensflare/lensflare3.png');
+
+    const lensflare = new Lensflare();
+    lensflare.addElement(new LensflareElement(textureFlare0, 512, 0, sunLight.color));
+    lensflare.addElement(new LensflareElement(textureFlare3, 60, 0.6));
+    lensflare.addElement(new LensflareElement(textureFlare3, 70, 0.7));
+    lensflare.addElement(new LensflareElement(textureFlare3, 120, 0.9));
+    lensflare.addElement(new LensflareElement(textureFlare3, 70, 1.0));
+    sunLight.add(lensflare);
+
     spaceship = await createSpaceship();
     scene.add(spaceship);
-    
+
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true; controls.dampingFactor = 0.05;
     controls.minDistance = 20; controls.maxDistance = 1200;
-    
-    setupLoadingManager();
-    textureLoader = new THREE.TextureLoader(loadingManager);
-    
+
     const renderPass = new RenderPass(scene, camera);
-    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+    bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
     bloomPass.threshold = 0; bloomPass.strength = 0.6; bloomPass.radius = 0.5;
     composer = new EffectComposer(renderer);
     composer.addPass(renderPass);
@@ -1741,9 +2046,12 @@ async function initThreeJS() {
     createStarfield();
     createSolarSystem(textureLoader);
     createMemoryStars();
+    createMemoryShards();
     createRainEffect();
     createSnowEffect();
     createBackgroundNebulae();
+    createConstellations();
+
     window.addEventListener('resize', onWindowResize);
     window.addEventListener('click', onClick);
     animate();
@@ -1760,15 +2068,15 @@ function mainLoop(timestamp) {
 
 async function init() {
     try {
-        const visitWebhookUrl = 'https://hook.us2.make.com/2vdmmjj1e6rfsguawjb3hjv3nkxfs1ho'; 
+        const visitWebhookUrl = 'https://hook.us2.make.com/2vdmmjj1e6rfsguawjb3hjv3nkxfs1ho';
         fetch(visitWebhookUrl, { method: 'POST' });
     } catch (e) {
         console.error("Could not send visit notification:", e);
     }
-    
+
     const isHighEndDevice = !window.matchMedia("(max-width: 768px)").matches;
     const config = { shootingStarInterval: isHighEndDevice ? 800 : 1500, asteroidInterval: isHighEndDevice ? 7000 : 12000, cometInterval: isHighEndDevice ? 15000 : 25000 };
-
+    updateShardCollectorUI();
     currentWeatherData = await getWeatherData();
     updateWeatherUI(currentWeatherData);
     if (currentWeatherData) {
@@ -1788,22 +2096,21 @@ async function init() {
     runBirthdayCheck();
     setupUIEventListeners();
     await initThreeJS();
-    
-    // <<<--- KHÔI PHỤC LẠI CÁC HÀM BỊ MẤT ---
+    showConstellationHelper("Gợi ý: Hãy thử tìm những ngôi sao đang phát sáng nhẹ trong vũ trụ...", 6000);
+
     createProceduralSaturnRing();
     createAsteroidBelt(375, 50, 2000);
-    // <<<-------------------------------------
 
     checkAndPreloadNightlySong();
     setInterval(checkAndPreloadNightlySong, 60000);
-    setTimeout(() => setInterval(createShootingStar, config.shootingStarInterval), 3000);
+    setTimeout(() => setInterval(startMeteorShower, 45000), 15000);
     setTimeout(() => { createFieryAsteroid(); setInterval(createFieryAsteroid, config.asteroidInterval); }, 8000);
     setTimeout(() => setInterval(createComet, config.cometInterval), 10000);
     setupGyroControls();
     setupMouseParallax();
     requestAnimationFrame(mainLoop);
     const today = new Date();
-    const flightDate = 13; 
+    const flightDate = 13;
     const flightMonth = 9;
     const flightYear = 2025;
 
@@ -1819,11 +2126,12 @@ async function init() {
 
     setTimeout(() => setInterval(createPeakRocket, 9000), 15000);
     setTimeout(() => setInterval(createExploringSatellite, 12000), 5000);
-    
+
     window.addEventListener('beforeunload', savePlaybackState);
-    
+
     setupUserLetterForm();
     setupJourneyButton();
+    setupShapeSelector();
 }
 
 init();
