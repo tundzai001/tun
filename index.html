@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Our Little Universe</title>
-    <link rel="icon" type="image/png" href="./favicon.png"> <!-- Tùy chọn: Thêm icon cho tab trình duyệt -->
+    <link rel="icon" type="image/png" href="./favicon.png">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,28 +42,35 @@
 
     <!-- ========= CÁC THÀNH PHẦN GIAO DIỆN CHÍNH ========= -->
     
-    <!-- WIDGET THỜI TIẾT -->
-    <div id="weather-widget-container" class="floating-controls hidden">
-        <button id="weather-toggle-btn">🌦️</button>
-        <div id="weather-tooltip">
-            <div id="weather-location">Thành Đô</div>
-            <div class="weather-info-row">
-                <span>Tình trạng:</span>
-                <span id="weather-condition">Đang tải...</span>
+    <!-- Nhóm các widget ở góc trên bên trái -->
+    <div class="top-left-widgets">
+        <!-- WIDGET THỜI TIẾT -->
+        <div id="weather-widget-container" class="floating-controls">
+            <button id="weather-toggle-btn">🌦️</button>
+            <div id="weather-tooltip">
+                <div id="weather-location">Thành Đô</div>
+                <div class="weather-info-row">
+                    <span>Tình trạng:</span>
+                    <span id="weather-condition">Đang tải...</span>
+                </div>
+                <div class="weather-info-row">
+                    <span>Nhiệt độ:</span>
+                    <span id="weather-temp">--°C</span>
+                </div>
+                <div class="weather-info-row">
+                    <span>Chất lượng không khí:</span>
+                    <span id="weather-aqi">Tốt</span>
+                </div>
+                <div class="weather-info-row">
+                    <span>Pha mặt trăng:</span>
+                    <span id="weather-moon">Trăng non</span>
+                </div>
+                <p id="weather-quote">"Dù thời tiết có ra sao, tình yêu của tớ vẫn luôn ở đây."</p>
             </div>
-            <div class="weather-info-row">
-                <span>Nhiệt độ:</span>
-                <span id="weather-temp">--°C</span>
-            </div>
-            <div class="weather-info-row">
-                <span>Chất lượng không khí:</span>
-                <span id="weather-aqi">Tốt</span>
-            </div>
-             <div class="weather-info-row">
-                <span>Pha mặt trăng:</span>
-                <span id="weather-moon">Trăng non</span>
-            </div>
-            <p id="weather-quote">"Dù thời tiết có ra sao, tình yêu của tớ vẫn luôn ở đây."</p>
+        </div>
+        <!-- WIDGET THU THẬP KÝ ỨC -->
+        <div id="shard-collector-widget" class="floating-controls hidden">
+            <p>✨ <span id="shard-count">0</span> / <span id="shard-total">0</span></p>
         </div>
     </div>
 
@@ -72,6 +79,7 @@
         <!-- Nhóm các nút ở góc trên bên phải -->
         <div class="top-right-controls">
             <button id="settings-toggle-btn" class="hidden">⚙️</button>
+            <button id="shape-toggle-btn" title="Chọn hình dạng" class="hidden">🎨</button>
         </div>
 
         <!-- Nhóm các nút ở góc dưới bên phải -->
@@ -86,6 +94,15 @@
     <div id="settings-panel" class="hidden">
         <label for="volume-slider">Âm lượng:</label>
         <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.7">
+        <div class="settings-divider"></div>
+        <button id="reset-shards-btn" class="settings-action-btn">Xóa Ký Ức Đã Thu Thập</button>
+    </div>
+
+    <!-- BẢNG CHỌN HÌNH DẠNG -->
+    <div id="shape-selection-panel" class="hidden">
+        <h4>Chọn Hành Trình</h4>
+        <button class="shape-choice-btn" data-shape="star" disabled>Ngôi Sao</button>
+        <button class="shape-choice-btn" data-shape="pyramid">Kim Tự Tháp</button>
     </div>
 
     <!-- THẺ THÔNG TIN HÀNH TINH -->
@@ -146,6 +163,10 @@
             <p>Bạn có một lá thư từ người thương...</p>
             <button id="read-flight-letter-btn">Đọc ngay</button>
         </div>
+    </div>
+
+    <div id="constellation-helper" class="hidden">
+        <p id="constellation-helper-text">Hãy tìm những ngôi sao đang phát sáng nhẹ...</p>
     </div>
 
     <!-- ========= SHADER SCRIPTS (DÙNG CHO THREE.JS) ========= -->
