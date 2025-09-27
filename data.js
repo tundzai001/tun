@@ -195,8 +195,8 @@
             content: `<p>Chỉ muốn nói là xin lỗi, vì tối qua tớ nói chuyện với cậu nghe có vẻ hơi... Tớ xin lỗi nhaa, tự nhiên tối qua bị suy nghĩ thôi, sorry bae nhiều lắm... nhưng mà suy nghĩ v thôi chứ vẫn nghe cậu kể gì nhé =))) nghe ác luôn, tối qua call với cậu xong là tớ cũng tắt máy luôn, trả biết thức đến mấy giờ nữa tại cứ nằm thôi, nhưng mà sáng nay là dậy siêu siêu muộn =))))))))) xong ê bên này trời mưa, dậy mà lạnh điên lên được =)) mặc dù có mỗi 26 độ =)) nhưng mà still cold cuz i can't hug u .... miss cậu quá đấy hà oiii.... Tớ yêu cậu nhiều lắm luôn ấy </p>` },
         { day: 26, title: "Gửi cậu, ngày thứ 14 bên bển...", 
             content: `<p>Tối qua tớ nhớ cậu quá, xong kiểu tối qua mất ngủ v, tớ đang ngủ xong cứ bị tỉnh ấy thế là lúc gần 3h sáng tớ xuống nấu ăn =))) ngồi ăn xem phim đến tận gần 5h mới di ngủ omg =))) ê cứ đà này khéo die sớm thật, tối qua nói chuyện với cậu vui v :)))) thấy nhớ điên lên được ấy, tớ nhớ cậu nhiều nhiều nhiều =)) cái gì quan trọng nhắc lại 3 lần heheee, sáng ở bên đấy sẽ hơi lạnh 1 chút nên nhớ để ý sức khoẻ nhaaa, tớ yêu cậu nhiều lắm đấy, have a good day okay :))) chúc lại mặc dù bức thư này được viết xong vào lúc 16:03 tàu khựa =))) sorry bae, but i love u so much !!!</p>` },
-        { day: 27, title: "Gửi cậu, ngày thứ hai mươi bảy...", 
-            content: `<p>Một lời nhắn gửi thật nhiều động lực cho cậu. Cậu là giỏi nhất! ^^</p>` },
+        { day: 27, title: "xin chào và helo chứ không tạm biệt đâu ....", 
+            content: `<p>Hôm nay là thứ 7, là ngày nghỉ rồi nên là cố gắng nghỉ ngơi nhiều chút lên nhaaa, tớ yêu cậu nhiều lắm đấy, chiều lên thư viện thì nhớ về phải ăn uống, có học bài thì nhanh nhanh để tối được ngủ nhiều hơn nhaaa, bởi vì mai cậu có tận 4 tiết omg quá nhiều cho ngày nghỉ..... thôi ksao cố lên, tớ biết cậu mạnh mẽ, đôi lúc yếu lòng 1 chút thôi =)) nhưng mà cậu sẽ làm được, mạnh mẽ, tự tin leenn. Tớ tin ở cậu, yêu cậu nhiều, gửi cậu cái ôm ấm áp nhaaa, kiss nữa =)) kiss từ xa cho nó nhớ =))))))) yêu cậu nhiều </p>` },
         { day: 28, title: "Gửi cậu, ngày thứ hai mươi tám...",
             content: `<p>Đếm ngược những ngày cuối tháng. Cố lên nhé. Tớ luôn ở đây ủng hộ cậu.</p>` },
         { day: 29, title: "Gửi cậu, ngày thứ hai mươi chín...", 
@@ -505,4 +505,5 @@ export const constellationsData = {
         }
     }
 };
+
 
