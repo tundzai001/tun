@@ -77,8 +77,8 @@
 
  /* --- DANH SÁCH THƯ BUỔI TỐI --- */
     export const dailyLetters = [ 
-        { day: 1, title: "hello cậu, ngày học đầu tiên của tháng kết thúc rồi", 
-            content: `<p>Vậy là một ngày nữa ở Thành Đô đã qua. Cậu đã vất vả, mệt mỏi rồi. Mọi thứ hôm nay vẫn ổn chứ? Có điều gì cậu muốn kể cho tớ nghe không?</p><p>Tuy là ở xa, nhưng mà tớ vẫn luôn ở đây lắng nghe cậu. Giờ thì nghỉ ngơi thôi nhé </p>` },
+        { day: 1, title: "hello cậu", 
+            content: `<p>Ngày nghỉ đầu tiên của cậu thế là kết thúc rồi, cậu bên đấy ăn chơi vui vẻ nhaaaa. mà hôm nay có giúp các chị nấu không đấy ??? hay là chỉ đi siêu thị thooi v =))) tớ hỏi thế thôi, chứ tớ biết mà, cậu đảm ác, nữ công gia chánh =)))) sời ơi nghe đã thấy đảm đang rồi, đảm đang, xinh đẹp, học lại giỏi, nhảy lại nét, còn gì để chê nữa ... 10 điểm =)) không gì để chê nữa except đầu hơi tối tí thôi hahhaha nhưng mà ê í là cậu tối haa =)) tối hơn cả tớ ấy :))) tớ tối bình thường thôi hehehe =)) còn cậu là trời ơi tối om luôn :)) ngủ nhiều lên nhé =)) tớ muốn cậu tăng cân chứ không phải giảm cân hiểu chưa =))) béo lên để còn bellyholic =)) để bóp bụng hiểu chưa ê dcm nghĩ thấy thích cm rồi ấy thích vkl ấy, dcm chắc điên mẹ mất trời ơi, trời lạnh lạnh,bóp bụng dồi ôi, thua mỗi gia cát lượng cái quạt hoặc không .. nhưng mà í là tớ yêu cậu nhé =))) cậu hỏi tớ thấy kì không thì không, tớ không muốn thay từ nào cả ấy trời ơi, í là just want to say it to u know that i love u sm, biết là cũng chưa rõ ràng nhưng mà tớ yêu cậu nhé =))) hihiiii, tí nói chuyện xong thì ngủ ngoan nghe chưa !! i love u </p>` },
         { day: 2, title: "xin cả chào nhesee, ngày thứ hai của cậu mệt không?", 
             content: `<p>Tan học rồi, chắc cậu mệt lắm. Đừng ôm hết mọi mệt mỏi một mình nhé, hãy chia sẻ với tớ. Tớ không ở cạnh để chăm sóc cậu được, nên chỉ có thể lắng nghe thôi và an ủi cậu thôi.</p><p>Hôm nay của tớ ở Việt Nam cũng hơi mệt mỏi một chút, nhưng mà kiểu có cậu ấy nên cảm giác thoải mái v =)) Có chuyện thì hãy kể tớ nhé, tớ luôn ở đây ❤️</p>` },
         { day: 3, title: "Gửi cậu, ngày thứ ba, lại một ngày nỗ lực rồi", 
@@ -505,6 +505,7 @@ export const constellationsData = {
         }
     }
 };
+
 
 
 
