@@ -143,8 +143,8 @@
 
     /* --- DANH SÁCH THƯ BAN NGÀY  --- */
     export const daytimeLetters = [ 
-        { day: 1, title: "Gửi cậu, ngày đầu tháng tốt lành nhé!", 
-            content: `<p>Bắt đầu tháng mới ở Thành Đô, chúc cậu mọi việc đều suôn sẻ. Tớ gửi một chút năng lượng từ Việt Nam qua cho cậu đây. Cố lên nhé!</p>` },
+        { day: 1, title: "Gửi cậu, ngày đầu tháng 10 cứ là akelo!", 
+            content: `<p>Đầu tháng bên xứ người cậu nhớ phải khoẻ mạnh nhaaa, trời cũng lạnh rồi, nhớ phải mặc ấm, không được ốm nghe chưa !!! cô mà ốm tôi về tôi phạt cô, đừng có trách hiểu chưa????? Mặc ấm, ăn no, ngủ kĩ và phải học chăm hiểu chưa nhể? Còn được 1 tuần nghỉ thì xả láng đê, chơi bời bét tè lè nhè điii hehe, tớ yêu cậu </p>` },
         { day: 2, title: "Gửi cậu, ngày thứ hai...", 
             content: `<p>Chúc cậu một ngày học tập hiệu quả. Đừng quên uống đủ nước và cười thật tươi nha. Tối mình nói chuyện sau.</p>` },
         { day: 3, title: "Gửi cậu, ngày thứ ba...", 
