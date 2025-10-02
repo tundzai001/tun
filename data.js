@@ -80,7 +80,7 @@
         { day: 1, title: "hello cậu", 
             content: `<p>Ngày nghỉ đầu tiên của cậu thế là kết thúc rồi, cậu bên đấy ăn chơi vui vẻ nhaaaa. mà hôm nay có giúp các chị nấu không đấy ??? hay là chỉ đi siêu thị thooi v =))) tớ hỏi thế thôi, chứ tớ biết mà, cậu đảm ác, nữ công gia chánh =)))) sời ơi nghe đã thấy đảm đang rồi, đảm đang, xinh đẹp, học lại giỏi, nhảy lại nét, còn gì để chê nữa ... 10 điểm =)) không gì để chê nữa except đầu hơi tối tí thôi hahhaha nhưng mà ê í là cậu tối haa =)) tối hơn cả tớ ấy :))) tớ tối bình thường thôi hehehe =)) còn cậu là trời ơi tối om luôn :)) ngủ nhiều lên nhé =)) tớ muốn cậu tăng cân chứ không phải giảm cân hiểu chưa =))) béo lên để còn bellyholic =)) để bóp bụng hiểu chưa ê dcm nghĩ thấy thích cm rồi ấy thích vkl ấy, dcm chắc điên mẹ mất trời ơi, trời lạnh lạnh,bóp bụng dồi ôi, thua mỗi gia cát lượng cái quạt hoặc không .. nhưng mà í là tớ yêu cậu nhé =))) cậu hỏi tớ thấy kì không thì không, tớ không muốn thay từ nào cả ấy trời ơi, í là just want to say it to u know that i love u sm, biết là cũng chưa rõ ràng nhưng mà tớ yêu cậu nhé =))) hihiiii, tí nói chuyện xong thì ngủ ngoan nghe chưa !! i love u </p>` },
         { day: 2, title: "xin cả chào nhesee, ngày thứ hai của cậu mệt không?", 
-            content: `<p>Tan học rồi, chắc cậu mệt lắm. Đừng ôm hết mọi mệt mỏi một mình nhé, hãy chia sẻ với tớ. Tớ không ở cạnh để chăm sóc cậu được, nên chỉ có thể lắng nghe thôi và an ủi cậu thôi.</p><p>Hôm nay của tớ ở Việt Nam cũng hơi mệt mỏi một chút, nhưng mà kiểu có cậu ấy nên cảm giác thoải mái v =)) Có chuyện thì hãy kể tớ nhé, tớ luôn ở đây ❤️</p>` },
+            content: `<p>Hôm nay là ngày nghỉ thứ hai của cậu rồi, cậu có akelo khoonggg??? kiểu vui vẻ không ấy... nếu buồn thì không được nghe chưa bởi vì tớ không ở cạnh để ôm cậu được, nên chỉ có thể lắng nghe thôi và an ủi cậu thôi.</p><p>Hôm nay của tớ ở Việt Nam cũng hơi mệt mỏi một chút, nhưng mà kiểu có cậu ấy nên cảm giác thoải mái v =)) mệt do chạy nhé =)) mệt vkll ê chạy được 14km giỏi không là chạy đấy, thật ra chạy với cuốc bộ =))) nhưng mà ấy kiểu như là bị mỏi chân ấy do lâu rồi tớ không chạy, ê về nhé chân là cứ nhức hết cả lên cảm giác như kiểu chặt chân đi mới hết được đau ấy =))) nhưng mà tớ vẫn akelo hehehe ê chuyện gì thì chuyện nhưng mà í là mình đang call ấy =)) thì chuyện gì cũng đang kể rồi ấy =)) ê nhưng mà thôi để chúc ngủ ngon nhé =)) cậu đi ngủ thì cậu ngủ ngon nhé, ngủ ngon, ngủ ngoan với cả mơ đẹp nghe chưa =)) tớ yêu cậu nhiều lắm =)) ❤️</p>` },
         { day: 3, title: "Gửi cậu, ngày thứ ba, lại một ngày nỗ lực rồi", 
             content: `<p>Tớ biết việc học và thích nghi với môi trường mới, các bạn mới không dễ dàng. Tớ tự hào về cậu nhiều lắm. Mỗi ngày trôi qua, cậu lại càng giỏi giang hơn một chút đấy.</p><p>Hôm nay có gì vui hay có gì khiến cậu mệt mỏi, tức giận không? Kể cho tớ nghe, lov u so much luôn</p>` },
         { day: 4, title: "Ngày thứ 4, tớ lại nhớ khoảng khắc đấy =))) dyeu v", 
@@ -505,6 +505,7 @@ export const constellationsData = {
         }
     }
 };
+
 
 
 
