@@ -94,7 +94,7 @@
         { day: 8, title: "helo bae, ê í là cậu yêu vkl =)) ", 
             content: `<p>Thế là đầu tuần cuối cùng ở Việt Nam =))) nghe cứ hụt hẫng tdn ấy cậu ơi nma tớ hy vọng cậu đừng khóc nhé =)) nhớ lời tớ dặn về khóc khi nào rồi đấy =))) .</p><p>Đừng lo lắng quá nhé, Bên cạnh cậu còn gia đình, còn tớ nữa. Tớ luôn tin ở cậu. Mạnh mẽ lên !!! love u so much luôn </p>` },
         { day: 9, title: "Hê và lô cậu =))) ê nma cậu yêu vl ", 
-            content: `<p>Hoa đẹp chứ? Ê ý là thấy tone màu đấy hợp cả cậu vl =)) kiểu xinh xinh lại còn dịu dàng nữa omg tuyệt. Cậu alws phải vui vẻ, same cái vibe với bông hoa nhé =)) kiểu là luôn tươi cười, vui vẻ như cách bông hoa nở rộ nhé. Tớ yêu cậu nhiều lắm luôn ý </p>` },
+            content: `<p>ê nhé sáng nay dậy là nóng vkl thế nào tối qua ngủ không bật quạt không bật điều hòa :)) ảo vl vẫn ngủ ngon ơ 9h sáng mới tỉnh giấc chắc điên mẹ thật rồi đấy, ê biết gì không hnay di học bác đức vui lắm để tí kể cho nhé tyeu nếu cậu còn sức nếu mệt thì thôi nhé, mình để hôm sau cũng được cũng được nhé với cả là ê hôm nay nghĩ là sao lại trêu bạn hà nhiều thế =))), nhưng lại nghĩ quên thì bạn được hưởng mà =))) hưởng gì ngon thế kbt :)) mỗi tội sợ b hà đè thôi sợ ơi sợ, nhìn tưởng v mà không phải vậy, sáng nay b tùng anh đi làm quên mất không ăn trưa, sorry tyeu nha, bị tập trung quá quên luôn huuhu sorry tyeu nhiều lắm đấy nhé, không cố ý đâu nhé, siêu xin lỗi cậu nhiều luôn, về bù cho nhé hehehe =))) à với cả thật ra tớ không uống nước lạnh đâu nhé =))) nhà hết đá từ lâu lắm r =)) còn chả để nước vào tủ lạnh để uống ấy .. nên là bạn tùng anh nghe lời b hà lắm nhé, đừng có giận nếu tôi còn ho nhé tyeu =)) à với cả tớ thấy hnay ấy câu có vẻ bận mà lại còn học nhiều nũa hay là thôi nhé =))  thôi call ấy, sợ tyeu mệt xong cố để nghe í là thôi, để tớ voice cho cậu nghe là được rùi, ngủ cho sớm dù gì mai cũng vẫn phải học đấy.... ê tớ yêu cậu nhiều lắm , em yêu chị hà nhiều lắm, anh yêu em sv năm nhất nhiều lắm =))) ê nghe dài quá tóm lại là yêu nhiều lắm nhé =)) ngủ ngoan nhé, i love you so much luôn đấy </p>` },
         { day: 10, title: "Gửi cậu, còn 3 ngày nữa là cậu lên đường rùi", 
             content: `<p>Công nhận thời gian trôi nhanh thật =))) mới ngày nào còn mới nói chuyện vậy mà đã chuẩn bị đi rồi huhu không phải buồn 1 chút nữa rồi mà buồn nhiều nhiều chút. Nhưng mà trộm vía mỗi tối được nói chuyện với cậu là kiểu vui vl ấy =))  Love you so so so so so.... much luôn.</p>` },
         { day: 11, title: "Còn 2 ngày nữa, ối giời ơi...",
@@ -159,8 +159,8 @@
             content: `<p>Cuối tuần rồi! Hôm nay cậu có dự định gì đặc biệt không? Dù làm gì cũng hãy thật vui nhé. Nhớ giữ gìn sức khỏe.</p>` },
         { day: 8, title: "Ê thứ 2 cuối cùng rồi đấy =)) í là t2 cuối ở đây =)) ", 
             content: `<p>Chúc cậu một thứ hai vui vẻ và luôn là kiểu happy, và hehehe luôn có tớ bên cạnh cậu nhaa alws luôn. Tạm gác lại sách vở và yes chuẩn bị thôi nào =)) í là cái thư này cũng cũng bình thường thôi =))) nói lời vẫn cứ akelo hơn =)) </p>` },
-        { day: 9, title: "Thứ 3 CUỐI rồi omg nhanh vkl ", 
-            content: `<p>Tuần cuối rồi, chúc cậu sang bên đấy mạnh khỏe và cố gắng học hành tốt nhé =)) mặc dù chưa đi đâu nma th kệ di cứ chúc. Cố lên cô gái của tớ =))) </p>` },
+        { day: 9, title: " helo tyeu nhé ", 
+            content: `<p>ê sáng nay cậu dậy có mệt không thế kiểu như là mình đang bị thói quen nghỉ ấy, nghỉ hẳn 8 ngày cơ mà, phải tớ là ê lười nhé =)) cậu sáng nay học chăm nhé cả chiều nữa, ngoan nhé đừng có bướng, đừng có đánh b đấy nhé, đừng có bắt nạt b nha =))) à sáng nay đạp xe đạp quên mất =)) khỏe nhể, ác đấy chứ, thế này thì cần gì oxi trên giường nhỉ =))) ê thôi nhé tập trung học đi nhé tyeu tớ yêu cậu nhiều lắm đấy nhaaa love u so much, ngoan, về đây tôi thương nhớ chưa, yêu lắm đấy  </p>` },
         { day: 10, title: "Gửi cậu, ngày giữa tuần cuối ở đây...", 
             content: `<p>dcm sao nhanh thế kbt omg ê nhớ cậu qs đấy buồn vkl sắp di rồi kìa huhuhuhuhuhu buồn nhiều chút nha, nma ksao vẫn còn cậu bên cạnh tớ mà hehehe love u sm</p>` },
         { day: 11, title: "Gửi cậu, còn mỗi 2 ngày nữa thuii...", 
@@ -505,6 +505,7 @@ export const constellationsData = {
         }
     }
 };
+
 
 
 
