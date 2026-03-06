@@ -18,7 +18,7 @@ export const birthdayData = {
 
 /* --- DỮ LIỆU QUỐC TẾ PHỤ NỮ 8/3 --- */
 export const march8thData = {
-    day: 6, month: 3,
+    day: 8, month: 3,
     letter: {
         title: "Gửi người phụ nữ tuyệt vời nhất của tớ 💖",
         content: `<p>Chúc mừng ngày Quốc tế Phụ nữ 8/3! Hôm nay là ngày để tôn vinh những người phụ nữ tuyệt vời, và đối với tớ, cậu chính là người tuyệt vời nhất trong vũ trụ này.</p>
