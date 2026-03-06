@@ -23,7 +23,8 @@ import {
     memoriesData,
     memoryShardsData,
     unlockedMemory,
-    constellationsData
+    constellationsData,
+    march8thData
 } from './data.js';
 
 // Import HÀM LẤY DỮ LIỆU THỜI TIẾT
@@ -81,6 +82,7 @@ const activeParticles = new Set();
 let upNextPlaylist = [];
 let upNextIndex = 0;
 let isBirthdayMode = false;
+let isMarch8thMode = false;
 let typingInterval = null;
 let wavesurfer;
 let scene, camera, renderer, controls, ambientLight, sunLight;
@@ -1189,6 +1191,13 @@ function runBirthdayCheck() {
     return isBirthdayMode;
 }
 
+function runMarch8thCheck() {
+    if (!march8thData) return false;
+    const now = new Date();
+    isMarch8thMode = (now.getDate() === march8thData.day && now.getMonth() + 1 === march8thData.month);
+    return isMarch8thMode;
+}
+
 function activateBirthdayMode() {
     const btn = document.getElementById('special-day-btn');
     btn.classList.remove('hidden');
@@ -1196,6 +1205,24 @@ function activateBirthdayMode() {
     setTimeout(() => { celebrationOverlay.style.display = 'flex'; celebrationOverlay.style.opacity = '1'; }, 1000);
     setTimeout(() => { celebrationOverlay.style.opacity = '0'; setTimeout(() => celebrationOverlay.style.display = 'none', 1000); }, 5000);
     btn.addEventListener('click', () => openLetter(birthdayData.letter, birthdayData.song, true));
+}
+
+function activateMarch8thMode() {
+    const btn = document.getElementById('special-day-btn');
+    const startPromptH1 = document.querySelector('.start-prompt h1');
+    const startPromptP = document.querySelector('.start-prompt p');
+
+    if (startPromptH1) startPromptH1.textContent = "Happy March 8th! 🌸";
+    if (startPromptP) startPromptP.textContent = "Chạm để nhận món quà đặc biệt";
+
+    btn.classList.remove('hidden');
+    gsap.from(btn, { scale: 0, opacity: 0, duration: 1.5, ease: "back.out(1.7)", delay: 1 });
+
+    // Hiệu ứng pháo hoa khi click nút 8/3
+    btn.addEventListener('click', () => {
+        openLetter(march8thData.letter, march8thData.song, true);
+        startMeteorShower(); // Trigger hiệu ứng sao băng lãng mạn
+    });
 }
 
 function getLetterForCurrentTime() {
@@ -2094,6 +2121,7 @@ async function init() {
     }, 900000);
 
     runBirthdayCheck();
+    runMarch8thCheck();
     setupUIEventListeners();
     await initThreeJS();
     showConstellationHelper("Gợi ý: Hãy thử tìm những ngôi sao đang phát sáng nhẹ trong vũ trụ...", 6000);
@@ -2120,6 +2148,8 @@ async function init() {
 
     if (isBirthdayMode) {
         activateBirthdayMode();
+    } else if (isMarch8thMode) {
+        activateMarch8thMode();
     } else {
         checkAndSetupLetterButton();
     }

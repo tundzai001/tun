@@ -16,6 +16,19 @@
         song: { file: "https://treuah.netlify.app/ordinary.mp3", title: "Ordinary - Alex Warren" }
     };
 
+    /* --- DỮ LIỆU QUỐC TẾ PHỤ NỮ 8/3 --- */
+    export const march8thData = {
+        day: 8, month: 3,
+        letter: {
+            title: "Gửi người phụ nữ tuyệt vời nhất của tớ 💖",
+            content: `<p>Chúc mừng ngày Quốc tế Phụ nữ 8/3! Hôm nay là ngày để tôn vinh những người phụ nữ tuyệt vời, và đối với tớ, cậu chính là người tuyệt vời nhất trong vũ trụ này.</p>
+                      <p>Tớ hy vọng cậu luôn luôn xinh đẹp, rạng rỡ và hạnh phúc với những gì mình đang làm. Cậu giống như một ngôi sao lung linh nhất, luôn sưởi ấm và soi sáng mọi ngóc ngách trong trái tim tớ. Dù khoảng cách có xa xôi, nhưng tình cảm tớ dành cho cậu vẫn luôn đong đầy và không bao giờ thay đổi.</p>
+                      <p>Hãy luôn tự tin là chính mình, một cô gái mạnh mẽ, dũng cảm nhưng cũng vô cùng dịu dàng nhé. Ngày hôm nay hãy thật vui vẻ và tận hưởng những điều ngọt ngào nhất dành riêng cho cậu.</p>
+                      <p>Tớ yêu cậu nhiều lắm! Chúc mừng ngày 8/3 nhé bae! ❤️</p>`
+        },
+        song: { file: "https://treuah.netlify.app/main/chamhoa.mp3", title: "Chăm Hoa - Mono" }
+    };
+
     /* --- PLAYLIST CHÍNH  --- */
     export const mainPlaylist = [ 
         { file: "https://treuah.netlify.app/leduong.mp3", title: "Lễ đường - Kai Đinh" }, 
