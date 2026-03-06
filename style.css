@@ -160,6 +160,7 @@ body {
     -webkit-backdrop-filter: blur(10px);
     cursor: pointer;
     transition: opacity 0.8s ease, backdrop-filter 0.8s ease;
+    will-change: opacity, backdrop-filter;
 }
 
 #music-overlay.hidden-overlay {
@@ -232,6 +233,7 @@ body {
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: opacity 0.5s, transform 0.5s;
+    will-change: transform, opacity;
 }
 
 #waveform-controls.hidden {
@@ -323,6 +325,7 @@ body {
     transition: opacity 0.4s ease, transform 0.4s ease, bottom 0.5s ease;
     pointer-events: none;
     z-index: 1002;
+    will-change: transform, opacity;
 }
 
 #planet-info-card:not(.hidden) {
@@ -377,6 +380,7 @@ body {
     transform: scale(0.95);
     transition: opacity 0.5s ease, transform 0.5s ease;
     pointer-events: none;
+    will-change: transform, opacity;
 }
 
 #letter-container:not(.hidden) {
@@ -480,6 +484,7 @@ body {
     align-items: center;
     backdrop-filter: blur(10px);
     transition: background-color 0.3s, transform 0.3s;
+    will-change: transform;
 }
 
 .floating-controls button:hover {

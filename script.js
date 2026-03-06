@@ -1405,7 +1405,8 @@ async function createSpaceship() {
 }
 
 function createStarfield() {
-    const starCount = 10000;
+    const isHighEndDevice = !window.matchMedia("(max-width: 768px)").matches;
+    const starCount = isHighEndDevice ? 6000 : 3000;
     const positions = [], colors = [];
     const color = new THREE.Color();
     for (let i = 0; i < starCount; i++) {
@@ -1423,10 +1424,12 @@ function createStarfield() {
 }
 
 function createSolarSystem(textureLoader) {
+    const isHighEndDevice = !window.matchMedia("(max-width: 768px)").matches;
+    const segments = isHighEndDevice ? 64 : 32;
     celestialData.forEach(data => {
         const pivot = new THREE.Object3D();
         scene.add(pivot);
-        const geometry = new THREE.SphereGeometry(data.size, 64, 64);
+        const geometry = new THREE.SphereGeometry(data.size, segments, segments);
         let material;
         if (data.type === 'star') {
             const uniforms = { uTime: { value: 0.0 }, uTexture: { value: textureLoader.load(data.texture) } };
@@ -1457,7 +1460,8 @@ function createSunEffects(sunMesh) {
 }
 
 function createProceduralSaturnRing() {
-    const particleCount = 20000;
+    const isHighEndDevice = !window.matchMedia("(max-width: 768px)").matches;
+    const particleCount = isHighEndDevice ? 10000 : 5000;
     const positions = [], colors = [], customData = [];
     const innerRadius = 40, outerRadius = 65, thickness = 2;
     const colorInside = new THREE.Color("#A19A87"), colorMiddle = new THREE.Color("#8C826B"), colorOutside = new THREE.Color("#B5AF9D");
@@ -2055,9 +2059,11 @@ async function initThreeJS() {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 4000);
     camera.position.set(0, 150, 400);
 
+    const isHighEndDevice = !window.matchMedia("(max-width: 768px)").matches;
+
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setClearColor(0x000000, 0);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isHighEndDevice ? 2 : 1.5));
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
@@ -2093,7 +2099,8 @@ async function initThreeJS() {
     controls.minDistance = 20; controls.maxDistance = 1200;
 
     const renderPass = new RenderPass(scene, camera);
-    bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+    const bloomResolution = isHighEndDevice ? new THREE.Vector2(window.innerWidth, window.innerHeight) : new THREE.Vector2(window.innerWidth / 2, window.innerHeight / 2);
+    bloomPass = new UnrealBloomPass(bloomResolution, 1.5, 0.4, 0.85);
     bloomPass.threshold = 0; bloomPass.strength = 0.6; bloomPass.radius = 0.5;
     composer = new EffectComposer(renderer);
     composer.addPass(renderPass);
@@ -2157,7 +2164,7 @@ async function init() {
     showConstellationHelper("Gợi ý: Hãy thử tìm những ngôi sao đang phát sáng nhẹ trong vũ trụ...", 6000);
 
     createProceduralSaturnRing();
-    createAsteroidBelt(375, 50, 2000);
+    createAsteroidBelt(375, 50, isHighEndDevice ? 1000 : 400);
 
     checkAndPreloadNightlySong();
     setInterval(checkAndPreloadNightlySong, 60000);
