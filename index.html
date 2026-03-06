@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -8,12 +9,17 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=Dancing+Script:wght@700&display=swap"
+        rel="stylesheet">
+
     <!-- Thư viện Leaflet cho bản đồ chuyến bay -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
+
 <body>
     <!-- ========= PHẦN NỀN VÀ 3D ========= -->
     <canvas id="webgl-canvas"></canvas>
@@ -41,7 +47,7 @@
     </div>
 
     <!-- ========= CÁC THÀNH PHẦN GIAO DIỆN CHÍNH ========= -->
-    
+
     <!-- Nhóm các widget ở góc trên bên trái -->
     <div class="top-left-widgets">
         <!-- WIDGET THỜI TIẾT -->
@@ -84,12 +90,12 @@
 
         <!-- Nhóm các nút ở góc dưới bên phải -->
         <div class="bottom-right-controls">
-             <button id="start-journey-btn" title="Bắt đầu hành trình">🚀</button>
-             <button id="open-letter-form-btn" title="Gửi lời nhắn cho tớ">✉️</button>
-             <button id="special-day-btn" class="hidden">💌</button>
+            <button id="start-journey-btn" title="Bắt đầu hành trình">🚀</button>
+            <button id="open-letter-form-btn" title="Gửi lời nhắn cho tớ">✉️</button>
+            <button id="special-day-btn" class="hidden">💌</button>
         </div>
     </div>
-    
+
     <!-- BẢNG CÀI ĐẶT -->
     <div id="settings-panel" class="hidden">
         <label for="volume-slider">Âm lượng:</label>
@@ -148,6 +154,7 @@
                 <div class="flap-right"></div>
                 <div class="flap-bottom"></div>
                 <div class="flap-top"></div>
+                <div class="wax-seal"></div>
             </div>
         </div>
     </div>
@@ -164,7 +171,7 @@
     </div>
 
     <!-- ========= CÁC LỚP PHỦ CHO SỰ KIỆN ĐẶC BIỆT ========= -->
-    
+
     <!-- LỚP PHỦ SINH NHẬT -->
     <div id="birthday-celebration">
         <p>Chúc mừng sinh nhật cậu!</p>
@@ -223,7 +230,7 @@
             gl_FragColor = vec4(r, g, b, 1.0);
         }
     </script>
-     <script type="x-shader/x-fragment" id="sunFragmentShader">
+    <script type="x-shader/x-fragment" id="sunFragmentShader">
         uniform float uTime;
         uniform sampler2D uTexture;
         varying vec2 vUv;
@@ -236,7 +243,7 @@
             gl_FragColor = vec4(finalColor, 1.0);
         }
     </script>
-    
+
     <!-- ========= CÁC THƯ VIỆN JAVASCRIPT ========= -->
     <script type="importmap">
     {
@@ -248,10 +255,11 @@
     </script>
     <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    
+
     <!-- ========= CÁC FILE SCRIPT CỦA DỰ ÁN ========= -->
     <script src="./data.js" type="module"></script>
     <script src="./weather.js" type="module"></script>
     <script src="./script.js" type="module"></script>
 </body>
+
 </html>

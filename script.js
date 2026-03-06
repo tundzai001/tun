@@ -1207,6 +1207,33 @@ function activateBirthdayMode() {
     btn.addEventListener('click', () => openLetter(birthdayData.letter, birthdayData.song, true));
 }
 
+function playMarch8thAnimation() {
+    startMeteorShower(); // Trigger hiệu ứng sao băng lãng mạn
+
+    const envelopeContainer = document.getElementById('envelope-container');
+    if (envelopeContainer && typeof gsap !== 'undefined') {
+        envelopeContainer.classList.remove('hidden');
+        const tl = gsap.timeline();
+        tl.set('.envelope-wrapper', { scale: 1, opacity: 1 })
+            .set('.flap-top', { rotationX: 0, zIndex: 6 })
+            .set('.letter-inside', { y: 0, scale: 1, zIndex: 2 })
+            .set('.wax-seal', { scale: 1, opacity: 1 })
+            .fromTo('.envelope-wrapper', { y: 150, opacity: 0 }, { y: 0, opacity: 1, duration: 1.0, ease: "back.out(1.2)" })
+            .to('.wax-seal', { scale: 1.5, opacity: 0, duration: 0.4, ease: "power2.in" }, "+=0.3")
+            .to('.flap-top', { rotationX: 180, duration: 0.6, ease: "power2.inOut" }, "-=0.2")
+            .set('.flap-top', { zIndex: 1 })
+            .set('.letter-inside', { zIndex: 6 })
+            .to('.letter-inside', { y: -80, scale: 1.1, duration: 0.8, ease: "power2.out" })
+            .to('.envelope-wrapper', { scale: 3, opacity: 0, duration: 1.0, ease: "power2.in" }, "+=0.5")
+            .add(() => {
+                envelopeContainer.classList.add('hidden');
+                openLetter(march8thData.letter, march8thData.song, true);
+            });
+    } else {
+        openLetter(march8thData.letter, march8thData.song, true);
+    }
+}
+
 function activateMarch8thMode() {
     const btn = document.getElementById('special-day-btn');
     const startPromptH1 = document.querySelector('.start-prompt h1');
@@ -1218,30 +1245,9 @@ function activateMarch8thMode() {
     btn.classList.remove('hidden');
     gsap.from(btn, { scale: 0, opacity: 0, duration: 1.5, ease: "back.out(1.7)", delay: 1 });
 
-    // Hiệu ứng pháo hoa và hộp thư mở ra khi click nút 8/3
+    // Cài đặt nút để có thể mở lại thư nếu cần
     btn.addEventListener('click', () => {
-        startMeteorShower(); // Trigger hiệu ứng sao băng lãng mạn
-
-        const envelopeContainer = document.getElementById('envelope-container');
-        if (envelopeContainer && typeof gsap !== 'undefined') {
-            envelopeContainer.classList.remove('hidden');
-            const tl = gsap.timeline();
-            tl.set('.envelope-wrapper', { scale: 1, opacity: 1 })
-                .set('.flap-top', { rotationX: 0, zIndex: 5 })
-                .set('.letter-inside', { y: 0, scale: 1, zIndex: 2 })
-                .fromTo('.envelope-wrapper', { y: 100, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "back.out(1.2)" })
-                .to('.flap-top', { rotationX: 180, duration: 0.6, ease: "power2.inOut" }, "+=0.5")
-                .set('.flap-top', { zIndex: 1 })
-                .set('.letter-inside', { zIndex: 6 })
-                .to('.letter-inside', { y: -80, scale: 1.1, duration: 0.8, ease: "power2.out" })
-                .to('.envelope-wrapper', { scale: 3, opacity: 0, duration: 1.0, ease: "power2.in" }, "+=0.5")
-                .add(() => {
-                    envelopeContainer.classList.add('hidden');
-                    openLetter(march8thData.letter, march8thData.song, true);
-                });
-        } else {
-            openLetter(march8thData.letter, march8thData.song, true);
-        }
+        playMarch8thAnimation();
     });
 }
 
@@ -1332,6 +1338,10 @@ function setupUIEventListeners() {
             audioAnalyser.connect(audioCtx.destination);
             audioAnalyser.fftSize = 128;
             audioDataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
+        }
+
+        if (isMarch8thMode) {
+            setTimeout(playMarch8thAnimation, 500);
         }
     };
 
