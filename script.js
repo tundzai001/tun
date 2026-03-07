@@ -1222,6 +1222,18 @@ function playMarch8thAnimation() {
         envelopeContainer.style.backdropFilter = 'blur(12px)';
         envelopeContainer.style.webkitBackdropFilter = 'blur(12px)';
 
+        const letterInside = envelopeContainer.querySelector('.letter-inside');
+        // Setting class and inserting div to type text on paper
+        letterInside.classList.add('march8th-paper');
+        letterInside.innerHTML = `
+            <div class="paper-text"></div>
+            <div class="heart-icon-wrapper" style="width: 100%; text-align: center; margin-top: 15px; opacity: 0; transform: scale(0);">
+                <span class="heart-icon" style="margin: 0;">🌸</span>
+            </div>
+        `;
+        const paperTextElem = letterInside.querySelector('.paper-text');
+        const heartWrapper = letterInside.querySelector('.heart-icon-wrapper');
+
         const tl = gsap.timeline();
         tl.set('.envelope-wrapper', { scale: 1, opacity: 1, rotation: -8 })
             .set('.flap-top', { rotationX: 0, zIndex: 6 })
@@ -1237,16 +1249,33 @@ function playMarch8thAnimation() {
             .to('.flap-top', { rotationX: 180, duration: 0.7, ease: "power2.inOut" }, "-=0.3")
             .set('.flap-top', { zIndex: 1 })
             .set('.letter-inside', { zIndex: 6 })
-            // Rút thư ra cao hơn một chút
-            .to('.letter-inside', { y: -120, scale: 1.15, duration: 0.9, ease: "back.out(1.2)" })
-            // Phóng to mạnh vào lá thư và fade out phong bì
-            .to('.envelope-wrapper', { scale: 5, opacity: 0, duration: 1.5, ease: "power3.in" }, "+=0.5")
+            // Rút thư ra cao hơn một chút lộ trang giấy
+            .to('.letter-inside', { y: -160, scale: 1.2, duration: 1.0, ease: "back.out(1.2)" })
             .add(() => {
-                envelopeContainer.classList.add('hidden');
-                envelopeContainer.style.background = '';
-                envelopeContainer.style.backdropFilter = '';
-                envelopeContainer.style.webkitBackdropFilter = '';
-                openLetter(march8thData.letter, march8thData.song, true);
+                // Hiệu ứng chữ chạy trên thư
+                const textToType = "Hello cậu,<br>Gửi người tuyệt vời nhất... 💖";
+                typewriterEffect([{ element: paperTextElem, text: textToType }], () => {
+                    // Chạy chữ xong thì bật cái icon blossom lên
+                    gsap.to(heartWrapper, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" });
+
+                    // Bay thẳng sát vào bức thư
+                    setTimeout(() => {
+                        gsap.to('.envelope-wrapper', {
+                            scale: 5, opacity: 0, duration: 1.3, ease: "power3.in", onComplete: () => {
+                                envelopeContainer.classList.add('hidden');
+                                envelopeContainer.style.background = '';
+                                envelopeContainer.style.backdropFilter = '';
+                                envelopeContainer.style.webkitBackdropFilter = '';
+
+                                // Trả cấu trúc chuẩn về
+                                letterInside.classList.remove('march8th-paper');
+                                letterInside.innerHTML = '<span class="heart-icon">❤️</span>';
+
+                                openLetter(march8thData.letter, march8thData.song, true);
+                            }
+                        });
+                    }, 1200);
+                });
             });
     } else {
         openLetter(march8thData.letter, march8thData.song, true);

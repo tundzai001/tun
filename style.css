@@ -1357,9 +1357,40 @@ body.state-night {
     will-change: transform, opacity;
 }
 
+.envelope .letter-inside.march8th-paper {
+    display: block;
+    padding: 30px 20px 0 20px;
+}
+
+.paper-text {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.6rem;
+    color: #e91e63;
+    line-height: 29px;
+    /* Khớp với độ rộng dòng kẻ */
+    text-align: left;
+    white-space: pre-wrap;
+    width: 100%;
+    text-shadow: 0 1px 2px rgba(255, 182, 193, 0.5);
+}
+
 .envelope .heart-icon {
     font-size: 4.5rem;
-    animation: beat 1.2s infinite;
+    animation: beat-emoji 1.2s infinite;
     display: block;
+    margin: 0 auto;
+    /* Căn giữa nếu display block */
     filter: drop-shadow(0 4px 10px rgba(255, 105, 180, 0.6));
+}
+
+@keyframes beat-emoji {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.15);
+    }
 }
