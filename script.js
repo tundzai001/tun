@@ -1235,55 +1235,85 @@ function playMarch8thAnimation() {
         const heartWrapper = letterInside.querySelector('.heart-icon-wrapper');
 
         const tl = gsap.timeline();
+        const tl = gsap.timeline();
         tl.set('.envelope-wrapper', { scale: 1, opacity: 1, rotationX: 0, rotationZ: 0, rotationY: 0, x: 0, y: 0 })
             .set('.flap-top', { rotationX: 0, zIndex: 6 })
-            .set('.letter-inside', { y: 0, scale: 1, zIndex: 2 })
+            .set('.letter-inside', { y: 0, scale: 1, zIndex: 2, rotationZ: 0, rotationX: 0 })
             .set('.wax-seal', { scale: 1, opacity: 1, rotation: 0 })
-            // Bay từ dưới lên, cuộn một vòng (cinematic entrance)
+            // Bay từ dưới lên sâu trong trục Z (cinematic entrance 3D phi thực tế)
             .fromTo('.envelope-wrapper',
-                { y: 400, opacity: 0, rotationZ: -10, rotationX: 60, scale: 0.5 },
-                { y: 0, opacity: 1, rotationZ: 0, rotationX: 0, scale: 1, duration: 1.5, ease: "power3.out" }
+                { y: 600, z: -800, opacity: 0, rotationZ: -15, rotationX: 75, scale: 0.1 },
+                { y: 0, z: 0, opacity: 1, rotationZ: 0, rotationX: 0, scale: 1, duration: 2.0, ease: "expo.out" }
             )
-            // Lắc vỗ cánh nhẹ như đang trôi nổi
-            .to('.envelope-wrapper', { y: -15, rotationZ: 2, duration: 1.2, yoyo: true, repeat: 1, ease: "sine.inOut" })
-            // Con dấu xoay phình ra và phát sáng rồi nổ tung (fade)
-            .to('.wax-seal', { scale: 3, rotation: 180, opacity: 0, filter: "blur(5px)", duration: 0.6, ease: "power2.in" }, "+=0.1")
-            // Nắp phong bì mở mượt mà
-            .to('.flap-top', { rotationX: 180, duration: 0.8, ease: "power2.inOut" }, "-=0.2")
+            // Lắc vỗ cánh nhẹ như đang trôi nổi không trọng lượng
+            .to('.envelope-wrapper', { y: -20, rotationZ: 3, rotationX: 5, duration: 1.5, yoyo: true, repeat: 1, ease: "sine.inOut" })
+            // Con dấu vỡ vụn phát sáng (glow & disperse) - rung nhẹ rồi nổ
+            .to('.wax-seal', { scale: 1.1, yoyo: true, repeat: 2, duration: 0.15 })
+            .to('.wax-seal', { scale: 4, rotation: 360, opacity: 0, filter: "brightness(3) blur(10px)", duration: 0.7, ease: "power2.in" }, "+=0.1")
+            // Nắp phong bì bung mở đầy tính vật lý (có độ nảy như lò xo)
+            .to('.flap-top', { rotationX: 180, duration: 1.0, ease: "elastic.out(1.2, 0.4)" }, "-=0.3")
             .set('.flap-top', { zIndex: 1 })
             .set('.letter-inside', { zIndex: 6 })
-            // Thư bay lộ ra ngoài một cách dứt khoát
-            .to('.letter-inside', { y: -180, scale: 1.05, duration: 1.2, ease: "back.out(1.1)" })
-            // CÚ PUSH-IN KỸ THUẬT SỐ (Camera zoom cực nét vào bức thư)
-            // wrapper di chuyển mạnh xuống dưới (y=440) để tiêu điểm của màn hình rơi vào bức thư
-            .to('.envelope-wrapper', { scale: 2.6, y: 440, x: -5, rotationX: 10, duration: 1.5, ease: "power3.inOut" })
+            // Thư rút ra từ từ, nghiêng nhẹ (3D slide)
+            .to('.letter-inside', { y: -180, scale: 1.05, rotationZ: -2, duration: 1.2, ease: "power3.out" })
+            // CÚ PUSH-IN KỸ THUẬT SỐ: Máy quay lao thẳng vào thư, phong bì mờ dần lùi lại
+            .to('.envelope', { filter: "brightness(0.6) blur(3px)", duration: 1.5 }, "zoomIn")
+            .to('.envelope-wrapper', { scale: 2.8, y: 460, x: -10, rotationX: 12, rotationY: 4, duration: 1.8, ease: "power3.inOut" }, "zoomIn")
             .add(() => {
                 const textToType = "Hello cậu,<br>Gửi người tuyệt vời nhất... 💖";
 
-                // TRACKING SHOT DOLLY CAMERA chậm rãi lia lúc đang viết chữ thư
-                gsap.to('.envelope-wrapper', { scale: 2.8, y: 470, x: 10, rotationZ: -1, duration: 4.0, ease: "none" });
+                // TRACKING SHOT DOLLY CAMERA: Lia góc máy cực chậm mượt mà
+                gsap.to('.envelope-wrapper', { scale: 3.0, y: 490, x: 15, rotationY: -2, rotationX: 8, duration: 4.5, ease: "none" });
 
                 typewriterEffect([{ element: paperTextElem, text: textToType }], () => {
                     paperTextElem.classList.add('typing-done'); // Xoá con trỏ nhấp nháy
 
-                    // ZOOM OUT TỪ TỪ (Camera Pullback) để thấy nụ hoa đào chuẩn bị bung nở
+                    // ZOOM OUT CUỐI & BUNG NỞ HOA CỰC ĐẠI (Master Level)
                     gsap.to('.envelope-wrapper', {
-                        scale: 1.3, y: -20, x: 0, rotationX: 0, rotationZ: 0, duration: 1.5, ease: "power3.inOut", onComplete: () => {
-                            // Hoa đào xoay vòng nảy to ra và toả sáng
-                            gsap.fromTo(heartWrapper,
-                                { opacity: 0, scale: 0, rotation: -180 },
-                                { opacity: 1, scale: 1.8, rotation: 0, duration: 1.2, ease: "elastic.out(1, 0.5)" }
-                            );
-                            gsap.to(heartWrapper, { scale: 1.3, duration: 0.8, ease: "sine.inOut", delay: 1.2 });
+                        scale: 1.3, y: -30, x: 0, rotationX: 0, rotationY: 0, rotationZ: 0, duration: 1.8, ease: "expo.inOut", onComplete: () => {
+                            // TẠO VỤ NỔ HẠT SÁNG KHI HOA NỞ (Particle Burst)
+                            const rect = heartWrapper.getBoundingClientRect();
+                            for (let i = 0; i < 25; i++) {
+                                const particle = document.createElement('div');
+                                particle.innerHTML = ['✨', '🌸', '💫', '💖'][Math.floor(Math.random() * 4)];
+                                particle.style.position = 'absolute';
+                                particle.style.left = '50%'; particle.style.top = '70%';
+                                particle.style.transform = 'translate(-50%, -50%)';
+                                particle.style.pointerEvents = 'none';
+                                particle.style.zIndex = '10';
+                                particle.style.fontSize = `${Math.random() * 15 + 10}px`;
+                                particle.style.filter = "drop-shadow(0 0 5px rgba(255, 105, 180, 0.8))";
+                                letterInside.appendChild(particle);
 
-                            // WARP SPEED CAMERA LAO THẲNG VÀO TÂM HOA / BỨC THƯ ĐỂ MỞ CẢNH MỚI BÊN TRONG 
+                                const angle = Math.random() * Math.PI * 2;
+                                const distance = 70 + Math.random() * 100;
+                                gsap.fromTo(particle,
+                                    { x: 0, y: 0, scale: 0, opacity: 1 },
+                                    { x: Math.cos(angle) * distance, y: Math.sin(angle) * distance, scale: Math.random() * 1.5 + 0.5, opacity: 0, rotation: Math.random() * 360, duration: 1.2 + Math.random() * 0.8, ease: "power3.out" }
+                                );
+                                setTimeout(() => particle.remove(), 2500); // Clean up
+                            }
+
+                            // Hoa đào chính nở rộ rực sáng kèm filter
+                            gsap.fromTo(heartWrapper,
+                                { opacity: 0, scale: 0, rotation: -180, filter: "brightness(3) blur(10px)" },
+                                { opacity: 1, scale: 1.8, rotation: 0, filter: "brightness(1) blur(0px)", duration: 1.5, ease: "elastic.out(1, 0.4)" }
+                            );
+                            // Hiệu ứng "nhịp tim" / "vẫy cánh" của hoa
+                            gsap.to(heartWrapper, { scale: 1.4, rotation: 5, duration: 0.8, ease: "sine.inOut", yoyo: true, repeat: 1, delay: 1.5 });
+
+                            // WARP SPEED CAMERA LAO MẠNH XÉ GIÓ
                             setTimeout(() => {
+                                // Phong bì xoắn ốc lao qua khung hình
                                 gsap.to('.envelope-wrapper', {
-                                    scale: 25, opacity: 0, rotationZ: 15, y: -100, x: -50, duration: 1.0, ease: "expo.in", onComplete: () => {
+                                    scale: 35, opacity: 0, rotationZ: 45, rotationX: -20, y: 300, filter: "blur(20px)", duration: 1.1, ease: "expo.in", onComplete: () => {
                                         envelopeContainer.classList.add('hidden');
                                         envelopeContainer.style.background = '';
                                         envelopeContainer.style.backdropFilter = '';
                                         envelopeContainer.style.webkitBackdropFilter = '';
+
+                                        // Reset lại các filter và thuộc tính bị thay đổi
+                                        gsap.set('.envelope', { filter: "none", opacity: 1 });
 
                                         // Trả cấu trúc chuẩn về
                                         letterInside.classList.remove('march8th-paper');
@@ -1292,7 +1322,7 @@ function playMarch8thAnimation() {
                                         openLetter(march8thData.letter, march8thData.song, true);
                                     }
                                 });
-                            }, 2200); // Ngưng tĩnh một giây để ngắm hoa trước khi vút đi
+                            }, 3000); // Ngưng tĩnh 3 giây để người dùng chìm đắm trong vụ nổ ánh sáng và đọc thư
                         }
                     });
                 });
