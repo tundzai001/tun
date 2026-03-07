@@ -1235,43 +1235,51 @@ function playMarch8thAnimation() {
         const heartWrapper = letterInside.querySelector('.heart-icon-wrapper');
 
         const tl = gsap.timeline();
-        tl.set('.envelope-wrapper', { scale: 1, opacity: 1, rotation: -8 })
+        tl.set('.envelope-wrapper', { scale: 1, opacity: 1, rotationX: 0, rotationZ: 0, rotationY: 0, x: 0, y: 0 })
             .set('.flap-top', { rotationX: 0, zIndex: 6 })
             .set('.letter-inside', { y: 0, scale: 1, zIndex: 2 })
             .set('.wax-seal', { scale: 1, opacity: 1, rotation: 0 })
-            // Bay lên với góc nghiêng
-            .fromTo('.envelope-wrapper', { y: 250, opacity: 0, rotation: -20 }, { y: 0, opacity: 1, rotation: 0, duration: 1.2, ease: "back.out(1.4)" })
-            // Lắc nhẹ đưa đẩy (bay bổng)
-            .to('.envelope-wrapper', { y: -15, rotation: 2, duration: 0.8, yoyo: true, repeat: 1, ease: "sine.inOut" })
-            // Con dấu xoay phình ra và bay hơi
-            .to('.wax-seal', { scale: 2.5, rotation: 180, opacity: 0, duration: 0.6, ease: "power2.in" }, "+=0.2")
-            // Mở nắp phong bì
-            .to('.flap-top', { rotationX: 180, duration: 0.7, ease: "power2.inOut" }, "-=0.3")
+            // Bay từ dưới lên, cuộn một vòng (cinematic entrance)
+            .fromTo('.envelope-wrapper',
+                { y: 400, opacity: 0, rotationZ: -10, rotationX: 60, scale: 0.5 },
+                { y: 0, opacity: 1, rotationZ: 0, rotationX: 0, scale: 1, duration: 1.5, ease: "power3.out" }
+            )
+            // Lắc vỗ cánh nhẹ như đang trôi nổi
+            .to('.envelope-wrapper', { y: -15, rotationZ: 2, duration: 1.2, yoyo: true, repeat: 1, ease: "sine.inOut" })
+            // Con dấu xoay phình ra và phát sáng rồi nổ tung (fade)
+            .to('.wax-seal', { scale: 3, rotation: 180, opacity: 0, filter: "blur(5px)", duration: 0.6, ease: "power2.in" }, "+=0.1")
+            // Nắp phong bì mở mượt mà
+            .to('.flap-top', { rotationX: 180, duration: 0.8, ease: "power2.inOut" }, "-=0.2")
             .set('.flap-top', { zIndex: 1 })
             .set('.letter-inside', { zIndex: 6 })
-            // Rút thư ra cao hơn một chút lộ trang giấy
-            .to('.letter-inside', { y: -160, scale: 1.2, duration: 1.0, ease: "back.out(1.2)" })
-            // CAMERA ZOOM IN sát vào thư
-            .to('.envelope-wrapper', { scale: 2.3, y: 130, x: -10, duration: 1.2, ease: "power2.inOut" })
+            // Thư bay lộ ra ngoài một cách dứt khoát
+            .to('.letter-inside', { y: -180, scale: 1.05, duration: 1.2, ease: "back.out(1.1)" })
+            // CÚ PUSH-IN KỸ THUẬT SỐ (Camera zoom cực nét vào bức thư)
+            // wrapper di chuyển mạnh xuống dưới (y=440) để tiêu điểm của màn hình rơi vào bức thư
+            .to('.envelope-wrapper', { scale: 2.6, y: 440, x: -5, rotationX: 10, duration: 1.5, ease: "power3.inOut" })
             .add(() => {
-                // Hiệu ứng chữ chạy trên thư
                 const textToType = "Hello cậu,<br>Gửi người tuyệt vời nhất... 💖";
 
-                // Pan camera nhẹ nhàng lúc đang gõ chữ
-                gsap.to('.envelope-wrapper', { x: 10, y: 150, duration: 2.5, ease: "none" });
+                // TRACKING SHOT DOLLY CAMERA chậm rãi lia lúc đang viết chữ thư
+                gsap.to('.envelope-wrapper', { scale: 2.8, y: 470, x: 10, rotationZ: -1, duration: 4.0, ease: "none" });
 
                 typewriterEffect([{ element: paperTextElem, text: textToType }], () => {
-                    // Gõ xong, CAMERA ZOOM OUT để thấy toàn bộ lá thư
-                    gsap.to('.envelope-wrapper', {
-                        scale: 1.15, x: 0, y: 0, duration: 1.2, ease: "power2.inOut", onComplete: () => {
-                            // Chạy chữ xong thì bật cái icon blossom lên với animation xịn
-                            gsap.to(heartWrapper, { opacity: 1, scale: 1.5, rotation: 360, duration: 0.8, ease: "back.out(1.5)" });
-                            gsap.to(heartWrapper, { scale: 1, duration: 0.4, ease: "power2.inOut", delay: 0.8 });
+                    paperTextElem.classList.add('typing-done'); // Xoá con trỏ nhấp nháy
 
-                            // Delay 1 chút ngắm hoa, rồi bay thẳng sát vào bức thư xé gió
+                    // ZOOM OUT TỪ TỪ (Camera Pullback) để thấy nụ hoa đào chuẩn bị bung nở
+                    gsap.to('.envelope-wrapper', {
+                        scale: 1.3, y: -20, x: 0, rotationX: 0, rotationZ: 0, duration: 1.5, ease: "power3.inOut", onComplete: () => {
+                            // Hoa đào xoay vòng nảy to ra và toả sáng
+                            gsap.fromTo(heartWrapper,
+                                { opacity: 0, scale: 0, rotation: -180 },
+                                { opacity: 1, scale: 1.8, rotation: 0, duration: 1.2, ease: "elastic.out(1, 0.5)" }
+                            );
+                            gsap.to(heartWrapper, { scale: 1.3, duration: 0.8, ease: "sine.inOut", delay: 1.2 });
+
+                            // WARP SPEED CAMERA LAO THẲNG VÀO TÂM HOA / BỨC THƯ ĐỂ MỞ CẢNH MỚI BÊN TRONG 
                             setTimeout(() => {
                                 gsap.to('.envelope-wrapper', {
-                                    scale: 10, opacity: 0, rotation: 10, duration: 1.2, ease: "power3.in", onComplete: () => {
+                                    scale: 25, opacity: 0, rotationZ: 15, y: -100, x: -50, duration: 1.0, ease: "expo.in", onComplete: () => {
                                         envelopeContainer.classList.add('hidden');
                                         envelopeContainer.style.background = '';
                                         envelopeContainer.style.backdropFilter = '';
@@ -1284,7 +1292,7 @@ function playMarch8thAnimation() {
                                         openLetter(march8thData.letter, march8thData.song, true);
                                     }
                                 });
-                            }, 1600);
+                            }, 2200); // Ngưng tĩnh một giây để ngắm hoa trước khi vút đi
                         }
                     });
                 });

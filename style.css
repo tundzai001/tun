@@ -1379,6 +1379,25 @@ body.state-night {
     font-weight: 700;
 }
 
+.paper-text::after {
+    content: '|';
+    display: inline-block;
+    vertical-align: bottom;
+    animation: blink-cursor 1s step-start infinite;
+    color: #ff4081;
+    margin-left: 2px;
+}
+
+.paper-text.typing-done::after {
+    display: none;
+}
+
+@keyframes blink-cursor {
+    50% {
+        opacity: 0;
+    }
+}
+
 .envelope .heart-icon {
     font-size: 4.5rem;
     animation: beat-emoji 1.2s infinite;
