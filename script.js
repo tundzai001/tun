@@ -1251,30 +1251,42 @@ function playMarch8thAnimation() {
             .set('.letter-inside', { zIndex: 6 })
             // Rút thư ra cao hơn một chút lộ trang giấy
             .to('.letter-inside', { y: -160, scale: 1.2, duration: 1.0, ease: "back.out(1.2)" })
+            // CAMERA ZOOM IN sát vào thư
+            .to('.envelope-wrapper', { scale: 2.3, y: 130, x: -10, duration: 1.2, ease: "power2.inOut" })
             .add(() => {
                 // Hiệu ứng chữ chạy trên thư
                 const textToType = "Hello cậu,<br>Gửi người tuyệt vời nhất... 💖";
+
+                // Pan camera nhẹ nhàng lúc đang gõ chữ
+                gsap.to('.envelope-wrapper', { x: 10, y: 150, duration: 2.5, ease: "none" });
+
                 typewriterEffect([{ element: paperTextElem, text: textToType }], () => {
-                    // Chạy chữ xong thì bật cái icon blossom lên
-                    gsap.to(heartWrapper, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" });
+                    // Gõ xong, CAMERA ZOOM OUT để thấy toàn bộ lá thư
+                    gsap.to('.envelope-wrapper', {
+                        scale: 1.15, x: 0, y: 0, duration: 1.2, ease: "power2.inOut", onComplete: () => {
+                            // Chạy chữ xong thì bật cái icon blossom lên với animation xịn
+                            gsap.to(heartWrapper, { opacity: 1, scale: 1.5, rotation: 360, duration: 0.8, ease: "back.out(1.5)" });
+                            gsap.to(heartWrapper, { scale: 1, duration: 0.4, ease: "power2.inOut", delay: 0.8 });
 
-                    // Bay thẳng sát vào bức thư
-                    setTimeout(() => {
-                        gsap.to('.envelope-wrapper', {
-                            scale: 5, opacity: 0, duration: 1.3, ease: "power3.in", onComplete: () => {
-                                envelopeContainer.classList.add('hidden');
-                                envelopeContainer.style.background = '';
-                                envelopeContainer.style.backdropFilter = '';
-                                envelopeContainer.style.webkitBackdropFilter = '';
+                            // Delay 1 chút ngắm hoa, rồi bay thẳng sát vào bức thư xé gió
+                            setTimeout(() => {
+                                gsap.to('.envelope-wrapper', {
+                                    scale: 10, opacity: 0, rotation: 10, duration: 1.2, ease: "power3.in", onComplete: () => {
+                                        envelopeContainer.classList.add('hidden');
+                                        envelopeContainer.style.background = '';
+                                        envelopeContainer.style.backdropFilter = '';
+                                        envelopeContainer.style.webkitBackdropFilter = '';
 
-                                // Trả cấu trúc chuẩn về
-                                letterInside.classList.remove('march8th-paper');
-                                letterInside.innerHTML = '<span class="heart-icon">❤️</span>';
+                                        // Trả cấu trúc chuẩn về
+                                        letterInside.classList.remove('march8th-paper');
+                                        letterInside.innerHTML = '<span class="heart-icon">❤️</span>';
 
-                                openLetter(march8thData.letter, march8thData.song, true);
-                            }
-                        });
-                    }, 1200);
+                                        openLetter(march8thData.letter, march8thData.song, true);
+                                    }
+                                });
+                            }, 1600);
+                        }
+                    });
                 });
             });
     } else {
