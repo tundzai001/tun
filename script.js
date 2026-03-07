@@ -1314,45 +1314,47 @@ function playMarch8thAnimation() {
                                     const spawnX = window.innerWidth / 2;
                                     const spawnY = window.innerHeight / 2;
 
-                                    for (let i = 0; i < 150; i++) {
+                                    // GIẢM SỐ LƯỢNG HẠT ĐỂ FIX LAG (Từ 150 xuống 40, hạt to hơn và animation tách rời)
+                                    for (let i = 0; i < 40; i++) {
                                         const particle = document.createElement('div');
-                                        particle.innerHTML = ['🌸', '🌸', '💮', '✨', '💖', '🌸'][Math.floor(Math.random() * 6)];
+                                        particle.innerHTML = ['🌸', '💮', '✨', '💖'][Math.floor(Math.random() * 4)];
                                         particle.style.position = 'fixed';
                                         particle.style.left = `${spawnX}px`;
                                         particle.style.top = `${spawnY}px`;
                                         particle.style.pointerEvents = 'none';
                                         particle.style.zIndex = '100000';
-                                        particle.style.fontSize = `${Math.random() * 30 + 15}px`;
-                                        particle.style.filter = "drop-shadow(0 0 15px rgba(255, 105, 180, 0.8))";
+                                        particle.style.fontSize = `${Math.random() * 40 + 20}px`; // Hạt to hơn
+                                        // BỎ filter: drop-shadow ĐỂ CỨU CPU/GPU
+                                        particle.style.textShadow = "0 0 10px rgba(255, 105, 180, 0.4)";
+                                        particle.style.willChange = "transform, opacity"; // Tối ưu GPU
                                         document.body.appendChild(particle);
 
                                         gsap.set(particle, { xPercent: -50, yPercent: -50, scale: 0 });
 
                                         const angle = Math.random() * Math.PI * 2;
-                                        // Vận tốc đa dạng: có cánh hoa bay lửng lơ ở giữa, có cánh phóng vút ra góc màn hình
-                                        const velocity = Math.random() * Math.random() * 1200 + 200;
+                                        const velocity = Math.random() * 800 + 400;
                                         const distanceX = Math.cos(angle) * velocity;
                                         const distanceY = Math.sin(angle) * velocity;
 
-                                        const pTl = gsap.timeline();
-                                        pTl.to(particle, {
+                                        // Launch out
+                                        gsap.to(particle, {
                                             x: distanceX,
                                             y: distanceY,
-                                            scale: Math.random() * 2.5 + 0.5,
+                                            scale: Math.random() * 2 + 1,
                                             rotation: Math.random() * 720,
-                                            duration: 1.5 + Math.random() * 1.5,
+                                            duration: 1.0 + Math.random() * 1.5,
                                             ease: "expo.out"
-                                        })
-                                            .to(particle, {
-                                                y: "+=" + (200 + Math.random() * 300),
-                                                x: "+=" + (Math.random() * 100 - 50),
-                                                rotation: "+=" + (Math.random() * 360),
-                                                opacity: 0,
-                                                duration: 2.5 + Math.random() * 2,
-                                                ease: "sine.inOut"
-                                            }, "-=1.0");
+                                        });
 
-                                        setTimeout(() => particle.remove(), 7000);
+                                        // Fall and fade
+                                        gsap.to(particle, {
+                                            y: "+=" + (150 + Math.random() * 200),
+                                            opacity: 0,
+                                            duration: 1.5 + Math.random() * 1.5,
+                                            ease: "sine.inOut",
+                                            delay: 1.0,
+                                            onComplete: () => particle.remove()
+                                        });
                                     }
 
                                     // 4. Hoa đào chính thức xuất hiện sau vụ nổ (Hiện hình từ luồng sương khói)
@@ -1517,43 +1519,54 @@ function startMarch8thVisuals() {
         gsap.to(sunLight.color, { r: 1.0, g: 0.5, b: 0.8, duration: 3 });
     }
 
-    // Start Blossom Rain
-    blossomInterval = setInterval(createCherryBlossom, 150);
+    // Start Blossom Rain - Tăng khoảng thời gian sinh hạt để giảm tải CPU
+    blossomInterval = setInterval(createCherryBlossom, 350);
 
-    // Magic Cursor Sparkles
+    // Magic Cursor Sparkles - Throttle mạnh hơn để tránh spam DOM
+    let cursorThrottle = false;
     cursorMoveHandler = (e) => {
-        if (!isVisuals8thActive || Math.random() > 0.3) return; // Throttle
+        if (!isVisuals8thActive || cursorThrottle) return;
+        cursorThrottle = true;
+        setTimeout(() => cursorThrottle = false, 50); // Chỉ tạo hạt mỗi 50ms (20 hạt/giây max)
+
         const sparkle = document.createElement('div');
         sparkle.className = 'magic-cursor-sparkle';
-        const size = Math.random() * 15 + 10;
+        const size = Math.random() * 10 + 8;
         sparkle.style.width = `${size}px`;
         sparkle.style.height = `${size}px`;
         sparkle.style.left = `${e.clientX}px`;
         sparkle.style.top = `${e.clientY}px`;
         document.body.appendChild(sparkle);
-        setTimeout(() => sparkle.remove(), 600);
+        setTimeout(() => sparkle.remove(), 500);
     };
     window.addEventListener('mousemove', cursorMoveHandler);
 
-    // 3D Parallax Tilt for Letter Form
+    // 3D Parallax Tilt for Letter Form - Dùng requestAnimationFrame để mượt và ít ăn CPU
+    let ticking = false;
     parallaxTiltHandler = (e) => {
         if (!isVisuals8thActive) return;
         const letterCard = letterContainer.querySelector('.letter-content.march8th-theme');
         if (!letterCard || letterContainer.classList.contains('hidden')) return;
 
-        const rect = letterCard.getBoundingClientRect();
-        const x = e.clientX - rect.left; // x position within the element.
-        const y = e.clientY - rect.top;  // y position within the element.
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                const rect = letterCard.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
 
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
 
-        const rotateX = ((y - centerY) / centerY) * -5; // Max 5 deg
-        const rotateY = ((x - centerX) / centerX) * 5;  // Max 5 deg
+                const rotateX = ((y - centerY) / centerY) * -3; // Giảm độ nghiêng xuống một chút
+                const rotateY = ((x - centerX) / centerX) * 3;
 
-        letterCard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                letterCard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                ticking = false;
+            });
+            ticking = true;
+        }
     };
-    window.addEventListener('mousemove', parallaxTiltHandler);
+    window.addEventListener('mousemove', parallaxTiltHandler, { passive: true });
 }
 
 function openLetter(letterData, specialSong = null, isBirthday = false) {
