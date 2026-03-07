@@ -1593,7 +1593,7 @@ function openLetter(letterData, specialSong = null, isBirthday = false) {
     tempDiv.innerHTML = letterData.content;
     const pElements = Array.from(tempDiv.querySelectorAll('p'));
     letterContentDiv.append(closeBtn, titleEl, ...pElements, signatureEl);
-    const signatureText = isBirthday ? 'Yêu cậu nhất luôn,<br>tun' : (specialSong ? 'Yêu cậu rất nhiều,<br>tun' : 'Luôn bên cạnh cậu,<br>tun');
+    const signatureText = isBirthday ? 'Yêu em nhất luôn,<br>tun' : (specialSong ? 'Yêu em rất nhiều,<br>tun' : 'Luôn bên cạnh em,<br>tun');
     const elementsToType = [{ element: titleEl, text: letterData.title }, ...pElements.map(p => ({ element: p, text: p.innerHTML })), { element: signatureEl, text: signatureText }];
     letterContainer.classList.remove('hidden');
     typewriterEffect(elementsToType);
