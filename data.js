@@ -20,9 +20,9 @@ export const birthdayData = {
 export const march8thData = {
     day: 7, month: 3,
     letter: {
-        title: "Gửi người phụ nữ tuyệt vời nhất của tớ 💖",
-        content: `<p>Chúc mừng ngày Quốc tế Phụ nữ 8/3! Hôm nay là ngày để tôn vinh những người phụ nữ tuyệt vời, và đối với tớ, cậu chính là người tuyệt vời nhất trong vũ trụ này.</p>
-                      <p>Tớ hy vọng cậu luôn luôn xinh đẹp, rạng rỡ và hạnh phúc với những gì mình đang làm. Cậu giống như một ngôi sao lung linh nhất, luôn sưởi ấm và soi sáng mọi ngóc ngách trong trái tim tớ. Dù khoảng cách có xa xôi, nhưng tình cảm tớ dành cho cậu vẫn luôn đong đầy và không bao giờ thay đổi.</p>
+        title: "Gửi người phụ nữ tuyệt vời nhất của anh 💖",
+        content: `<p>Chúc mừng ngày Quốc tế Phụ nữ 8/3! Hôm nay là ngày để tôn vinh những người phụ nữ tuyệt vời, và đặc biệt hơn đối với anh là em, em tuyệt vời vl, ê í là anh siêu yêu em luôn ấy, em đặc biệt lắm đó.</p>
+                      <p> Em xinh vl em biết không, em xinh lắm luôn đấy nhé anh thề luôn á </p>
                       <p>Hãy luôn tự tin là chính mình, một cô gái mạnh mẽ, dũng cảm nhưng cũng vô cùng dịu dàng nhé. Ngày hôm nay hãy thật vui vẻ và tận hưởng những điều ngọt ngào nhất dành riêng cho cậu.</p>
                       <p>Tớ yêu cậu nhiều lắm! Chúc mừng ngày 8/3 nhé bae! ❤️</p>`
     },
