@@ -1271,7 +1271,7 @@ function playMarch8thAnimation() {
                 tl.to('.flap-top, .flap-bottom, .flap-left, .flap-right', { filter: "blur(4px) brightness(0.85)", duration: 1.5 }, "zoomIn")
                     .to('.envelope-wrapper', { scale: pushScale, y: pushY, x: -10, rotationX: 12, rotationY: 4, duration: 1.8, ease: "power3.inOut" }, "zoomIn")
                     .add(() => {
-                        const textToType = "Hello cậu,<br>Gửi người tuyệt vời nhất... 💖";
+                        const textToType = "Hello em,<br>Gửi người tuyệt vời nhất của anh... 💖";
 
                         // TRACKING SHOT DOLLY CAMERA
                         gsap.to('.envelope-wrapper', { scale: dollyScale, y: dollyY, x: 15, rotationY: -2, rotationX: 8, duration: 4.5, ease: "none" });
@@ -1310,41 +1310,49 @@ function playMarch8thAnimation() {
                                         onComplete: () => gsap.set(envelopeContainer, { x: 0, y: 0, rotationZ: 0 })
                                     });
 
-                                    // 3. TẠO VỤ NỔ HẠT SÁNG KHI HOA NỞ (Particle Burst 3D)
-                                    const rect = heartWrapper.getBoundingClientRect();
-                                    const contRect = envelopeContainer.getBoundingClientRect();
-                                    const centerX = rect.left + rect.width / 2 - contRect.left;
-                                    const centerY = rect.top + rect.height / 2 - contRect.top;
+                                    // 3. VỤ NỔ HOA ĐÀO TOÀN MÀN HÌNH (Full Screen Floral Burst)
+                                    const spawnX = window.innerWidth / 2;
+                                    const spawnY = window.innerHeight / 2;
 
-                                    for (let i = 0; i < 40; i++) {
+                                    for (let i = 0; i < 150; i++) {
                                         const particle = document.createElement('div');
-                                        particle.innerHTML = ['✨', '🌸', '💥', '💫', '💖', '⭐'][Math.floor(Math.random() * 6)];
-                                        particle.style.position = 'absolute';
-                                        particle.style.left = `${centerX}px`;
-                                        particle.style.top = `${centerY}px`;
+                                        particle.innerHTML = ['🌸', '🌸', '💮', '✨', '💖', '🌸'][Math.floor(Math.random() * 6)];
+                                        particle.style.position = 'fixed';
+                                        particle.style.left = `${spawnX}px`;
+                                        particle.style.top = `${spawnY}px`;
                                         particle.style.pointerEvents = 'none';
                                         particle.style.zIndex = '100000';
-                                        particle.style.fontSize = `${Math.random() * 25 + 15}px`;
-                                        particle.style.filter = "drop-shadow(0 0 10px rgba(255, 105, 180, 1))";
-                                        envelopeContainer.appendChild(particle);
+                                        particle.style.fontSize = `${Math.random() * 30 + 15}px`;
+                                        particle.style.filter = "drop-shadow(0 0 15px rgba(255, 105, 180, 0.8))";
+                                        document.body.appendChild(particle);
 
-                                        gsap.set(particle, { xPercent: -50, yPercent: -50 });
+                                        gsap.set(particle, { xPercent: -50, yPercent: -50, scale: 0 });
 
                                         const angle = Math.random() * Math.PI * 2;
-                                        // Phóng đi cực xa và bạo lực
-                                        const distanceX = Math.cos(angle) * (150 + Math.random() * 300);
-                                        const distanceY = Math.sin(angle) * (150 + Math.random() * 250);
+                                        // Vận tốc đa dạng: có cánh hoa bay lửng lơ ở giữa, có cánh phóng vút ra góc màn hình
+                                        const velocity = Math.random() * Math.random() * 1200 + 200;
+                                        const distanceX = Math.cos(angle) * velocity;
+                                        const distanceY = Math.sin(angle) * velocity;
 
                                         const pTl = gsap.timeline();
-                                        pTl.fromTo(particle,
-                                            { x: 0, y: 0, scale: 0, opacity: 1 },
-                                            { x: distanceX, y: distanceY, scale: Math.random() * 2 + 1, rotation: Math.random() * 1080, duration: 0.6 + Math.random() * 0.3, ease: "power4.out" }
-                                        )
+                                        pTl.to(particle, {
+                                            x: distanceX,
+                                            y: distanceY,
+                                            scale: Math.random() * 2.5 + 0.5,
+                                            rotation: Math.random() * 720,
+                                            duration: 1.5 + Math.random() * 1.5,
+                                            ease: "expo.out"
+                                        })
                                             .to(particle, {
-                                                y: "+=" + (150 + Math.random() * 200), x: "+=" + (Math.random() * 100 - 50), rotation: "+=" + (Math.random() * 360), opacity: 0, duration: 2.0 + Math.random() * 2, ease: "sine.inOut"
-                                            });
+                                                y: "+=" + (200 + Math.random() * 300),
+                                                x: "+=" + (Math.random() * 100 - 50),
+                                                rotation: "+=" + (Math.random() * 360),
+                                                opacity: 0,
+                                                duration: 2.5 + Math.random() * 2,
+                                                ease: "sine.inOut"
+                                            }, "-=1.0");
 
-                                        setTimeout(() => particle.remove(), 5000);
+                                        setTimeout(() => particle.remove(), 7000);
                                     }
 
                                     // 4. Hoa đào chính thức xuất hiện sau vụ nổ (Hiện hình từ luồng sương khói)
@@ -1354,11 +1362,18 @@ function playMarch8thAnimation() {
                                     );
                                     gsap.to(heartWrapper, { y: -10, scale: 1.4, rotation: 5, duration: 0.8, ease: "sine.inOut", yoyo: true, repeat: 2, delay: 2.0 });
 
-                                    // WARP SPEED CAMERA LAO MẠNH XÉ GIÓ
+                                    // CHUYỂN CẢNH KÍ ỨC THƠ MỘNG (Dreamy Memory Transition)
                                     setTimeout(() => {
-                                        // Phong bì xoắn ốc lao qua khung hình
+                                        // Phong bì tan biến nhẹ nhàng như một giấc mơ bay vào hư không
                                         gsap.to('.envelope-wrapper', {
-                                            scale: 35, opacity: 0, rotationZ: 45, rotationX: -20, y: 300, filter: "blur(20px)", duration: 1.1, ease: "expo.in", onComplete: () => {
+                                            scale: 1.6,
+                                            opacity: 0,
+                                            rotationZ: -2,
+                                            y: -80,
+                                            filter: "blur(25px) brightness(1.8)",
+                                            duration: 3.5,
+                                            ease: "power2.inOut",
+                                            onComplete: () => {
                                                 envelopeContainer.classList.add('hidden');
                                                 envelopeContainer.style.background = '';
                                                 envelopeContainer.style.backdropFilter = '';
@@ -1372,10 +1387,9 @@ function playMarch8thAnimation() {
                                                 letterInside.innerHTML = '<span class="heart-icon">❤️</span>';
 
                                                 openLetter(march8thData.letter, march8thData.song, true);
-
                                             }
                                         });
-                                    }, 3000); // Ngưng tĩnh 3 giây để ngắm hoa rơi lượn lờ và đọc thư
+                                    }, 3500); // Ngưng tĩnh 3.5 giây để ngắm hoa rơi lượn lờ và đọc thư
                                 }
                             });
                         });
