@@ -1210,23 +1210,42 @@ function activateBirthdayMode() {
 function playMarch8thAnimation() {
     startMeteorShower(); // Trigger hiệu ứng sao băng lãng mạn
 
+    // Thêm các hạt bay lên rực rỡ
+    for (let i = 0; i < 25; i++) {
+        setTimeout(createTextParticle, i * 150);
+    }
+
     const envelopeContainer = document.getElementById('envelope-container');
     if (envelopeContainer && typeof gsap !== 'undefined') {
         envelopeContainer.classList.remove('hidden');
+        envelopeContainer.style.background = 'rgba(255, 182, 193, 0.15)';
+        envelopeContainer.style.backdropFilter = 'blur(12px)';
+        envelopeContainer.style.webkitBackdropFilter = 'blur(12px)';
+
         const tl = gsap.timeline();
-        tl.set('.envelope-wrapper', { scale: 1, opacity: 1 })
+        tl.set('.envelope-wrapper', { scale: 1, opacity: 1, rotation: -8 })
             .set('.flap-top', { rotationX: 0, zIndex: 6 })
             .set('.letter-inside', { y: 0, scale: 1, zIndex: 2 })
-            .set('.wax-seal', { scale: 1, opacity: 1 })
-            .fromTo('.envelope-wrapper', { y: 150, opacity: 0 }, { y: 0, opacity: 1, duration: 1.0, ease: "back.out(1.2)" })
-            .to('.wax-seal', { scale: 1.5, opacity: 0, duration: 0.4, ease: "power2.in" }, "+=0.3")
-            .to('.flap-top', { rotationX: 180, duration: 0.6, ease: "power2.inOut" }, "-=0.2")
+            .set('.wax-seal', { scale: 1, opacity: 1, rotation: 0 })
+            // Bay lên với góc nghiêng
+            .fromTo('.envelope-wrapper', { y: 250, opacity: 0, rotation: -20 }, { y: 0, opacity: 1, rotation: 0, duration: 1.2, ease: "back.out(1.4)" })
+            // Lắc nhẹ đưa đẩy (bay bổng)
+            .to('.envelope-wrapper', { y: -15, rotation: 2, duration: 0.8, yoyo: true, repeat: 1, ease: "sine.inOut" })
+            // Con dấu xoay phình ra và bay hơi
+            .to('.wax-seal', { scale: 2.5, rotation: 180, opacity: 0, duration: 0.6, ease: "power2.in" }, "+=0.2")
+            // Mở nắp phong bì
+            .to('.flap-top', { rotationX: 180, duration: 0.7, ease: "power2.inOut" }, "-=0.3")
             .set('.flap-top', { zIndex: 1 })
             .set('.letter-inside', { zIndex: 6 })
-            .to('.letter-inside', { y: -80, scale: 1.1, duration: 0.8, ease: "power2.out" })
-            .to('.envelope-wrapper', { scale: 3, opacity: 0, duration: 1.0, ease: "power2.in" }, "+=0.5")
+            // Rút thư ra cao hơn một chút
+            .to('.letter-inside', { y: -120, scale: 1.15, duration: 0.9, ease: "back.out(1.2)" })
+            // Phóng to mạnh vào lá thư và fade out phong bì
+            .to('.envelope-wrapper', { scale: 5, opacity: 0, duration: 1.5, ease: "power3.in" }, "+=0.5")
             .add(() => {
                 envelopeContainer.classList.add('hidden');
+                envelopeContainer.style.background = '';
+                envelopeContainer.style.backdropFilter = '';
+                envelopeContainer.style.webkitBackdropFilter = '';
                 openLetter(march8thData.letter, march8thData.song, true);
             });
     } else {
@@ -1277,6 +1296,13 @@ function openLetter(letterData, specialSong = null, isBirthday = false) {
     if (!letterContainer?.classList.contains('hidden')) return;
     const letterContentDiv = letterContainer.querySelector('.letter-content');
     letterContentDiv.innerHTML = '';
+
+    // Reset và set theme cho ngày 8/3
+    letterContentDiv.className = 'letter-content';
+    if (isMarch8thMode) {
+        letterContentDiv.classList.add('march8th-theme');
+    }
+
     const titleEl = document.createElement('h1');
     const signatureEl = document.createElement('p');
     signatureEl.className = 'signature';

@@ -467,6 +467,51 @@ body {
     color: #ff6b9d;
 }
 
+/* THEME 8/3 DÀNH CHO BỨC THƯ */
+.letter-content.march8th-theme {
+    background: rgba(255, 243, 248, 0.95);
+    color: #ad1457;
+    box-shadow: 0 0 50px rgba(255, 128, 171, 0.5);
+    border-image: linear-gradient(145deg, #ff8a80, #ff4081) 1;
+    animation: glow-border-pink 4s linear infinite;
+}
+
+.letter-content.march8th-theme h1 {
+    color: #e91e63;
+    text-shadow: 0 0 10px rgba(233, 30, 99, 0.4);
+}
+
+.letter-content.march8th-theme .signature {
+    color: #ff4081;
+}
+
+.letter-content.march8th-theme p {
+    color: #880e4f;
+    font-weight: 500;
+}
+
+.letter-content.march8th-theme #close-letter-btn {
+    color: #e91e63;
+}
+
+.letter-content.march8th-theme #close-letter-btn:hover {
+    color: #c2185b;
+}
+
+@keyframes glow-border-pink {
+    0% {
+        border-image: linear-gradient(145deg, #ff8a80, #ff4081) 1;
+    }
+
+    50% {
+        border-image: linear-gradient(145deg, #ff4081, #ff8a80) 1;
+    }
+
+    100% {
+        border-image: linear-gradient(145deg, #ff8a80, #ff4081) 1;
+    }
+}
+
 /* ======================================================= */
 /* 5A. CÁC NÚT ĐIỀU KHIỂN NỔI (FLOATING CONTROLS)        */
 /* ======================================================= */
@@ -1204,9 +1249,9 @@ body.state-night {
     position: relative;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #ff6b9d, #e05584);
+    background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
     border-radius: 8px;
-    box-shadow: 0 15px 50px rgba(255, 107, 157, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 50px rgba(255, 117, 140, 0.6), inset 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
 .envelope .flap-left {
@@ -1217,10 +1262,10 @@ body.state-night {
     height: 0;
     border-top: 115px solid transparent;
     border-bottom: 115px solid transparent;
-    border-left: 170px solid #ff7a97;
+    border-left: 170px solid #ff8fa3;
     z-index: 3;
     border-radius: 8px 0 0 8px;
-    filter: drop-shadow(2px 0 3px rgba(0, 0, 0, 0.2));
+    filter: drop-shadow(2px 0 3px rgba(0, 0, 0, 0.25));
 }
 
 .envelope .flap-right {
@@ -1231,10 +1276,10 @@ body.state-night {
     height: 0;
     border-top: 115px solid transparent;
     border-bottom: 115px solid transparent;
-    border-right: 170px solid #ff7a97;
+    border-right: 170px solid #ff8fa3;
     z-index: 3;
     border-radius: 0 8px 8px 0;
-    filter: drop-shadow(-2px 0 3px rgba(0, 0, 0, 0.2));
+    filter: drop-shadow(-2px 0 3px rgba(0, 0, 0, 0.25));
 }
 
 .envelope .flap-bottom {
@@ -1245,10 +1290,10 @@ body.state-night {
     height: 0;
     border-left: 170px solid transparent;
     border-right: 170px solid transparent;
-    border-bottom: 140px solid #ff8ba3;
+    border-bottom: 140px solid #ff9db0;
     z-index: 4;
     border-radius: 0 0 8px 8px;
-    filter: drop-shadow(0 -2px 4px rgba(0, 0, 0, 0.2));
+    filter: drop-shadow(0 -3px 5px rgba(180, 10, 50, 0.2));
 }
 
 .envelope .flap-top {
@@ -1259,10 +1304,10 @@ body.state-night {
     height: 0;
     border-left: 170px solid transparent;
     border-right: 170px solid transparent;
-    border-top: 135px solid #e05584;
+    border-top: 135px solid #ff597b;
     transform-origin: top;
     z-index: 6;
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(0 4px 6px rgba(180, 10, 50, 0.3));
     will-change: transform;
 }
 
@@ -1271,16 +1316,17 @@ body.state-night {
     top: 135px;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 50px;
-    height: 50px;
-    background: radial-gradient(circle, #ff3b6a, #c7153a);
+    width: 55px;
+    height: 55px;
+    background: linear-gradient(135deg, #fceca1 0%, #f3a183 100%);
+    border: 2px solid rgba(255, 255, 255, 0.5);
     border-radius: 50%;
     z-index: 7;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+    box-shadow: 0 4px 15px rgba(253, 160, 133, 0.6), inset 0 2px 5px rgba(255, 255, 255, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #ffd700;
+    color: #fff;
     font-size: 1.5rem;
     font-family: serif;
     font-weight: bold;
@@ -1288,9 +1334,9 @@ body.state-night {
 }
 
 .envelope .wax-seal::after {
-    content: '❤';
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-    font-size: 1.2rem;
+    content: '🌸';
+    text-shadow: 0 2px 4px rgba(200, 50, 50, 0.4);
+    font-size: 1.4rem;
 }
 
 .envelope .letter-inside {
@@ -1299,21 +1345,21 @@ body.state-night {
     left: 10px;
     width: 320px;
     height: 210px;
-    background: linear-gradient(to bottom, #fff 0%, #f9f9f9 100%);
+    background: linear-gradient(to bottom, #fff 0%, #fff0f5 100%);
     z-index: 2;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 6px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-    background-image: repeating-linear-gradient(transparent, transparent 28px, #e0e0e0 28px, #e0e0e0 29px);
+    box-shadow: 0 5px 20px rgba(255, 105, 180, 0.3);
+    background-image: repeating-linear-gradient(transparent, transparent 28px, #ffb6c1 28px, #ffb6c1 29px);
     background-position: 0 30px;
     will-change: transform, opacity;
 }
 
 .envelope .heart-icon {
-    font-size: 4rem;
+    font-size: 4.5rem;
     animation: beat 1.2s infinite;
     display: block;
-    filter: drop-shadow(0 2px 5px rgba(255, 107, 157, 0.5));
+    filter: drop-shadow(0 4px 10px rgba(255, 105, 180, 0.6));
 }
