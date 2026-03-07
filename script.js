@@ -1239,10 +1239,10 @@ function playMarch8thAnimation() {
             .set('.flap-top', { rotationX: 0, zIndex: 6 })
             .set('.letter-inside', { y: 0, scale: 1, zIndex: 2, rotationZ: 0, rotationX: 0 })
             .set('.wax-seal', { scale: 1, opacity: 1, rotation: 0 })
-            // Bay từ tít dưới mép dưới màn hình phi lên (Bay cực thực tế)
+            // Bay lượn từ vũ trụ sâu thẳm (Orbit & Scale in)
             .fromTo('.envelope-wrapper',
-                { y: window.innerHeight ? window.innerHeight + 500 : 1000, opacity: 0, rotationZ: -25, rotationX: 45, scale: 0.1 },
-                { y: 0, opacity: 1, rotationZ: 0, rotationX: 0, scale: 1, duration: 2.2, ease: "power4.out" }
+                { z: -2000, scale: 0.05, opacity: 0, rotationZ: 720, rotationX: 360, rotationY: 180, x: window.innerWidth / 2, y: -window.innerHeight / 2 },
+                { z: 0, scale: 1, opacity: 1, rotationZ: 0, rotationX: 0, rotationY: 0, x: 0, y: 0, duration: 3.5, ease: "expo.out" }
             )
             // Lắc vỗ cánh nhẹ như đang trôi nổi không trọng lượng
             .to('.envelope-wrapper', { y: -20, rotationZ: 3, rotationX: 5, duration: 1.5, yoyo: true, repeat: 1, ease: "sine.inOut" })
@@ -1270,51 +1270,77 @@ function playMarch8thAnimation() {
                     // ZOOM OUT CUỐI & BUNG NỞ HOA CỰC ĐẠI (Master Level)
                     gsap.to('.envelope-wrapper', {
                         scale: 1.3, y: -30, x: 0, rotationX: 0, rotationY: 0, rotationZ: 0, duration: 1.8, ease: "expo.inOut", onComplete: () => {
-                            // TẠO VỤ NỔ HẠT SÁNG KHI HOA NỞ (Particle Burst 3D)
+                            // --- SIÊU VỤ NỔ (SCREEN EXPLOSION & SHAKE) ---
+                            // 1. Chớp sáng mù mắt (Flashbang)
+                            const flash = document.createElement('div');
+                            flash.style.position = 'fixed';
+                            flash.style.inset = '0';
+                            flash.style.backgroundColor = '#fff';
+                            flash.style.boxShadow = 'inset 0 0 100px 50px rgba(255,105,180,1)'; // Ánh hồng nổ
+                            flash.style.zIndex = '999999';
+                            flash.style.opacity = '0';
+                            flash.style.pointerEvents = 'none';
+                            flash.style.mixBlendMode = 'screen';
+                            document.body.appendChild(flash);
+
+                            gsap.timeline()
+                                .to(flash, { opacity: 1, duration: 0.05, ease: "power4.out" })
+                                .to(flash, { opacity: 0, duration: 1.5, ease: "power2.out", onComplete: () => flash.remove() });
+
+                            // 2. Rung chuyển camera (Screen Shake)
+                            gsap.to(envelopeContainer, {
+                                x: () => Math.random() * 30 - 15,
+                                y: () => Math.random() * 30 - 15,
+                                rotationZ: () => Math.random() * 4 - 2,
+                                duration: 0.05,
+                                yoyo: true,
+                                repeat: 12,
+                                onComplete: () => gsap.set(envelopeContainer, { x: 0, y: 0, rotationZ: 0 })
+                            });
+
+                            // 3. TẠO VỤ NỔ HẠT SÁNG KHI HOA NỞ (Particle Burst 3D)
                             const rect = heartWrapper.getBoundingClientRect();
                             const contRect = envelopeContainer.getBoundingClientRect();
                             const centerX = rect.left + rect.width / 2 - contRect.left;
                             const centerY = rect.top + rect.height / 2 - contRect.top;
 
-                            for (let i = 0; i < 35; i++) {
+                            for (let i = 0; i < 40; i++) {
                                 const particle = document.createElement('div');
-                                particle.innerHTML = ['✨', '🌸', '💫', '💖', '⭐', '🌸'][Math.floor(Math.random() * 6)];
+                                particle.innerHTML = ['✨', '🌸', '💥', '💫', '💖', '⭐'][Math.floor(Math.random() * 6)];
                                 particle.style.position = 'absolute';
                                 particle.style.left = `${centerX}px`;
                                 particle.style.top = `${centerY}px`;
                                 particle.style.pointerEvents = 'none';
-                                particle.style.zIndex = '10000';
-                                particle.style.fontSize = `${Math.random() * 20 + 10}px`;
-                                particle.style.filter = "drop-shadow(0 0 8px rgba(255, 105, 180, 0.9))";
-                                envelopeContainer.appendChild(particle); // Dán hạt ra container ngoài cùng để ko bị cắt viền
+                                particle.style.zIndex = '100000';
+                                particle.style.fontSize = `${Math.random() * 25 + 15}px`;
+                                particle.style.filter = "drop-shadow(0 0 10px rgba(255, 105, 180, 1))";
+                                envelopeContainer.appendChild(particle);
 
                                 gsap.set(particle, { xPercent: -50, yPercent: -50 });
 
                                 const angle = Math.random() * Math.PI * 2;
-                                // Giới hạn vụ nổ tỏa rộng hơn
-                                const distanceX = Math.cos(angle) * (100 + Math.random() * 250);
-                                const distanceY = Math.sin(angle) * (100 + Math.random() * 200);
+                                // Phóng đi cực xa và bạo lực
+                                const distanceX = Math.cos(angle) * (150 + Math.random() * 300);
+                                const distanceY = Math.sin(angle) * (150 + Math.random() * 250);
 
-                                // Tạo timeline vật lý bay lượn thực tế
                                 const pTl = gsap.timeline();
                                 pTl.fromTo(particle,
                                     { x: 0, y: 0, scale: 0, opacity: 1 },
-                                    { x: distanceX, y: distanceY - 50, scale: Math.random() * 1.5 + 0.5, rotation: Math.random() * 720, duration: 0.8 + Math.random() * 0.4, ease: "expo.out" }
+                                    { x: distanceX, y: distanceY, scale: Math.random() * 2 + 1, rotation: Math.random() * 1080, duration: 0.6 + Math.random() * 0.3, ease: "power4.out" }
                                 )
                                     .to(particle, {
-                                        y: "+=" + (100 + Math.random() * 150), x: "+=" + (Math.random() * 100 - 50), rotation: "+=" + (Math.random() * 360), opacity: 0, duration: 2.0 + Math.random() * 1.5, ease: "sine.inOut"
+                                        y: "+=" + (150 + Math.random() * 200), x: "+=" + (Math.random() * 100 - 50), rotation: "+=" + (Math.random() * 360), opacity: 0, duration: 2.0 + Math.random() * 2, ease: "sine.inOut"
                                     });
 
-                                setTimeout(() => particle.remove(), 4500); // Clean up
+                                setTimeout(() => particle.remove(), 5000);
                             }
 
-                            // Hoa đào chính nở rộ rực sáng kèm filter
+                            // 4. Hoa đào chính thức xuất hiện sau vụ nổ (Hiện hình từ luồng sương khói)
                             gsap.fromTo(heartWrapper,
-                                { opacity: 0, scale: 0, rotation: -180, filter: "brightness(3) blur(10px)" },
-                                { opacity: 1, scale: 1.8, rotation: 0, filter: "brightness(1) blur(0px)", duration: 1.5, ease: "elastic.out(1, 0.4)" }
+                                { opacity: 0, scale: 5, rotation: -720, filter: "brightness(5) blur(20px)" }, // Hiện ra từ vụ nổ khổng lồ
+                                { opacity: 1, scale: 1.8, rotation: 0, filter: "brightness(1) blur(0px)", duration: 2.0, ease: "elastic.out(1, 0.3)" }
                             );
-                            // Hiệu ứng "nhịp tim" / "vẫy cánh" lượn lờ của hoa chính
-                            gsap.to(heartWrapper, { y: -10, scale: 1.4, rotation: 5, duration: 0.8, ease: "sine.inOut", yoyo: true, repeat: 2, delay: 1.5 });
+                            gsap.to(heartWrapper, { y: -10, scale: 1.4, rotation: 5, duration: 0.8, ease: "sine.inOut", yoyo: true, repeat: 2, delay: 2.0 });
 
                             // WARP SPEED CAMERA LAO MẠNH XÉ GIÓ
                             setTimeout(() => {
