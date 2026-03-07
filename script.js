@@ -1253,8 +1253,13 @@ function playMarch8thAnimation() {
             .to('.flap-top', { rotationX: 180, duration: 1.0, ease: "elastic.out(1.2, 0.4)" }, "-=0.3")
             .set('.flap-top', { zIndex: 1 })
             .set('.letter-inside', { zIndex: 6 })
-            // Thư rút ra từ từ, nghiêng nhẹ (3D slide)
-            .to('.letter-inside', { y: -180, scale: 1.05, rotationZ: -2, duration: 1.2, ease: "power3.out" })
+            // --- KỸ XẢO RÚT THƯ CHI TIẾT (The Great Reveal) ---
+            // 1. Thò mép thư lên từ từ ngập ngừng (Tạo suspense/hồi hộp)
+            .to('.letter-inside', { y: -50, duration: 0.8, ease: "power2.inOut" })
+            // 2. Rút toẹt một phát lên thoát khỏi vỏ với độ nảy nhẹ, phong bì phản lực giật chúi xuống rồi nảy lại
+            .to('.letter-inside', { y: -200, scale: 1.1, rotationZ: -2, duration: 1.4, ease: "back.out(1.5)" }, "extract")
+            .to('.envelope', { y: 35, rotationX: -15, duration: 0.6, ease: "power3.out" }, "extract")
+            .to('.envelope', { y: 0, rotationX: 0, duration: 1.2, ease: "elastic.out(1.2, 0.3)" }, "extract+=0.6")
             .add(() => {
                 const isMobile = window.innerWidth < 768;
                 const pushScale = isMobile ? 1.6 : 2.8;
@@ -1262,8 +1267,8 @@ function playMarch8thAnimation() {
                 const dollyScale = isMobile ? 1.7 : 3.0;
                 const dollyY = isMobile ? 240 : 490;
 
-                // CÚ PUSH-IN KỸ THUẬT SỐ: Máy quay lao thẳng vào thư
-                tl.to('.flap-top, .flap-bottom, .flap-left, .flap-right', { filter: "brightness(0.3)", duration: 1.5 }, "zoomIn")
+                // CÚ PUSH-IN KỸ THUẬT SỐ: Máy quay lao thẳng vào thư, làm mờ nhẹ phong bì xung quanh (Depth of Field) thay vì làm đen
+                tl.to('.flap-top, .flap-bottom, .flap-left, .flap-right', { filter: "blur(4px) brightness(0.85)", duration: 1.5 }, "zoomIn")
                     .to('.envelope-wrapper', { scale: pushScale, y: pushY, x: -10, rotationX: 12, rotationY: 4, duration: 1.8, ease: "power3.inOut" }, "zoomIn")
                     .add(() => {
                         const textToType = "Hello cậu,<br>Gửi người tuyệt vời nhất... 💖";
