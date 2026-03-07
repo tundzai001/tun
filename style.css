@@ -1231,7 +1231,6 @@ body.state-night {
     width: 340px;
     height: 230px;
     perspective: 1200px;
-    will-change: transform, opacity;
 }
 
 .envelope-wrapper.floating {
@@ -1359,7 +1358,6 @@ body.state-night {
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
     background-image: repeating-linear-gradient(transparent, transparent 28px, rgba(233, 30, 99, 0.25) 28px, rgba(233, 30, 99, 0.25) 29px);
     background-position: 0 30px;
-    will-change: transform, opacity;
 }
 
 .envelope .letter-inside.march8th-paper {

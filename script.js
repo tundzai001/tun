@@ -1239,10 +1239,10 @@ function playMarch8thAnimation() {
             .set('.flap-top', { rotationX: 0, zIndex: 6 })
             .set('.letter-inside', { y: 0, scale: 1, zIndex: 2, rotationZ: 0, rotationX: 0 })
             .set('.wax-seal', { scale: 1, opacity: 1, rotation: 0 })
-            // Bay từ dưới lên sâu trong trục Z (cinematic entrance 3D phi thực tế)
+            // Bay từ tít dưới mép dưới màn hình phi lên (Bay cực thực tế)
             .fromTo('.envelope-wrapper',
-                { y: 600, z: -800, opacity: 0, rotationZ: -15, rotationX: 75, scale: 0.1 },
-                { y: 0, z: 0, opacity: 1, rotationZ: 0, rotationX: 0, scale: 1, duration: 2.0, ease: "expo.out" }
+                { y: window.innerHeight ? window.innerHeight + 500 : 1000, opacity: 0, rotationZ: -25, rotationX: 45, scale: 0.1 },
+                { y: 0, opacity: 1, rotationZ: 0, rotationX: 0, scale: 1, duration: 2.2, ease: "power4.out" }
             )
             // Lắc vỗ cánh nhẹ như đang trôi nổi không trọng lượng
             .to('.envelope-wrapper', { y: -20, rotationZ: 3, rotationX: 5, duration: 1.5, yoyo: true, repeat: 1, ease: "sine.inOut" })
@@ -1255,8 +1255,8 @@ function playMarch8thAnimation() {
             .set('.letter-inside', { zIndex: 6 })
             // Thư rút ra từ từ, nghiêng nhẹ (3D slide)
             .to('.letter-inside', { y: -180, scale: 1.05, rotationZ: -2, duration: 1.2, ease: "power3.out" })
-            // CÚ PUSH-IN KỸ THUẬT SỐ: Máy quay lao thẳng vào thư, phong bì mờ dần lùi lại
-            .to('.envelope', { filter: "brightness(0.6) blur(3px)", duration: 1.5 }, "zoomIn")
+            // CÚ PUSH-IN KỸ THUẬT SỐ: Máy quay lao thẳng vào thư, làm tối các mép phong bì nhưng GIỮ RÕ thư
+            .to('.flap-top, .flap-bottom, .flap-left, .flap-right', { filter: "brightness(0.3)", duration: 1.5 }, "zoomIn")
             .to('.envelope-wrapper', { scale: 2.8, y: 460, x: -10, rotationX: 12, rotationY: 4, duration: 1.8, ease: "power3.inOut" }, "zoomIn")
             .add(() => {
                 const textToType = "Hello cậu,<br>Gửi người tuyệt vời nhất... 💖";
@@ -1270,27 +1270,42 @@ function playMarch8thAnimation() {
                     // ZOOM OUT CUỐI & BUNG NỞ HOA CỰC ĐẠI (Master Level)
                     gsap.to('.envelope-wrapper', {
                         scale: 1.3, y: -30, x: 0, rotationX: 0, rotationY: 0, rotationZ: 0, duration: 1.8, ease: "expo.inOut", onComplete: () => {
-                            // TẠO VỤ NỔ HẠT SÁNG KHI HOA NỞ (Particle Burst)
+                            // TẠO VỤ NỔ HẠT SÁNG KHI HOA NỞ (Particle Burst 3D)
                             const rect = heartWrapper.getBoundingClientRect();
-                            for (let i = 0; i < 25; i++) {
+                            const contRect = envelopeContainer.getBoundingClientRect();
+                            const centerX = rect.left + rect.width / 2 - contRect.left;
+                            const centerY = rect.top + rect.height / 2 - contRect.top;
+
+                            for (let i = 0; i < 35; i++) {
                                 const particle = document.createElement('div');
-                                particle.innerHTML = ['✨', '🌸', '💫', '💖'][Math.floor(Math.random() * 4)];
+                                particle.innerHTML = ['✨', '🌸', '💫', '💖', '⭐', '🌸'][Math.floor(Math.random() * 6)];
                                 particle.style.position = 'absolute';
-                                particle.style.left = '50%'; particle.style.top = '70%';
-                                particle.style.transform = 'translate(-50%, -50%)';
+                                particle.style.left = `${centerX}px`;
+                                particle.style.top = `${centerY}px`;
                                 particle.style.pointerEvents = 'none';
-                                particle.style.zIndex = '10';
-                                particle.style.fontSize = `${Math.random() * 15 + 10}px`;
-                                particle.style.filter = "drop-shadow(0 0 5px rgba(255, 105, 180, 0.8))";
-                                letterInside.appendChild(particle);
+                                particle.style.zIndex = '10000';
+                                particle.style.fontSize = `${Math.random() * 20 + 10}px`;
+                                particle.style.filter = "drop-shadow(0 0 8px rgba(255, 105, 180, 0.9))";
+                                envelopeContainer.appendChild(particle); // Dán hạt ra container ngoài cùng để ko bị cắt viền
+
+                                gsap.set(particle, { xPercent: -50, yPercent: -50 });
 
                                 const angle = Math.random() * Math.PI * 2;
-                                const distance = 70 + Math.random() * 100;
-                                gsap.fromTo(particle,
+                                // Giới hạn vụ nổ tỏa rộng hơn
+                                const distanceX = Math.cos(angle) * (100 + Math.random() * 250);
+                                const distanceY = Math.sin(angle) * (100 + Math.random() * 200);
+
+                                // Tạo timeline vật lý bay lượn thực tế
+                                const pTl = gsap.timeline();
+                                pTl.fromTo(particle,
                                     { x: 0, y: 0, scale: 0, opacity: 1 },
-                                    { x: Math.cos(angle) * distance, y: Math.sin(angle) * distance, scale: Math.random() * 1.5 + 0.5, opacity: 0, rotation: Math.random() * 360, duration: 1.2 + Math.random() * 0.8, ease: "power3.out" }
-                                );
-                                setTimeout(() => particle.remove(), 2500); // Clean up
+                                    { x: distanceX, y: distanceY - 50, scale: Math.random() * 1.5 + 0.5, rotation: Math.random() * 720, duration: 0.8 + Math.random() * 0.4, ease: "expo.out" }
+                                )
+                                    .to(particle, {
+                                        y: "+=" + (100 + Math.random() * 150), x: "+=" + (Math.random() * 100 - 50), rotation: "+=" + (Math.random() * 360), opacity: 0, duration: 2.0 + Math.random() * 1.5, ease: "sine.inOut"
+                                    });
+
+                                setTimeout(() => particle.remove(), 4500); // Clean up
                             }
 
                             // Hoa đào chính nở rộ rực sáng kèm filter
@@ -1298,8 +1313,8 @@ function playMarch8thAnimation() {
                                 { opacity: 0, scale: 0, rotation: -180, filter: "brightness(3) blur(10px)" },
                                 { opacity: 1, scale: 1.8, rotation: 0, filter: "brightness(1) blur(0px)", duration: 1.5, ease: "elastic.out(1, 0.4)" }
                             );
-                            // Hiệu ứng "nhịp tim" / "vẫy cánh" của hoa
-                            gsap.to(heartWrapper, { scale: 1.4, rotation: 5, duration: 0.8, ease: "sine.inOut", yoyo: true, repeat: 1, delay: 1.5 });
+                            // Hiệu ứng "nhịp tim" / "vẫy cánh" lượn lờ của hoa chính
+                            gsap.to(heartWrapper, { y: -10, scale: 1.4, rotation: 5, duration: 0.8, ease: "sine.inOut", yoyo: true, repeat: 2, delay: 1.5 });
 
                             // WARP SPEED CAMERA LAO MẠNH XÉ GIÓ
                             setTimeout(() => {
@@ -1312,7 +1327,7 @@ function playMarch8thAnimation() {
                                         envelopeContainer.style.webkitBackdropFilter = '';
 
                                         // Reset lại các filter và thuộc tính bị thay đổi
-                                        gsap.set('.envelope', { filter: "none", opacity: 1 });
+                                        gsap.set('.flap-top, .flap-bottom, .flap-left, .flap-right', { filter: "none" });
 
                                         // Trả cấu trúc chuẩn về
                                         letterInside.classList.remove('march8th-paper');
@@ -1321,7 +1336,7 @@ function playMarch8thAnimation() {
                                         openLetter(march8thData.letter, march8thData.song, true);
                                     }
                                 });
-                            }, 3000); // Ngưng tĩnh 3 giây để người dùng chìm đắm trong vụ nổ ánh sáng và đọc thư
+                            }, 3000); // Ngưng tĩnh 3 giây để ngắm hoa rơi lượn lờ và đọc thư
                         }
                     });
                 });
