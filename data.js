@@ -22,9 +22,9 @@ export const march8thData = {
     letter: {
         title: "Gửi người phụ nữ tuyệt vời nhất của anh 💖",
         content: `<p>Chúc mừng ngày Quốc tế Phụ nữ 8/3! Hôm nay là ngày để tôn vinh những người phụ nữ tuyệt vời, và đặc biệt hơn đối với anh là em, em tuyệt vời vl, ê í là anh siêu yêu em luôn ấy, em đặc biệt lắm đó.</p>
-                      <p> Em xinh vl em biết không, em xinh lắm luôn đấy nhé anh thề luôn á </p>
-                      <p>Hãy luôn tự tin là chính mình, một cô gái mạnh mẽ, dũng cảm nhưng cũng vô cùng dịu dàng nhé. Ngày hôm nay hãy thật vui vẻ và tận hưởng những điều ngọt ngào nhất dành riêng cho cậu.</p>
-                      <p>Tớ yêu cậu nhiều lắm! Chúc mừng ngày 8/3 nhé bae! ❤️</p>`
+                      <p> Em xinh vl em biết không, em xinh lắm luôn đấy nhé anh thề luôn á, thật sự là giờ này anh cũng có nhiều thứ để kể cho em, có vui có buồn, nhưng mà biết gì không =)) vui buồn đấy em cùng anh đi qua rồi đấy =))) ê tự dưng nghe sến vl em ơi nhưng mà real đó. Ê anh yêu em lắm luôn nhé, hè này em nhớ về với anh nhé, anh nhớ em lắm luôn đấy, ngày mai là bắt đầu ngày em học rồi, em nhớ để ý sức khỏe nhé, nhớ ăn uống đầy đủ, đừng áp lực quá nhé, anh tin em sẽ làm được, anh yêu em nhiều lắm luôn. Thật sự là anh rất yêu em luôn ấy, ê í là kiểu xưa anh nói thế nào giờ chắc không đúng nữa, anh cảm giác lần này anh cũng đặt hết lòng, anh không muốn nó tan vỡ lắm kiểu cũng biết là chưa tính đến xa nhé =)) nhưng mà í là cũng không muốn dừng ấy, nên là nếu anh có sai gì thì em cứ nói nhé, anh sẽ cố gắng sửa, anh không muốn mất em đâu, anh yêu em nhiều lắm luôn. 8/3 em luôn xinh đẹp nhé, rực rỡ luôn anh yêu em lắm lắm lắm ấy. i love you so much !!! </p>
+                      <p>Hãy luôn tự tin là chính mình, một cô gái mạnh mẽ, dũng cảm nhưng cũng vô cùng dịu dàng nhé. Ngày hôm nay hãy thật vui vẻ và tận hưởng những điều ngọt ngào nhất dành riêng cho em nhé. Anh yêu em.</p>
+                      <p>Anh yêu em nhiều lắm! Chúc mừng ngày 8/3 nhé bae! ❤️</p>`
     },
     song: { file: "https://treuah.netlify.app/main/chamhoa.mp3", title: "Chăm Hoa - Mono" }
 };

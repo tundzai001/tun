@@ -1257,9 +1257,9 @@ function playMarch8thAnimation() {
             // 1. Thò mép thư lên từ từ ngập ngừng (Tạo suspense/hồi hộp)
             .to('.letter-inside', { y: -50, duration: 0.8, ease: "power2.inOut" })
             // 2. Rút toẹt một phát lên thoát khỏi vỏ với độ nảy nhẹ, phong bì phản lực giật chúi xuống rồi nảy lại
-            .to('.letter-inside', { y: -200, scale: 1.1, rotationZ: -2, duration: 1.4, ease: "back.out(1.5)" }, "extract")
-            .to('.envelope', { y: 35, rotationX: -15, duration: 0.6, ease: "power3.out" }, "extract")
-            .to('.envelope', { y: 0, rotationX: 0, duration: 1.2, ease: "elastic.out(1.2, 0.3)" }, "extract+=0.6")
+            .to('.letter-inside', { y: -200, scale: 1.15, rotationZ: -3, duration: 1.4, ease: "back.out(1.8)" }, "extract")
+            .to('.envelope', { y: 40, rotationX: -20, duration: 0.6, ease: "power3.out" }, "extract")
+            .to('.envelope', { y: 0, rotationX: 0, duration: 1.2, ease: "elastic.out(1.5, 0.2)" }, "extract+=0.6")
             .add(() => {
                 const isMobile = window.innerWidth < 768;
                 const pushScale = isMobile ? 1.6 : 2.8;
@@ -1372,6 +1372,7 @@ function playMarch8thAnimation() {
                                                 letterInside.innerHTML = '<span class="heart-icon">❤️</span>';
 
                                                 openLetter(march8thData.letter, march8thData.song, true);
+
                                             }
                                         });
                                     }, 3000); // Ngưng tĩnh 3 giây để ngắm hoa rơi lượn lờ và đọc thư
@@ -1424,15 +1425,136 @@ function checkAndSetupLetterButton() {
     if (letterInfo) { btn.classList.remove('hidden'); btn.onclick = () => openLetter(letterInfo.letter, letterInfo.song); }
 }
 
+let blossomInterval = null;
+let activeBlossoms = new Set();
+let cursorMoveHandler = null;
+let parallaxTiltHandler = null;
+let isVisuals8thActive = false;
+
+function createCherryBlossom() {
+    if (!isVisuals8thActive) return;
+    if (activeBlossoms.size > 80) return; // Limit particles
+
+    const blossom = document.createElement('div');
+    blossom.className = 'cherry-blossom';
+
+    // SVG Hoa Đào
+    blossom.innerHTML = `<svg width="15" height="15" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 10 C60 10, 80 30, 90 50 C80 60, 60 70, 50 90 C40 70, 20 60, 10 50 C20 30, 40 10, 50 10 Z" fill="#ffb7c5" opacity="0.8"/>
+        <path d="M50 20 C55 20, 70 35, 80 50 C70 60, 55 65, 50 80 C45 65, 30 60, 20 50 C30 35, 45 20, 50 20 Z" fill="#ffc0cb" opacity="0.9"/>
+    </svg>`;
+
+    const startX = Math.random() * window.innerWidth;
+    const size = Math.random() * 1.5 + 0.5;
+    const duration = Math.random() * 6 + 6;
+    const fallDistanceX = (Math.random() * 200 - 100) + 'px';
+    const rotationX = Math.random() * 360 + 360 + 'deg';
+    const rotationY = Math.random() * 360 + 360 + 'deg';
+    const rotationZ = Math.random() * 360 + 360 + 'deg';
+
+    blossom.style.left = `${startX}px`;
+    blossom.style.transform = `scale(${size})`;
+    blossom.style.setProperty('--fall-distance-x', fallDistanceX);
+    blossom.style.setProperty('--fall-rotation-x', rotationX);
+    blossom.style.setProperty('--fall-rotation-y', rotationY);
+    blossom.style.setProperty('--fall-rotation', rotationZ);
+    blossom.style.animationDuration = `${duration}s`;
+
+    document.body.appendChild(blossom);
+    activeBlossoms.add(blossom);
+
+    setTimeout(() => {
+        blossom.remove();
+        activeBlossoms.delete(blossom);
+    }, duration * 1000);
+}
+
+function stopMarch8thVisuals() {
+    isVisuals8thActive = false;
+    if (blossomInterval) {
+        clearInterval(blossomInterval);
+        blossomInterval = null;
+    }
+    if (cursorMoveHandler) {
+        window.removeEventListener('mousemove', cursorMoveHandler);
+        cursorMoveHandler = null;
+    }
+    if (parallaxTiltHandler) {
+        window.removeEventListener('mousemove', parallaxTiltHandler);
+        parallaxTiltHandler = null;
+    }
+
+    activeBlossoms.forEach(b => b.remove());
+    activeBlossoms.clear();
+
+    // Reset lighting
+    if (ambientLight && sunLight) {
+        gsap.to(ambientLight.color, { r: 1, g: 1, b: 1, duration: 2 });
+        gsap.to(sunLight.color, { r: 1, g: 1, b: 1, duration: 2 });
+    }
+}
+
+function startMarch8thVisuals() {
+    isVisuals8thActive = true;
+
+    // Shift Universe Lighting to Romantic Magenta/Pink
+    if (ambientLight && sunLight) {
+        gsap.to(ambientLight.color, { r: 0.8, g: 0.2, b: 0.5, duration: 3 });
+        gsap.to(sunLight.color, { r: 1.0, g: 0.5, b: 0.8, duration: 3 });
+    }
+
+    // Start Blossom Rain
+    blossomInterval = setInterval(createCherryBlossom, 150);
+
+    // Magic Cursor Sparkles
+    cursorMoveHandler = (e) => {
+        if (!isVisuals8thActive || Math.random() > 0.3) return; // Throttle
+        const sparkle = document.createElement('div');
+        sparkle.className = 'magic-cursor-sparkle';
+        const size = Math.random() * 15 + 10;
+        sparkle.style.width = `${size}px`;
+        sparkle.style.height = `${size}px`;
+        sparkle.style.left = `${e.clientX}px`;
+        sparkle.style.top = `${e.clientY}px`;
+        document.body.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 600);
+    };
+    window.addEventListener('mousemove', cursorMoveHandler);
+
+    // 3D Parallax Tilt for Letter Form
+    parallaxTiltHandler = (e) => {
+        if (!isVisuals8thActive) return;
+        const letterCard = letterContainer.querySelector('.letter-content.march8th-theme');
+        if (!letterCard || letterContainer.classList.contains('hidden')) return;
+
+        const rect = letterCard.getBoundingClientRect();
+        const x = e.clientX - rect.left; // x position within the element.
+        const y = e.clientY - rect.top;  // y position within the element.
+
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = ((y - centerY) / centerY) * -5; // Max 5 deg
+        const rotateY = ((x - centerX) / centerX) * 5;  // Max 5 deg
+
+        letterCard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+    };
+    window.addEventListener('mousemove', parallaxTiltHandler);
+}
+
 function openLetter(letterData, specialSong = null, isBirthday = false) {
     if (!letterContainer?.classList.contains('hidden')) return;
     const letterContentDiv = letterContainer.querySelector('.letter-content');
     letterContentDiv.innerHTML = '';
 
+    // Reset rotation before showing
+    letterContentDiv.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
+
     // Reset và set theme cho ngày 8/3
     letterContentDiv.className = 'letter-content';
     if (isMarch8thMode) {
         letterContentDiv.classList.add('march8th-theme');
+        startMarch8thVisuals(); // Bắt đầu hiệu ứng 8/3!
     }
 
     const titleEl = document.createElement('h1');
@@ -1457,8 +1579,13 @@ function openLetter(letterData, specialSong = null, isBirthday = false) {
         const fullNightlyPlaylist = [specialSong, ...shuffledNightlySongs];
         fadeOut(() => { playTrack(fullNightlyPlaylist[0], fullNightlyPlaylist, 0); });
     } else if (specialSong && isBirthday) { fadeOut(() => playTrack(specialSong, [specialSong], 0)); }
-    closeBtn.addEventListener('click', () => { letterContainer.classList.add('hidden'); if (typingInterval) clearTimeout(typingInterval); }, { once: true });
+    closeBtn.addEventListener('click', () => {
+        letterContainer.classList.add('hidden');
+        if (typingInterval) clearTimeout(typingInterval);
+        if (isMarch8thMode) stopMarch8thVisuals();
+    }, { once: true });
 }
+
 
 function adjustLetterButtonPosition() {
     const btn = document.getElementById('special-day-btn');

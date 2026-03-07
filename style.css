@@ -469,51 +469,132 @@ body {
 
 /* THEME 8/3 DÀNH CHO BỨC THƯ CHI TIẾT (PREMIUM DARK) */
 .letter-content.march8th-theme {
-    background: rgba(25, 12, 18, 0.95);
+    background: rgba(25, 12, 18, 0.45);
     color: #f8bbd0;
-    box-shadow: 0 0 50px rgba(255, 64, 129, 0.4);
-    border-image: linear-gradient(145deg, #ff4081, #f50057) 1;
-    animation: glow-border-pink 4s linear infinite;
+    box-shadow: 0 15px 50px rgba(255, 64, 129, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 182, 193, 0.4);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    border-image: none;
+    animation: none;
+    transform-style: preserve-3d;
+    transform: perspective(1000px);
+    transition: transform 0.1s ease-out;
+}
+
+/* Ánh sáng quét viền (Premium Sweep) */
+.letter-content.march8th-theme::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 17px;
+    background: conic-gradient(from 0deg, transparent 0%, rgba(255, 128, 171, 0.2) 25%, rgba(255, 64, 129, 0.8) 50%, rgba(255, 128, 171, 0.2) 75%, transparent 100%);
+    z-index: -1;
+    animation: rotate-glow-border 4s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes rotate-glow-border {
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .letter-content.march8th-theme h1 {
-    color: #ff80ab;
-    text-shadow: 0 0 15px rgba(255, 128, 171, 0.5);
-    font-size: 2rem;
+    color: #ffd6e0;
+    text-shadow: 0 0 20px rgba(255, 128, 171, 0.8), 0 0 40px rgba(255, 64, 129, 0.4);
+    font-size: 2.2rem;
+    font-family: 'Dancing Script', cursive;
+    letter-spacing: 2px;
 }
 
 .letter-content.march8th-theme .signature {
-    color: #ff4081;
-    font-size: 2.2rem;
+    color: #ff80ab;
+    font-size: 2.5rem;
+    text-shadow: 0 0 15px rgba(255, 64, 129, 0.6);
+    animation: blink-softly 3s alternate infinite;
+}
+
+@keyframes blink-softly {
+    0% {
+        opacity: 0.8;
+        text-shadow: 0 0 15px rgba(255, 64, 129, 0.4);
+    }
+
+    100% {
+        opacity: 1;
+        text-shadow: 0 0 25px rgba(255, 64, 129, 0.9);
+    }
 }
 
 .letter-content.march8th-theme p {
     color: #fce4ec;
-    font-weight: 400;
-    line-height: 1.9;
+    font-weight: 300;
+    line-height: 2.0;
     font-size: 1.15rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 0.5px;
 }
 
 .letter-content.march8th-theme #close-letter-btn {
     color: #ff80ab;
+    text-shadow: 0 0 10px rgba(255, 128, 171, 0.5);
 }
 
 .letter-content.march8th-theme #close-letter-btn:hover {
-    color: #ff4081;
-    transform: rotate(90deg) scale(1.1);
+    color: #fff;
+    text-shadow: 0 0 20px #ff4081;
+    transform: rotate(90deg) scale(1.2);
 }
 
-@keyframes glow-border-pink {
+/* --- HOA ĐÀO RƠI VÀ CURSOR SÁNG (Cherry Blossoms & Magic Cursor) --- */
+.cherry-blossom {
+    position: fixed;
+    top: -10%;
+    z-index: 10001;
+    pointer-events: none;
+    user-select: none;
+    animation: fall linear forwards;
+    filter: drop-shadow(0 0 5px rgba(255, 182, 193, 0.8));
+    will-change: transform, opacity;
+}
+
+@keyframes fall {
     0% {
-        border-image: linear-gradient(145deg, #ff4081, #f50057) 1;
+        transform: translate3d(0, 0, 0) rotate(0deg) rotateX(0deg) rotateY(0deg);
+        opacity: 0;
     }
 
-    50% {
-        border-image: linear-gradient(145deg, #f50057, #ff80ab) 1;
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
     }
 
     100% {
-        border-image: linear-gradient(145deg, #ff4081, #f50057) 1;
+        transform: translate3d(var(--fall-distance-x), 110vh, 0) rotate(var(--fall-rotation)) rotateX(var(--fall-rotation-x)) rotateY(var(--fall-rotation-y));
+        opacity: 0;
+    }
+}
+
+.magic-cursor-sparkle {
+    position: fixed;
+    pointer-events: none;
+    z-index: 10005;
+    background: radial-gradient(circle, #fff, #ff80ab 40%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 1;
+    animation: sparkle-fade 0.6s ease-out forwards;
+    will-change: transform, opacity, width, height;
+}
+
+@keyframes sparkle-fade {
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.1);
     }
 }
 
