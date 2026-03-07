@@ -1235,7 +1235,6 @@ function playMarch8thAnimation() {
         const heartWrapper = letterInside.querySelector('.heart-icon-wrapper');
 
         const tl = gsap.timeline();
-        const tl = gsap.timeline();
         tl.set('.envelope-wrapper', { scale: 1, opacity: 1, rotationX: 0, rotationZ: 0, rotationY: 0, x: 0, y: 0 })
             .set('.flap-top', { rotationX: 0, zIndex: 6 })
             .set('.letter-inside', { y: 0, scale: 1, zIndex: 2, rotationZ: 0, rotationX: 0 })
