@@ -201,17 +201,157 @@ body {
     display: none;
     justify-content: center;
     align-items: center;
-    background: rgba(0, 0, 0, 0.5);
+    padding: 24px;
+    background:
+        radial-gradient(circle at 50% 30%, rgba(255, 217, 112, 0.18), transparent 30%),
+        rgba(0, 0, 0, 0.62);
     pointer-events: none;
     opacity: 0;
     transition: opacity 1s ease-in-out;
+    overflow: hidden;
 }
 
-#birthday-celebration p {
-    font-size: clamp(3rem, 8vw, 6rem);
+#birthday-celebration.is-active {
+    pointer-events: auto;
+}
+
+.birthday-sky {
+    position: absolute;
+    inset: -10%;
+    background-image:
+        radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 1px, transparent 2px),
+        radial-gradient(circle, rgba(255, 217, 112, 0.9) 0 1px, transparent 2px);
+    background-size: 92px 92px, 137px 137px;
+    animation: birthday-sky-drift 18s linear infinite;
+    opacity: 0.45;
+}
+
+.birthday-story-card {
+    position: relative;
+    width: min(92vw, 560px);
+    padding: clamp(24px, 5vw, 42px);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 8px;
+    background:
+        linear-gradient(145deg, rgba(18, 16, 32, 0.88), rgba(44, 18, 42, 0.82)),
+        rgba(15, 15, 28, 0.84);
     color: white;
+    text-align: center;
+    box-shadow: 0 22px 80px rgba(0, 0, 0, 0.45), 0 0 50px rgba(255, 107, 157, 0.22);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    transform: translateY(18px) scale(0.96);
+    opacity: 0;
+    transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.8s ease;
+}
+
+#birthday-celebration.is-active .birthday-story-card {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.birthday-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.birthday-kicker {
+    margin-bottom: 10px;
+    color: #ffd970;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.birthday-story-card h2 {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(2.7rem, 10vw, 5.2rem);
+    line-height: 0.95;
     text-shadow: 0 0 10px #ff6b9d, 0 0 20px #ff6b9d, 0 0 40px #ff6b9d;
     animation: birthday-pulse 2s infinite;
+}
+
+.birthday-countdown {
+    margin-top: 18px;
+    color: #a8e6cf;
+    font-size: clamp(1rem, 3vw, 1.35rem);
+    font-weight: 700;
+}
+
+.birthday-storyline {
+    display: grid;
+    gap: 10px;
+    margin: 22px auto 26px;
+    color: rgba(255, 255, 255, 0.86);
+    font-size: clamp(0.9rem, 2.4vw, 1rem);
+    line-height: 1.55;
+}
+
+.birthday-storyline span {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: birthday-line-in 0.7s ease forwards;
+}
+
+.birthday-storyline span:nth-child(2) {
+    animation-delay: 0.45s;
+}
+
+.birthday-storyline span:nth-child(3) {
+    animation-delay: 0.9s;
+}
+
+.birthday-open-letter-btn {
+    border: 0;
+    border-radius: 8px;
+    padding: 13px 22px;
+    background: linear-gradient(145deg, #ff6b9d, #ffd970);
+    color: #1b1020;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 0 22px rgba(255, 107, 157, 0.42);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.birthday-open-letter-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 32px rgba(255, 217, 112, 0.52);
+}
+
+.birthday-confetti {
+    position: fixed;
+    top: -16px;
+    width: 8px;
+    height: 14px;
+    border-radius: 2px;
+    z-index: 10002;
+    pointer-events: none;
+    animation: birthday-confetti-fall var(--fall-duration, 4s) linear forwards;
+}
+
+.birthday-orbit-wish {
+    position: fixed;
+    z-index: 10002;
+    color: #fff;
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(1.8rem, 8vw, 4.5rem);
+    text-shadow: 0 0 18px rgba(255, 107, 157, 0.9), 0 0 34px rgba(255, 217, 112, 0.6);
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.72);
+    animation: birthday-wish-pop 3.6s ease forwards;
 }
 
 /* ======================================================= */
@@ -999,6 +1139,53 @@ body {
 
     50% {
         transform: scale(1.05);
+    }
+}
+
+@keyframes birthday-sky-drift {
+    from {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+
+    to {
+        transform: translate3d(-80px, 60px, 0) rotate(2deg);
+    }
+}
+
+@keyframes birthday-line-in {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes birthday-confetti-fall {
+    0% {
+        transform: translate3d(0, -20px, 0) rotate(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate3d(var(--fall-drift, 0px), calc(100vh + 60px), 0) rotate(var(--fall-rotate, 540deg));
+        opacity: 0;
+    }
+}
+
+@keyframes birthday-wish-pop {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.72);
+    }
+
+    16%,
+    72% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -64%) scale(1.08);
     }
 }
 

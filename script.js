@@ -11,6 +11,7 @@ import { Lensflare, LensflareElement } from 'three/addons/objects/Lensflare.js';
 // Import DỮ LIỆU TĨNH từ file data.js
 import {
     birthdayData,
+    birthdayStoryData,
     mainPlaylist,
     dailySongs,
     dailyLetters,
@@ -82,6 +83,8 @@ const activeParticles = new Set();
 let upNextPlaylist = [];
 let upNextIndex = 0;
 let isBirthdayMode = false;
+let isBirthdayPreludeMode = false;
+let daysUntilBirthday = null;
 let isMarch8thMode = false;
 let typingInterval = null;
 let wavesurfer;
@@ -1187,8 +1190,12 @@ function updateFavoriteButton(file) {
 function runBirthdayCheck() {
     if (!birthdayData) return false;
     const now = new Date();
-    isBirthdayMode = (now.getDate() === birthdayData.day && now.getMonth() + 1 === birthdayData.month);
-    return isBirthdayMode;
+    const currentYearBirthday = new Date(now.getFullYear(), birthdayData.month - 1, birthdayData.day);
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    daysUntilBirthday = Math.ceil((currentYearBirthday - today) / 86400000);
+    isBirthdayMode = daysUntilBirthday === 0;
+    isBirthdayPreludeMode = daysUntilBirthday > 0 && daysUntilBirthday <= 7;
+    return isBirthdayMode || isBirthdayPreludeMode;
 }
 
 function runMarch8thCheck() {
@@ -1200,11 +1207,129 @@ function runMarch8thCheck() {
 
 function activateBirthdayMode() {
     const btn = document.getElementById('special-day-btn');
+    const startPromptH1 = document.querySelector('.start-prompt h1');
+    const startPromptP = document.querySelector('.start-prompt p');
+    const promptCopy = birthdayStoryData.startPrompt;
+    if (startPromptH1) startPromptH1.textContent = isBirthdayMode ? promptCopy.dayTitle : promptCopy.preludeTitle;
+    if (startPromptP) startPromptP.textContent = isBirthdayMode ? promptCopy.daySubtitle : promptCopy.preludeSubtitle;
     btn.classList.remove('hidden');
+    btn.title = isBirthdayMode ? 'Mở quà sinh nhật' : 'Đếm ngược sinh nhật 9/6';
+    btn.textContent = isBirthdayMode ? '🎂' : '🎁';
+    const openBirthday = () => showBirthdayStory(true);
+    btn.onclick = openBirthday;
+    setupBirthdayStoryControls();
+}
+
+function setupBirthdayStoryControls() {
+    const closeBtn = document.getElementById('birthday-close-btn');
+    const openLetterBtn = document.getElementById('birthday-open-letter-btn');
+    if (closeBtn) closeBtn.onclick = hideBirthdayStory;
+    if (openLetterBtn) {
+        openLetterBtn.onclick = () => {
+            if (openLetterBtn.dataset.action === 'wait') {
+                createBirthdayWish(birthdayStoryData.prelude.waitWish);
+                hideBirthdayStory();
+                return;
+            }
+            hideBirthdayStory();
+            setTimeout(() => openLetter(birthdayData.letter, birthdayData.song, true), 350);
+        };
+    }
+}
+
+function showBirthdayStory(forceOpenLetterButton = false, autoHide = false) {
     const celebrationOverlay = document.getElementById('birthday-celebration');
-    setTimeout(() => { celebrationOverlay.style.display = 'flex'; celebrationOverlay.style.opacity = '1'; }, 1000);
-    setTimeout(() => { celebrationOverlay.style.opacity = '0'; setTimeout(() => celebrationOverlay.style.display = 'none', 1000); }, 5000);
-    btn.addEventListener('click', () => openLetter(birthdayData.letter, birthdayData.song, true));
+    if (!celebrationOverlay) return;
+
+    const title = document.getElementById('birthday-title');
+    const kicker = document.getElementById('birthday-kicker');
+    const countdown = document.getElementById('birthday-countdown');
+    const openLetterBtn = document.getElementById('birthday-open-letter-btn');
+    const storyLines = document.getElementById('birthday-storyline');
+
+    if (isBirthdayMode) {
+        const birthdayCopy = birthdayStoryData.birthday;
+        if (kicker) kicker.textContent = birthdayCopy.kicker;
+        if (title) title.textContent = birthdayCopy.title;
+        if (countdown) countdown.textContent = birthdayCopy.countdown;
+        if (openLetterBtn) {
+            openLetterBtn.textContent = birthdayCopy.button;
+            openLetterBtn.dataset.action = 'open';
+        }
+        if (storyLines) {
+            storyLines.innerHTML = birthdayCopy.lines.map(line => `<span>${line}</span>`).join('');
+        }
+        createBirthdayWish(birthdayCopy.wish);
+    } else {
+        const preludeCopy = birthdayStoryData.prelude;
+        const dayText = daysUntilBirthday === 1 ? 'còn 1 ngày nữa' : `còn ${daysUntilBirthday} ngày nữa`;
+        if (kicker) kicker.textContent = preludeCopy.kicker;
+        if (title) title.textContent = preludeCopy.title;
+        if (countdown) countdown.textContent = preludeCopy.countdownTemplate.replace('{daysText}', dayText);
+        if (openLetterBtn) {
+            openLetterBtn.textContent = forceOpenLetterButton ? preludeCopy.previewButton : preludeCopy.waitButton;
+            openLetterBtn.dataset.action = forceOpenLetterButton ? 'open' : 'wait';
+        }
+        if (storyLines) {
+            storyLines.innerHTML = preludeCopy.lines.map(line => `<span>${line}</span>`).join('');
+        }
+    }
+
+    celebrationOverlay.style.display = 'flex';
+    celebrationOverlay.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(() => {
+        celebrationOverlay.style.opacity = '1';
+        celebrationOverlay.classList.add('is-active');
+    });
+    createBirthdayConfetti(isBirthdayMode ? 96 : 44);
+    startMeteorShower();
+    for (let i = 0; i < (isBirthdayMode ? 26 : 12); i++) {
+        setTimeout(createTextParticle, i * 110);
+    }
+    if (autoHide) {
+        setTimeout(() => {
+            if (celebrationOverlay.classList.contains('is-active')) hideBirthdayStory();
+        }, isBirthdayMode ? 9000 : 7000);
+    }
+}
+
+function hideBirthdayStory() {
+    const celebrationOverlay = document.getElementById('birthday-celebration');
+    if (!celebrationOverlay) return;
+    celebrationOverlay.style.opacity = '0';
+    celebrationOverlay.classList.remove('is-active');
+    celebrationOverlay.setAttribute('aria-hidden', 'true');
+    setTimeout(() => {
+        if (!celebrationOverlay.classList.contains('is-active')) {
+            celebrationOverlay.style.display = 'none';
+        }
+    }, 1000);
+}
+
+function createBirthdayConfetti(count = 60) {
+    const colors = ['#ff6b9d', '#ffd970', '#4ecdc4', '#ffffff', '#c534ed'];
+    for (let i = 0; i < count; i++) {
+        const confetti = document.createElement('span');
+        confetti.className = 'birthday-confetti';
+        confetti.style.left = `${Math.random() * 100}%`;
+        confetti.style.background = getRandomItem(colors);
+        confetti.style.setProperty('--fall-duration', `${Math.random() * 2.8 + 2.6}s`);
+        confetti.style.setProperty('--fall-drift', `${Math.random() * 260 - 130}px`);
+        confetti.style.setProperty('--fall-rotate', `${Math.random() * 720 + 360}deg`);
+        confetti.style.animationDelay = `${Math.random() * 0.8}s`;
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 6500);
+    }
+}
+
+function createBirthdayWish(text) {
+    const wish = document.createElement('div');
+    wish.className = 'birthday-orbit-wish';
+    wish.textContent = text;
+    wish.style.left = '50%';
+    wish.style.top = '22%';
+    document.body.appendChild(wish);
+    setTimeout(() => wish.remove(), 3800);
 }
 
 function playMarch8thAnimation() {
@@ -1654,6 +1779,8 @@ function setupUIEventListeners() {
 
         if (isMarch8thMode) {
             setTimeout(playMarch8thAnimation, 500);
+        } else if (isBirthdayMode || isBirthdayPreludeMode) {
+            setTimeout(() => showBirthdayStory(false, true), 500);
         }
     };
 

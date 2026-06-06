@@ -173,8 +173,17 @@
     <!-- ========= CÁC LỚP PHỦ CHO SỰ KIỆN ĐẶC BIỆT ========= -->
 
     <!-- LỚP PHỦ SINH NHẬT -->
-    <div id="birthday-celebration">
-        <p>Chúc mừng sinh nhật cậu!</p>
+    <div id="birthday-celebration" aria-hidden="true">
+        <div class="birthday-sky" aria-hidden="true"></div>
+        <div class="birthday-story-card">
+            <button id="birthday-close-btn" class="birthday-close-btn" type="button" aria-label="Đóng">×</button>
+            <p class="birthday-kicker" id="birthday-kicker"></p>
+            <h2 id="birthday-title"></h2>
+            <p id="birthday-countdown" class="birthday-countdown"></p>
+            <div class="birthday-storyline" id="birthday-storyline">
+            </div>
+            <button id="birthday-open-letter-btn" class="birthday-open-letter-btn" type="button"></button>
+        </div>
     </div>
 
     <!-- LỚP PHỦ NGÀY BAY -->

@@ -16,6 +16,40 @@ export const birthdayData = {
     song: { file: "https://treuah.netlify.app/ordinary.mp3", title: "Ordinary - Alex Warren" }
 };
 
+export const birthdayStoryData = {
+    startPrompt: {
+        preludeTitle: "Birthday countdown",
+        preludeSubtitle: "chạm để bắt đầu đếm ngược 9/6",
+        dayTitle: "Happy Birthday 9/6",
+        daySubtitle: "chạm để mở vũ trụ sinh nhật"
+    },
+    prelude: {
+        kicker: "Countdown to 9/6",
+        title: "Sinh nhật của em sắp tới rồi",
+        countdownTemplate: "{daysText} là tới sinh nhật em. Vũ trụ đang chuẩn bị quà.",
+        previewButton: "Xem trước món quà nhỏ",
+        waitButton: "Oke để 9/6 mở",
+        waitWish: "Hẹn 9/6 nhé",
+        lines: [
+            "Anh đang để từng ngôi sao rơi đúng chỗ.",
+            "Mỗi ngày gần hơn 9/6 là một lời nhắc: em rất đặc biệt.",
+            "Đến đúng ngày, bức thư sẽ sáng nhất."
+        ]
+    },
+    birthday: {
+        kicker: "Happy birthday 9/6",
+        title: "Chúc mừng sinh nhật em",
+        countdown: "Hôm nay là ngày của em, cả vũ trụ bật đèn rồi.",
+        button: "Mở thư sinh nhật",
+        wish: "Happy Birthday",
+        lines: [
+            "Hôm nay mọi vì sao đều đứng về phía em.",
+            "Anh gom lại thành một lời chúc thật mềm.",
+            "Tuổi mới vui vẻ, xinh đẹp, bình an và được yêu thật nhiều."
+        ]
+    }
+};
+
 /* --- DỮ LIỆU QUỐC TẾ PHỤ NỮ 8/3 --- */
 export const march8thData = {
     day: 8, month: 3,
