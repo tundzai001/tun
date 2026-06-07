@@ -1198,6 +1198,25 @@ function runBirthdayCheck() {
     return isBirthdayMode || isBirthdayPreludeMode;
 }
 
+function getBirthdayDateLabel() {
+    return `${birthdayData.day}/${birthdayData.month}`;
+}
+
+function withBirthdayDate(text) {
+    return typeof text === 'string' ? text.replaceAll('9/6', getBirthdayDateLabel()) : text;
+}
+
+function getBirthdayStoryCopy(section) {
+    const copy = birthdayStoryData[section];
+    if (!copy) return {};
+    return Object.fromEntries(
+        Object.entries(copy).map(([key, value]) => [
+            key,
+            Array.isArray(value) ? value.map(withBirthdayDate) : withBirthdayDate(value)
+        ])
+    );
+}
+
 function runMarch8thCheck() {
     if (!march8thData) return false;
     const now = new Date();
@@ -1209,11 +1228,12 @@ function activateBirthdayMode() {
     const btn = document.getElementById('special-day-btn');
     const startPromptH1 = document.querySelector('.start-prompt h1');
     const startPromptP = document.querySelector('.start-prompt p');
-    const promptCopy = birthdayStoryData.startPrompt;
+    const promptCopy = getBirthdayStoryCopy('startPrompt');
     if (startPromptH1) startPromptH1.textContent = isBirthdayMode ? promptCopy.dayTitle : promptCopy.preludeTitle;
     if (startPromptP) startPromptP.textContent = isBirthdayMode ? promptCopy.daySubtitle : promptCopy.preludeSubtitle;
+    if (!btn) return;
     btn.classList.remove('hidden');
-    btn.title = isBirthdayMode ? 'Mở quà sinh nhật' : 'Đếm ngược sinh nhật 9/6';
+    btn.title = isBirthdayMode ? 'Mở quà sinh nhật' : `Đếm ngược sinh nhật ${getBirthdayDateLabel()}`;
     btn.textContent = isBirthdayMode ? '🎂' : '🎁';
     const openBirthday = () => showBirthdayStory(true);
     btn.onclick = openBirthday;
@@ -1227,7 +1247,7 @@ function setupBirthdayStoryControls() {
     if (openLetterBtn) {
         openLetterBtn.onclick = () => {
             if (openLetterBtn.dataset.action === 'wait') {
-                createBirthdayWish(birthdayStoryData.prelude.waitWish);
+                createBirthdayWish(getBirthdayStoryCopy('prelude').waitWish);
                 hideBirthdayStory();
                 return;
             }
@@ -1248,7 +1268,7 @@ function showBirthdayStory(forceOpenLetterButton = false, autoHide = false) {
     const storyLines = document.getElementById('birthday-storyline');
 
     if (isBirthdayMode) {
-        const birthdayCopy = birthdayStoryData.birthday;
+        const birthdayCopy = getBirthdayStoryCopy('birthday');
         if (kicker) kicker.textContent = birthdayCopy.kicker;
         if (title) title.textContent = birthdayCopy.title;
         if (countdown) countdown.textContent = birthdayCopy.countdown;
@@ -1261,7 +1281,7 @@ function showBirthdayStory(forceOpenLetterButton = false, autoHide = false) {
         }
         createBirthdayWish(birthdayCopy.wish);
     } else {
-        const preludeCopy = birthdayStoryData.prelude;
+        const preludeCopy = getBirthdayStoryCopy('prelude');
         const dayText = daysUntilBirthday === 1 ? 'còn 1 ngày nữa' : `còn ${daysUntilBirthday} ngày nữa`;
         if (kicker) kicker.textContent = preludeCopy.kicker;
         if (title) title.textContent = preludeCopy.title;
@@ -2622,7 +2642,7 @@ async function init() {
         setTimeout(setupFlightDayExperience, 2000);
     }
 
-    if (isBirthdayMode) {
+    if (isBirthdayMode || isBirthdayPreludeMode) {
         activateBirthdayMode();
     } else if (isMarch8thMode) {
         activateMarch8thMode();
