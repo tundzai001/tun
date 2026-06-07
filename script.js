@@ -1124,9 +1124,15 @@ function fadeOut(callback) {
 function fadeIn() {
     stopFade();
     if (!wavesurfer) return;
-    const targetVolume = parseFloat(volumeSlider.value);
+    const targetVolume = parseFloat(volumeSlider.value) || 0.7;
     wavesurfer.setVolume(0);
-    wavesurfer.play();
+    const playPromise = wavesurfer.play();
+    if (playPromise?.catch) {
+        playPromise.catch(() => {
+            songTitleEl.textContent = "Bấm ▶ để phát bài hát";
+            wavesurfer.setVolume(targetVolume);
+        });
+    }
     fadeInterval = setInterval(() => {
         let newVolume = wavesurfer.getVolume() + 0.1;
         if (newVolume >= targetVolume) { newVolume = targetVolume; stopFade(); }
@@ -1137,7 +1143,7 @@ function fadeIn() {
 function playTrack(track, playlist, index, startTime = 0) {
     if (!track?.file) { playNext(); return; }
     upNextPlaylist = playlist;
-    let upNextIndex = index;
+    upNextIndex = index;
     if (!wavesurfer) {
         wavesurfer = WaveSurfer.create({ container: waveformContainer, waveColor: 'rgba(200, 200, 200, 0.5)', progressColor: 'var(--theme-color-primary)', height: 50, barWidth: 2, barRadius: 3, cursorWidth: 0, responsive: true, hideScrollbar: true, media: audio, backend: 'MediaElement' });
         wavesurfer.on('finish', playNext);

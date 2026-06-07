@@ -201,10 +201,11 @@ body {
     display: none;
     justify-content: center;
     align-items: center;
-    padding: 24px;
+    padding: 28px;
     background:
-        radial-gradient(circle at 50% 30%, rgba(255, 217, 112, 0.18), transparent 30%),
-        rgba(0, 0, 0, 0.62);
+        radial-gradient(circle at 50% 20%, rgba(255, 217, 112, 0.16), transparent 28%),
+        radial-gradient(circle at 85% 70%, rgba(78, 205, 196, 0.12), transparent 26%),
+        rgba(0, 0, 0, 0.68);
     pointer-events: none;
     opacity: 0;
     transition: opacity 1s ease-in-out;
@@ -219,30 +220,45 @@ body {
     position: absolute;
     inset: -10%;
     background-image:
-        radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 1px, transparent 2px),
-        radial-gradient(circle, rgba(255, 217, 112, 0.9) 0 1px, transparent 2px);
-    background-size: 92px 92px, 137px 137px;
-    animation: birthday-sky-drift 18s linear infinite;
-    opacity: 0.45;
+        radial-gradient(circle, rgba(255, 255, 255, 0.85) 0 1px, transparent 2px),
+        radial-gradient(circle, rgba(255, 217, 112, 0.65) 0 1px, transparent 2px);
+    background-size: 118px 118px, 172px 172px;
+    animation: birthday-sky-drift 26s linear infinite;
+    opacity: 0.25;
 }
 
 .birthday-story-card {
     position: relative;
-    width: min(92vw, 560px);
-    padding: clamp(24px, 5vw, 42px);
-    border: 1px solid rgba(255, 255, 255, 0.24);
+    width: min(92vw, 520px);
+    padding: clamp(24px, 4.5vw, 38px);
+    border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 8px;
     background:
-        linear-gradient(145deg, rgba(18, 16, 32, 0.88), rgba(44, 18, 42, 0.82)),
-        rgba(15, 15, 28, 0.84);
+        linear-gradient(180deg, rgba(20, 22, 34, 0.94), rgba(17, 12, 24, 0.92)),
+        rgba(15, 15, 28, 0.88);
     color: white;
     text-align: center;
-    box-shadow: 0 22px 80px rgba(0, 0, 0, 0.45), 0 0 50px rgba(255, 107, 157, 0.22);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    transform: translateY(18px) scale(0.96);
+    box-shadow:
+        0 24px 90px rgba(0, 0, 0, 0.58),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transform: translateY(14px) scale(0.98);
     opacity: 0;
     transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.8s ease;
+}
+
+.birthday-story-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255, 217, 112, 0.7), rgba(78, 205, 196, 0.3), rgba(255, 107, 157, 0.45));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
 }
 
 #birthday-celebration.is-active .birthday-story-card {
@@ -252,56 +268,97 @@ body {
 
 .birthday-close-btn {
     position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 34px;
-    height: 34px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    top: 14px;
+    right: 14px;
+    width: 36px;
+    height: 36px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.86);
     font-size: 1.25rem;
     line-height: 1;
     cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.birthday-close-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: rotate(90deg);
 }
 
 .birthday-kicker {
-    margin-bottom: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    margin-bottom: 18px;
+    padding: 0 12px;
+    border: 1px solid rgba(255, 217, 112, 0.22);
+    border-radius: 999px;
+    background: rgba(255, 217, 112, 0.08);
     color: #ffd970;
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
 }
 
 .birthday-story-card h2 {
-    font-family: 'Dancing Script', cursive;
-    font-size: clamp(2.7rem, 10vw, 5.2rem);
-    line-height: 0.95;
-    text-shadow: 0 0 10px #ff6b9d, 0 0 20px #ff6b9d, 0 0 40px #ff6b9d;
-    animation: birthday-pulse 2s infinite;
+    max-width: 11ch;
+    margin: 0 auto;
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(2.15rem, 6vw, 4rem);
+    line-height: 1.04;
+    font-weight: 800;
+    letter-spacing: 0;
+    color: #fff7fb;
+    text-wrap: balance;
+    text-shadow: 0 10px 32px rgba(255, 107, 157, 0.24);
 }
 
 .birthday-countdown {
-    margin-top: 18px;
-    color: #a8e6cf;
-    font-size: clamp(1rem, 3vw, 1.35rem);
-    font-weight: 700;
+    width: min(100%, 420px);
+    margin: 20px auto 0;
+    padding: 13px 16px;
+    border: 1px solid rgba(168, 230, 207, 0.2);
+    border-radius: 8px;
+    background: rgba(168, 230, 207, 0.08);
+    color: #c8f7e4;
+    font-size: clamp(0.95rem, 2.4vw, 1.08rem);
+    font-weight: 650;
+    line-height: 1.45;
 }
 
 .birthday-storyline {
     display: grid;
-    gap: 10px;
-    margin: 22px auto 26px;
-    color: rgba(255, 255, 255, 0.86);
-    font-size: clamp(0.9rem, 2.4vw, 1rem);
-    line-height: 1.55;
+    gap: 8px;
+    width: min(100%, 430px);
+    margin: 20px auto 26px;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: clamp(0.9rem, 2.2vw, 0.98rem);
+    line-height: 1.5;
+    text-align: left;
 }
 
 .birthday-storyline span {
     opacity: 0;
     transform: translateY(10px);
     animation: birthday-line-in 0.7s ease forwards;
+    position: relative;
+    padding-left: 18px;
+}
+
+.birthday-storyline span::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.72em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffd970, #4ecdc4);
+    box-shadow: 0 0 12px rgba(255, 217, 112, 0.34);
 }
 
 .birthday-storyline span:nth-child(2) {
@@ -315,19 +372,46 @@ body {
 .birthday-open-letter-btn {
     border: 0;
     border-radius: 8px;
-    padding: 13px 22px;
-    background: linear-gradient(145deg, #ff6b9d, #ffd970);
-    color: #1b1020;
+    min-width: 178px;
+    min-height: 46px;
+    padding: 0 22px;
+    background: linear-gradient(135deg, #ffd970, #ff8aa8);
+    color: #1c1420;
     font-size: 0.95rem;
-    font-weight: 700;
+    font-weight: 800;
     cursor: pointer;
-    box-shadow: 0 0 22px rgba(255, 107, 157, 0.42);
+    box-shadow: 0 14px 34px rgba(255, 107, 157, 0.22);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .birthday-open-letter-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 0 32px rgba(255, 217, 112, 0.52);
+    box-shadow: 0 18px 40px rgba(255, 217, 112, 0.24);
+}
+
+@media (max-height: 800px) and (min-width: 481px) {
+    .birthday-story-card {
+        width: min(86vw, 500px);
+        padding: 24px 34px 28px;
+    }
+
+    .birthday-kicker {
+        margin-bottom: 12px;
+    }
+
+    .birthday-story-card h2 {
+        font-size: clamp(2rem, 5vw, 3.25rem);
+    }
+
+    .birthday-countdown {
+        margin-top: 16px;
+        padding: 11px 14px;
+    }
+
+    .birthday-storyline {
+        margin: 16px auto 22px;
+        gap: 7px;
+    }
 }
 
 .birthday-confetti {
@@ -1275,6 +1359,24 @@ body {
     .top-left-widgets {
         top: 15px;
         left: 15px;
+    }
+
+    #birthday-celebration {
+        padding: 16px;
+    }
+
+    .birthday-story-card {
+        width: min(100%, 380px);
+        padding: 24px 20px 26px;
+    }
+
+    .birthday-story-card h2 {
+        max-width: 10ch;
+        font-size: clamp(2rem, 12vw, 3rem);
+    }
+
+    .birthday-storyline {
+        text-align: left;
     }
 }
 
