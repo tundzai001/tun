@@ -295,7 +295,7 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 28px;
-    margin-bottom: 18px;
+    margin-bottom: 24px;
     padding: 0 12px;
     border: 1px solid rgba(255, 217, 112, 0.22);
     border-radius: 999px;
@@ -451,7 +451,7 @@ body {
     background:
         radial-gradient(circle at 22% 22%, rgba(255, 217, 112, 0.16), transparent 26%),
         radial-gradient(circle at 82% 30%, rgba(78, 205, 196, 0.14), transparent 24%),
-        linear-gradient(135deg, rgba(3, 5, 13, 0.96), rgba(24, 12, 30, 0.96) 52%, rgba(6, 13, 24, 0.98));
+        linear-gradient(135deg, rgba(3, 5, 13, 1), rgba(24, 12, 30, 1) 52%, rgba(6, 13, 24, 1));
     opacity: 0;
     pointer-events: none;
     perspective: 1300px;
@@ -621,7 +621,7 @@ body {
     display: inline-flex;
     min-height: 30px;
     align-items: center;
-    margin-bottom: 18px;
+    margin-bottom: 24px;
     padding: 0 12px;
     border: 1px solid rgba(255, 217, 112, 0.28);
     border-radius: 999px;
@@ -678,7 +678,7 @@ body {
     transform: translate3d(-50%, -50%, 160px) rotateY(-11deg) rotateX(5deg);
     transform-style: preserve-3d;
     will-change: transform;
-    contain: layout style;
+    
 }
 
 .birthday-photo-plane::after {
@@ -714,7 +714,7 @@ body {
     transform: translate3d(calc(-50% + var(--card-x, 0px)), calc(-50% + var(--card-y, 0px)), var(--card-z, -80px)) rotateZ(var(--card-r, 0deg)) rotateY(var(--card-ry, 0deg)) scale(var(--card-scale, 1));
     transition: opacity 0.7s ease, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), filter 0.7s ease;
     will-change: transform;
-    contain: layout style;
+    
 }
 
 .birthday-photo-stack-card img {

@@ -1618,6 +1618,16 @@ function renderBirthdayCinematicScene(index, immediate = false) {
     const isFinal = index === maxPhotoIndex;
     const activePhotoIndex = photos.length ? index % photos.length : 0;
 
+    // --- Cinematic Autoplay System ---
+    if (birthdayCinematicState.autoplayTimer) clearTimeout(birthdayCinematicState.autoplayTimer);
+    if (!isFinal) {
+        birthdayCinematicState.autoplayTimer = setTimeout(() => {
+            if (birthdayCinematicState.active && !document.hidden) {
+                stepBirthdayCinematic(1);
+            }
+        }, 5500); // Wait 5.5s per scene
+    }
+
     // --- Update text content ---
     if (kicker) kicker.textContent = scene.kicker || '';
     if (title) title.textContent = scene.title || '';
