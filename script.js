@@ -1697,11 +1697,11 @@ function renderBirthdayCinematicScene(index, immediate = false) {
     
     const duration = immediate ? 0 : 0.8;
     const planeTransforms = [
-        { z: 275, rotateY: -14, rotateX: 7, x: 22, y: 0, scale: 1.18 },
-        { z: 235, rotateY: -6, rotateX: 4, x: -10, y: -6, scale: 1.12 },
-        { z: 265, rotateY: 9, rotateX: -2, x: -38, y: -12, scale: 1.14 },
-        { z: 225, rotateY: 3, rotateX: 0, x: 24, y: 8, scale: 1.08 },
-        { z: 250, rotateY: -10, rotateX: -3, x: -18, y: 12, scale: 1.13 }
+        { z: 120, rotateY: -8,  rotateX: 4,  x: 15, y: 0,  scale: 1.05 },
+        { z: 80,  rotateY: -4,  rotateX: 2,  x: -8, y: -4, scale: 1.02 },
+        { z: 110, rotateY: 6,   rotateX: -1, x: -18, y: -6, scale: 1.04 },
+        { z: 60,  rotateY: 2,   rotateX: 0,  x: 12, y: 4,  scale: 1.0  },
+        { z: 90,  rotateY: -6,  rotateX: -2, x: -12, y: 6,  scale: 1.03 }
     ];
     const target = planeTransforms[index % planeTransforms.length] || planeTransforms[0];
     birthdayCinematicState.planeTarget = target;
@@ -1736,6 +1736,21 @@ function renderBirthdayCinematicScene(index, immediate = false) {
 
     // Photo plane: cinematic camera movement
     if (plane) {
+        if (immediate) {
+            // Apply immediately to avoid 1-frame "jump" before timeline starts
+            gsap.set(plane, {
+                xPercent: -50,
+                yPercent: -50,
+                x: target.x,
+                y: target.y,
+                z: target.z,
+                rotationY: target.rotateY,
+                rotationX: target.rotateX,
+                scale: target.scale,
+                transformPerspective: 1300,
+                transformOrigin: '50% 50%'
+            });
+        }
         tl.to(plane, {
             xPercent: -50,
             yPercent: -50,
