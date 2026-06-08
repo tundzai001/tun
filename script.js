@@ -494,7 +494,7 @@ function createPeakRocket() {
     rocketGroup.rotation.x = Math.PI / 2;
     rocketGroup.scale.setScalar(2.0);
     const trailParticles = [];
-    const particleCount = 150;
+    const particleCount = 300;
     const trailGeometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
@@ -595,7 +595,7 @@ function createComet() {
     const headGeometry = new THREE.SphereGeometry(2, 32, 32);
     const headMaterial = new THREE.MeshBasicMaterial({ color: 0x87ceeb });
     const cometHead = new THREE.Mesh(headGeometry, headMaterial);
-    const particleCount = 500;
+    const particleCount = 1000;
     const particlesGeometry = new THREE.BufferGeometry();
     const posArray = new Float32Array(particleCount * 3);
     particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
@@ -679,208 +679,13 @@ function createDramaticShootingStar() {
 function startMeteorShower() {
     const count = Math.floor(Math.random() * 10) + 5;
     for (let i = 0; i < count; i++) {
-const wingShape = new THREE.Shape();
-    wingShape.moveTo(0, 0); wingShape.lineTo(3, -2); wingShape.lineTo(3, -4); wingShape.lineTo(0, -5);
-    const wing = new THREE.Mesh(new THREE.ExtrudeGeometry(wingShape, { depth: 0.2, bevelEnabled: false }), rocketMat);
-    wing.position.set(1.2, -2, 0);
-    const wing2 = wing.clone(); wing2.rotation.y = Math.PI * 2 / 3;
-    const wing3 = wing.clone(); wing3.rotation.y = Math.PI * 4 / 3;
-    rocketGroup.add(body, nose, booster, wing, wing2, wing3);
-    rocketGroup.rotation.x = Math.PI / 2;
-    rocketGroup.scale.setScalar(2.0);
-    const trailParticles = [];
-    const particleCount = 100;
-    const trailGeometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(particleCount * 3);
-    const colors = new Float32Array(particleCount * 3);
-    trailGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    trailGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    const trailMaterial = new THREE.PointsMaterial({ size: 0.8, vertexColors: true, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false });
-    const trail = new THREE.Points(trailGeometry, trailMaterial);
-    for (let i = 0; i < particleCount; i++) {
-        trailParticles.push({
-            position: new THREE.Vector3(),
-            velocity: new THREE.Vector3(),
-            lifetime: 0,
-            maxLifetime: Math.random() * 2 + 1
-        });
-    }
-    const spawnRadius = 1300;
-    const startX = (Math.random() > 0.5 ? 1 : -1) * spawnRadius;
-    const startY = (Math.random() - 0.5) * 500;
-    const startZ = (Math.random() - 0.5) * spawnRadius * 2;
-    rocketGroup.position.set(startX, startY, startZ);
-    rocketGroup.lookAt(0, 0, 0);
-    scene.add(rocketGroup, trail);
-    const duration = Math.random() * 12 + 8;
-    gsap.to(rocketGroup.position, {
-        x: -startX, y: -startY, z: -startZ, duration: duration, ease: "power1.in",
-        onComplete: () => {
-            scene.remove(rocketGroup, trail);
-            activePeakRockets = activePeakRockets.filter(r => r.group !== rocketGroup);
-        }
-    });
-    activePeakRockets.push({ group: rocketGroup, trail: trail, particles: trailParticles });
-}
-
-function updatePeakRocketTrail(rocket, delta) {
-    const positions = rocket.trail.geometry.attributes.position.array;
-    const colors = rocket.trail.geometry.attributes.color.array;
-    const enginePosition = rocket.group.position.clone().add(new THREE.Vector3(0, -6, 0).applyQuaternion(rocket.group.quaternion));
-    rocket.particles.forEach((p, i) => {
-        if (p.lifetime <= 0) {
-            p.position.copy(enginePosition);
-            const spread = 1.5;
-            p.velocity.set((Math.random() - 0.5) * spread, (Math.random() - 0.5) * spread, (Math.random() - 0.5) * spread).add(rocket.group.position.clone().sub(p.position).normalize().multiplyScalar(-5));
-            p.lifetime = p.maxLifetime;
-        }
-        p.lifetime -= delta;
-        p.position.add(p.velocity.clone().multiplyScalar(delta));
-        const lifePercent = p.lifetime / p.maxLifetime;
-        const i3 = i * 3;
-        positions[i3] = p.position.x;
-        positions[i3 + 1] = p.position.y;
-        positions[i3 + 2] = p.position.z;
-        const color = new THREE.Color();
-        if (lifePercent > 0.7) color.setHSL(0.1, 1, 0.5 + (lifePercent - 0.7) * 1.5);
-        else color.setHSL(0.05, 1, lifePercent * 0.7);
-        colors[i3] = color.r; colors[i3 + 1] = color.g; colors[i3 + 2] = color.b;
-    });
-    rocket.trail.geometry.attributes.position.needsUpdate = true;
-    rocket.trail.geometry.attributes.color.needsUpdate = true;
-}
-
-function createFieryAsteroid() {
-    const asteroidGroup = new THREE.Group();
-    const size = Math.random() * 4 + 2;
-    const coreGeometry = new THREE.DodecahedronGeometry(size, 3);
-    const uniforms = { uTime: { value: 0.0 } };
-    const coreMaterial = new THREE.ShaderMaterial({ uniforms, vertexShader: document.getElementById('vertexShader').textContent, fragmentShader: document.getElementById('fragmentShader').textContent });
-    const asteroidCore = new THREE.Mesh(coreGeometry, coreMaterial);
-    asteroidGroup.add(asteroidCore);
-    const glowTexture = createProceduralTexture((ctx, canvasSize) => {
-        const gradient = ctx.createRadialGradient(canvasSize / 2, canvasSize / 2, 0, canvasSize / 2, canvasSize / 2, canvasSize / 2);
-        gradient.addColorStop(0, 'rgba(255, 150, 0, 0.8)');
-        gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvasSize, canvasSize);
-    });
-    const glowSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture, blending: THREE.AdditiveBlending, transparent: true }));
-    glowSprite.scale.set(size * 4, size * 4, 1);
-    asteroidGroup.add(glowSprite);
-    const spawnRadius = 1000;
-    const startX = (Math.random() - 0.5) * spawnRadius * 1.5;
-    const startY = (Math.random() - 0.5) * 200;
-    const startZ = (Math.random() > 0.5 ? 1 : -1) * (spawnRadius * 0.8);
-    asteroidGroup.position.set(startX, startY, startZ);
-    scene.add(asteroidGroup);
-    const duration = Math.random() * 10 + 10;
-    gsap.to(asteroidGroup.position, {
-        x: -startX, y: -startY * 1.5, z: -startZ,
-        duration: duration, ease: "none",
-        onComplete: () => {
-            scene.remove(asteroidGroup);
-            activeAsteroids = activeAsteroids.filter(a => a.group !== asteroidGroup);
-        }
-    });
-    activeAsteroids.push({ group: asteroidGroup, uniforms: uniforms });
-}
-
-function createComet() {
-    const headGeometry = new THREE.SphereGeometry(2, 32, 32);
-    const headMaterial = new THREE.MeshBasicMaterial({ color: 0x87ceeb });
-    const cometHead = new THREE.Mesh(headGeometry, headMaterial);
-    const particleCount = 200;
-    const particlesGeometry = new THREE.BufferGeometry();
-    const posArray = new Float32Array(particleCount * 3);
-    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-    const cometParticleTexture = createProceduralTexture((ctx, size) => {
-        const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-        gradient.addColorStop(0, 'rgba(173, 216, 230, 1)');
-        gradient.addColorStop(0.4, 'rgba(135, 206, 250, 0.5)');
-        gradient.addColorStop(1, 'rgba(0, 191, 255, 0)');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, size, size);
-    });
-    const particleMaterial = new THREE.PointsMaterial({ map: cometParticleTexture, size: 2.5, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, sizeAttenuation: true });
-    const cometTail = new THREE.Points(particlesGeometry, particleMaterial);
-    cometHead.add(cometTail);
-    const spawnRadius = 900;
-    const startX = (Math.random() > 0.5 ? 1 : -1) * spawnRadius;
-    const startY = (Math.random() - 0.5) * 400;
-    const startZ = (Math.random() - 0.5) * spawnRadius * 2;
-    cometHead.position.set(startX, startY, startZ);
-    scene.add(cometHead);
-    const duration = Math.random() * 15 + 20;
-    gsap.to(cometHead.position, {
-        x: -startX, z: -startZ, duration: duration, ease: "power1.in",
-        onComplete: () => {
-            scene.remove(cometHead);
-            activeComets = activeComets.filter(c => c.head !== cometHead);
-        }
-    });
-    activeComets.push({ head: cometHead, tail: cometTail });
-}
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[array[i], array[j]] = [array[j], array[i]]; }
-    return array;
-}
-
-function formatTime(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
-}
-
-function getRandomItem(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function createDramaticShootingStar() {
-    const starGroup = new THREE.Group();
-    const core = new THREE.Mesh(new THREE.SphereGeometry(2, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffe48a, toneMapped: false }));
-    const glowTexture = createProceduralTexture((ctx, size) => {
-        const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-        gradient.addColorStop(0, 'rgba(255, 228, 138, 0.8)');
-        gradient.addColorStop(1, 'rgba(255, 150, 0, 0)');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, size, size);
-    });
-    const glowSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture, blending: THREE.AdditiveBlending }));
-    glowSprite.scale.set(20, 20, 1);
-    core.add(glowSprite);
-    const tailGeometry = new THREE.CylinderGeometry(0.1, 2.5, 150, 16);
-    tailGeometry.translate(0, -75, 0);
-    const tailMaterial = new THREE.MeshBasicMaterial({ color: 0x87ceeb, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending });
-    const tail = new THREE.Mesh(tailGeometry, tailMaterial);
-    starGroup.add(core, tail);
-    const startY = Math.random() * 400 - 200;
-    const startX = (Math.random() > 0.5 ? 1 : -1) * 1500;
-    const startZ = Math.random() * 2000 - 1000;
-    starGroup.position.set(startX, startY, startZ);
-    const target = new THREE.Vector3((Math.random() - 0.5) * 500, (Math.random() - 0.5) * 200, 0);
-    starGroup.lookAt(target);
-    scene.add(starGroup);
-    gsap.to(starGroup.position, {
-        x: -startX * 1.2,
-        y: startY + (Math.random() - 0.5) * 300,
-        z: -startZ * 1.2,
-        duration: Math.random() * 2 + 2,
-        ease: "power1.in",
-        onComplete: () => scene.remove(starGroup)
-    });
-}
-
-function startMeteorShower() {
-    const count = Math.floor(Math.random() * 5) + 3;
-    for (let i = 0; i < count; i++) {
         setTimeout(createDramaticShootingStar, i * (Math.random() * 300 + 100));
     }
 }
 
 function createTextParticle() {
     const isHighEndDevice = !window.matchMedia("(max-width: 768px)").matches;
-    const config = { maxParticles: isHighEndDevice ? 40 : 20 };
+    const config = { maxParticles: isHighEndDevice ? 70 : 30 };
     if (!galaxy || activeParticles.size >= config.maxParticles) return;
     let messagesToUse = isBirthdayMode ? [...birthdayMessages] : [...messages];
     if (currentWeatherData) {
@@ -1520,7 +1325,7 @@ function showBirthdayStory(forceOpenLetterButton = false, autoHide = false) {
         celebrationOverlay.style.opacity = '1';
         celebrationOverlay.classList.add('is-active');
     });
-    createBirthdayConfetti(96);
+    createBirthdayConfetti(isBirthdayMode ? 96 : 44);
     startMeteorShower();
     for (let i = 0; i < (isBirthdayMode ? 26 : 12); i++) {
         setTimeout(createTextParticle, i * 110);
@@ -1601,7 +1406,7 @@ function setupBirthdayCinematicControls() {
     overlay.addEventListener('wheel', event => {
         if (!birthdayCinematicState.active) return;
         event.preventDefault();
-        if (Math.abs(event.deltaY) < 18) return;
+        if (Math.abs(event.deltaY) < 18) return; // Increased threshold for less jitter
         stepBirthdayCinematic(event.deltaY > 0 ? 1 : -1);
     }, { passive: false });
 
@@ -1753,7 +1558,6 @@ function startBirthdayCinematicCanvas() {
             const r = particle.size * particle.z;
             ctx.arc(particle.x, particle.y, r, 0, Math.PI * 2);
             ctx.fill();
-            // Soft glow ring (cheaper than shadowBlur)
             ctx.globalAlpha = alpha * 0.15;
             ctx.beginPath();
             ctx.arc(particle.x, particle.y, r * 3, 0, Math.PI * 2);
@@ -2078,7 +1882,7 @@ function playMarch8thAnimation() {
                                     const spawnY = window.innerHeight / 2;
 
                                     // GIẢM SỐ LƯỢNG HẠT ĐỂ FIX LAG (Từ 150 xuống 40, hạt to hơn và animation tách rời)
-                                    for (let i = 0; i < 25; i++) {
+                                    for (let i = 0; i < 40; i++) {
                                         const particle = document.createElement('div');
                                         particle.innerHTML = ['🌸', '💮', '✨', '💖'][Math.floor(Math.random() * 4)];
                                         particle.style.position = 'fixed';
@@ -2483,7 +2287,7 @@ async function createSpaceship() {
 
 function createStarfield() {
     const isHighEndDevice = !window.matchMedia("(max-width: 768px)").matches;
-    const starCount = isHighEndDevice ? 3000 : 1500;
+    const starCount = isHighEndDevice ? 6000 : 3000;
     const positions = [], colors = [];
     const color = new THREE.Color();
     for (let i = 0; i < starCount; i++) {
@@ -2538,7 +2342,7 @@ function createSunEffects(sunMesh) {
 
 function createProceduralSaturnRing() {
     const isHighEndDevice = !window.matchMedia("(max-width: 768px)").matches;
-    const particleCount = isHighEndDevice ? 5000 : 2500;
+    const particleCount = isHighEndDevice ? 10000 : 5000;
     const positions = [], colors = [], customData = [];
     const innerRadius = 40, outerRadius = 65, thickness = 2;
     const colorInside = new THREE.Color("#A19A87"), colorMiddle = new THREE.Color("#8C826B"), colorOutside = new THREE.Color("#B5AF9D");
@@ -3127,11 +2931,6 @@ function animate() {
         bloomPass.strength = 0.6 + bass * 0.4;
         if (starfield) starfield.material.size = 1.5 + mid * 1.5;
     }
-    const particleInterval = !window.matchMedia("(max-width: 768px)").matches ? 400 : 700;
-    if (elapsedTime * 1000 - lastParticleTime > particleInterval) {
-        createTextParticle();
-        lastParticleTime = elapsedTime * 1000;
-    }
 
     composer.render();
 }
@@ -3181,7 +2980,7 @@ async function initThreeJS() {
     controls.minDistance = 20; controls.maxDistance = 1200;
 
     const renderPass = new RenderPass(scene, camera);
-    const bloomResolution = isHighEndDevice ? new THREE.Vector2(Math.floor(window.innerWidth / 1.5), Math.floor(window.innerHeight / 1.5)) : new THREE.Vector2(Math.floor(window.innerWidth / 2.5), Math.floor(window.innerHeight / 2.5));
+    const bloomResolution = isHighEndDevice ? new THREE.Vector2(window.innerWidth, window.innerHeight) : new THREE.Vector2(window.innerWidth / 2, window.innerHeight / 2);
     bloomPass = new UnrealBloomPass(bloomResolution, 1.5, 0.4, 0.85);
     bloomPass.threshold = 0; bloomPass.strength = 0.6; bloomPass.radius = 0.5;
     composer = new EffectComposer(renderer);
@@ -3255,7 +3054,7 @@ async function init() {
     setTimeout(() => setInterval(createComet, config.cometInterval), 10000);
     setupGyroControls();
     setupMouseParallax();
-    // mainLoop merged into animate() - no separate rAF loop
+    requestAnimationFrame(mainLoop);
     const today = new Date();
     const flightDate = 13;
     const flightMonth = 9;
