@@ -188,6 +188,40 @@
 
     <!-- LỚP PHỦ NGÀY BAY -->
     <button id="flight-day-btn" class="hidden">Một hành trình đặc biệt...</button>
+    <div id="birthday-cinematic" aria-hidden="true">
+        <canvas id="birthday-cinematic-canvas" aria-hidden="true"></canvas>
+        <div class="birthday-cinematic-stars" aria-hidden="true"></div>
+        <div class="birthday-cinematic-vignette" aria-hidden="true"></div>
+        <button id="birthday-cinematic-close" class="birthday-cinematic-close" type="button" aria-label="Đóng">×</button>
+        <div class="birthday-cinematic-stage">
+            <section class="birthday-cinematic-copy">
+                <p id="birthday-cinematic-kicker"></p>
+                <h2 id="birthday-cinematic-title"></h2>
+                <p id="birthday-cinematic-body"></p>
+            </section>
+            <section class="birthday-cinematic-visual" aria-hidden="true">
+                <div class="birthday-orbit-ring birthday-orbit-ring-one"></div>
+                <div class="birthday-orbit-ring birthday-orbit-ring-two"></div>
+                <div class="birthday-photo-stack" id="birthday-photo-stack"></div>
+                <div class="birthday-photo-plane" id="birthday-photo-plane">
+                    <img id="birthday-cinematic-photo" alt="">
+                    <div class="birthday-photo-shine"></div>
+                </div>
+                <div class="birthday-cinematic-planet birthday-cinematic-planet-one"></div>
+                <div class="birthday-cinematic-planet birthday-cinematic-planet-two"></div>
+            </section>
+        </div>
+        <div class="birthday-cinematic-controls">
+            <div id="birthday-cinematic-dots" class="birthday-cinematic-dots" aria-label="Tiến trình"></div>
+            <p id="birthday-cinematic-hint">Lướt chuột hoặc vuốt để tiếp tục</p>
+            <div class="birthday-cinematic-actions">
+                <button id="birthday-cinematic-prev" type="button">Trước</button>
+                <button id="birthday-cinematic-next" type="button">Tiếp</button>
+                <button id="birthday-cinematic-letter" type="button">Mở thư sinh nhật</button>
+            </div>
+        </div>
+    </div>
+
     <div id="flight-overlay">
         <div id="flight-map"></div>
         <div id="flight-notification" class="hidden">

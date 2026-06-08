@@ -9,6 +9,19 @@ export const airportData = {
 /* --- DỮ LIỆU SINH NHẬT --- */
 export const birthdayData = {
     day: 7, month: 6,
+    photos: [
+        "images/birthday/z7912769188496_fba42a0e2807fbead245ba822d2ed1e2.jpg",
+        "images/birthday/z7912769240071_f07a699af75d2d169194e938421a20a3.jpg",
+        "images/birthday/z7912769283827_92061c656206c440fda4b368213e802f.jpg",
+        "images/birthday/z7912769348321_05bd0cd58607eef5227700ef1c313ea8.jpg",
+        "images/birthday/z7912769388906_37630896355a641f184ee37d9a6693ec.jpg",
+        "images/birthday/z7912769432323_6b32251c989510cad34986c71edff852.jpg",
+        "images/birthday/z7912769496467_534fa31f0157927c08bc20eedc16c568.jpg",
+        "images/birthday/z7912769546984_4b3fa4bd8f843ba751658ddb05182320.jpg",
+        "images/birthday/z7912769611831_549a4f70bf71c3efe64eddcf1d6c0547.jpg",
+        "images/birthday/z7912769684155_018c74f5ca09542124d11ff1367b6add.jpg"
+    ],
+    photoFallback: "images/xinh1.jpg",
     letter: {
         title: "Gửi em, cô gái tuyệt vời nhất từng được sinh ra =))) nghe hơi sến tí nhưng mà thôi",
         content: `<p>Hôm nay là ngày sinh nhật của em, là ngày mà mẹ em đã sinh ra em =))) anh biết nhưng mà ý là kiểu ngày mà mẹ em đẻ ra thiên thần luôn rồi ấy kiểu em tuyệt vời mà xinh xắn lại còn giỏi giang nữa omg</p><p> Có lẽ nếu xét về tình cảm dành cho em chắc anh thua mỗi mẹ em thôi ấy, anh yêu em nhiều lắm luôn í. Thôi anh nhắn v th tại anh viết thư tay cho em rồi mà =)) đọc thư tay nó mới tình cảm hơn chứ <p>Chúc em sinh nhật vui vẻ!</p></p>`
@@ -40,14 +53,37 @@ export const birthdayStoryData = {
         kicker: "Happy birthday 9/6",
         title: "Chúc mừng sinh nhật em",
         countdown: "Hôm nay là ngày của em, cả vũ trụ bật đèn rồi.",
-        button: "Mở thư sinh nhật",
+        button: "Bắt đầu hành trình",
         wish: "Happy Birthday",
         lines: [
             "Hôm nay mọi vì sao đều đứng về phía em.",
             "Anh gom lại thành một lời chúc thật mềm.",
             "Tuổi mới vui vẻ, xinh đẹp, bình an và được yêu thật nhiều."
         ]
-    }
+    },
+    cinematicScenes: [
+        {
+            kicker: "Chapter 01",
+            title: "Happy Birthday 9/6",
+            body: "Vũ trụ đang mở ra một đường bay riêng cho em. Lần này không phải một tấm thiệp nữa, mà là cả một cảnh phim nhỏ."
+        },
+        {
+            kicker: "Chapter 02",
+            title: "Người làm các vì sao dừng lại",
+            body: "Anh giữ tấm ảnh này như một khung hình đặc biệt, để mỗi lần nhìn vào lại thấy mình may mắn."
+        },
+        {
+            kicker: "Chapter 03",
+            title: "Bay qua một vũ trụ rất gần",
+            body: "Mỗi hành tinh, mỗi vệt sáng, mỗi đoạn nhạc đều đang đi cùng một lời nhắc: em được yêu thật nhiều."
+        },
+        {
+            kicker: "Final Chapter",
+            title: "Mở bí mật cuối cùng",
+            body: "Khi em sẵn sàng, mình mở lá thư sinh nhật. Bài hát đã đợi sẵn ở đó.",
+            cta: "Mở thư sinh nhật"
+        }
+    ]
 };
 
 /* --- DỮ LIỆU QUỐC TẾ PHỤ NỮ 8/3 --- */

@@ -438,6 +438,463 @@ body {
     animation: birthday-wish-pop 3.6s ease forwards;
 }
 
+#birthday-cinematic {
+    position: fixed;
+    inset: 0;
+    z-index: 10020;
+    display: none;
+    overflow: hidden;
+    color: #fff;
+    background:
+        radial-gradient(circle at 22% 22%, rgba(255, 217, 112, 0.16), transparent 26%),
+        radial-gradient(circle at 82% 30%, rgba(78, 205, 196, 0.14), transparent 24%),
+        linear-gradient(135deg, rgba(3, 5, 13, 0.96), rgba(24, 12, 30, 0.96) 52%, rgba(6, 13, 24, 0.98));
+    opacity: 0;
+    pointer-events: none;
+    perspective: 1300px;
+    transition: opacity 0.55s ease;
+}
+
+#birthday-cinematic.is-active {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.birthday-cinematic-stars,
+.birthday-cinematic-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+#birthday-cinematic-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.78;
+}
+
+.birthday-cinematic-stars {
+    background-image:
+        radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1px, transparent 2px),
+        radial-gradient(circle, rgba(255, 217, 112, 0.65) 0 1px, transparent 2px),
+        linear-gradient(115deg, transparent 0 44%, rgba(255, 255, 255, 0.09) 45%, transparent 47% 100%);
+    background-size: 110px 110px, 170px 170px, 100% 100%;
+    opacity: 0.32;
+    transform: translate3d(var(--scene-drift-x, 0px), var(--scene-drift-y, 0px), 0) scale(1.08);
+    animation: birthday-cinematic-drift 38s linear infinite;
+}
+
+.birthday-cinematic-vignette {
+    background:
+        radial-gradient(circle at center, transparent 0 42%, rgba(0, 0, 0, 0.52) 100%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.34), transparent 22%, rgba(0, 0, 0, 0.46));
+}
+
+.birthday-cinematic-close {
+    position: absolute;
+    top: 22px;
+    right: 22px;
+    z-index: 5;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    font-size: 1.35rem;
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.birthday-cinematic-close:hover {
+    transform: rotate(90deg);
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.birthday-cinematic-stage {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(300px, 0.88fr) minmax(360px, 1.12fr);
+    align-items: center;
+    gap: clamp(28px, 5vw, 76px);
+    width: min(1180px, calc(100vw - 84px));
+    min-height: 100vh;
+    margin: 0 auto;
+    transform-style: preserve-3d;
+}
+
+.birthday-cinematic-copy {
+    transform: translate3d(0, 0, 90px);
+}
+
+.birthday-cinematic-copy p:first-child {
+    display: inline-flex;
+    min-height: 30px;
+    align-items: center;
+    margin-bottom: 18px;
+    padding: 0 12px;
+    border: 1px solid rgba(255, 217, 112, 0.28);
+    border-radius: 999px;
+    background: rgba(255, 217, 112, 0.08);
+    color: #ffd970;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.birthday-cinematic-copy h2 {
+    max-width: 11ch;
+    margin: 0;
+    color: #fff7fb;
+    font-size: clamp(3rem, 7vw, 6.8rem);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: 0;
+    text-wrap: balance;
+    text-shadow: 0 18px 70px rgba(255, 107, 157, 0.28);
+}
+
+.birthday-cinematic-copy p:last-child {
+    max-width: 540px;
+    margin-top: 22px;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: clamp(1rem, 2vw, 1.22rem);
+    font-weight: 500;
+    line-height: 1.7;
+}
+
+.birthday-cinematic-visual {
+    position: relative;
+    min-height: min(72vh, 640px);
+    transform-style: preserve-3d;
+}
+
+.birthday-photo-plane {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(34vw, 390px);
+    aspect-ratio: 4 / 5;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 8px;
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04)),
+        rgba(255, 255, 255, 0.08);
+    box-shadow:
+        0 40px 100px rgba(0, 0, 0, 0.58),
+        0 0 70px rgba(255, 107, 157, 0.18);
+    overflow: hidden;
+    transform: translate3d(-50%, -50%, 160px) rotateY(-11deg) rotateX(5deg);
+    transform-style: preserve-3d;
+    will-change: transform, filter;
+}
+
+.birthday-photo-stack {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    pointer-events: none;
+}
+
+.birthday-photo-stack-card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(12vw, 132px);
+    aspect-ratio: 4 / 5;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.36);
+    opacity: 0.48;
+    transform: translate3d(calc(-50% + var(--card-x, 0px)), calc(-50% + var(--card-y, 0px)), var(--card-z, -80px)) rotateZ(var(--card-r, 0deg)) rotateY(var(--card-ry, 0deg)) scale(var(--card-scale, 1));
+    transition: opacity 0.7s ease, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), filter 0.7s ease;
+    will-change: transform, opacity, filter;
+}
+
+.birthday-photo-stack-card img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.birthday-photo-stack-card.is-active {
+    opacity: 0;
+}
+
+.birthday-photo-stack-card.is-near {
+    opacity: 0.78;
+    filter: saturate(1.08);
+}
+
+.birthday-photo-stack-card.is-far {
+    opacity: 0.28;
+    filter: blur(1.8px) saturate(0.82);
+}
+
+.birthday-photo-plane::before {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    z-index: 2;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    pointer-events: none;
+}
+
+.birthday-photo-plane img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    filter: saturate(1.08) contrast(1.04);
+}
+
+.birthday-photo-plane.is-fallback img {
+    opacity: 0.88;
+}
+
+.birthday-photo-shine {
+    position: absolute;
+    inset: -30%;
+    background: linear-gradient(110deg, transparent 34%, rgba(255, 255, 255, 0.22) 46%, transparent 58%);
+    transform: translateX(-60%) rotate(8deg);
+    animation: birthday-photo-shine 5.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.birthday-orbit-ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(44vw, 540px);
+    aspect-ratio: 1;
+    border: 1px solid rgba(255, 217, 112, 0.22);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) rotateX(68deg) rotateZ(0deg);
+    box-shadow: 0 0 48px rgba(255, 217, 112, 0.1);
+    animation: birthday-orbit-spin 30s linear infinite;
+}
+
+.birthday-orbit-ring-two {
+    width: min(55vw, 680px);
+    border-color: rgba(78, 205, 196, 0.18);
+    animation-duration: 42s;
+    animation-direction: reverse;
+}
+
+.birthday-cinematic-planet {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(0.1px);
+    box-shadow: inset -14px -18px 32px rgba(0, 0, 0, 0.28), 0 0 50px rgba(255, 255, 255, 0.08);
+}
+
+.birthday-cinematic-planet-one {
+    right: 7%;
+    top: 17%;
+    width: 76px;
+    height: 76px;
+    background: linear-gradient(135deg, #ffd970, #ff8aa8 58%, #6f375e);
+    transform: translateZ(40px);
+}
+
+.birthday-cinematic-planet-two {
+    left: 7%;
+    bottom: 14%;
+    width: 46px;
+    height: 46px;
+    background: linear-gradient(135deg, #a8e6cf, #4ecdc4 55%, #153f4a);
+    transform: translateZ(120px);
+}
+
+.birthday-cinematic-controls {
+    position: absolute;
+    left: 50%;
+    bottom: 24px;
+    z-index: 4;
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    width: min(92vw, 620px);
+    transform: translateX(-50%);
+}
+
+.birthday-cinematic-dots {
+    display: flex;
+    gap: 9px;
+}
+
+.birthday-cinematic-dots button {
+    width: 38px;
+    height: 4px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: background 0.25s ease, width 0.25s ease;
+}
+
+.birthday-cinematic-dots button.is-active {
+    width: 58px;
+    background: linear-gradient(90deg, #ffd970, #ff8aa8);
+}
+
+#birthday-cinematic-hint {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.52);
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.birthday-cinematic-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.birthday-cinematic-actions button {
+    min-height: 42px;
+    padding: 0 16px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.86);
+    font-weight: 750;
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.birthday-cinematic-actions button:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.13);
+}
+
+.birthday-cinematic-actions button:disabled {
+    cursor: default;
+    opacity: 0.42;
+    transform: none;
+}
+
+#birthday-cinematic-letter {
+    display: none;
+    border: 0;
+    background: linear-gradient(135deg, #ffd970, #ff8aa8);
+    color: #1c1420;
+    box-shadow: 0 16px 42px rgba(255, 107, 157, 0.26);
+}
+
+#birthday-cinematic.is-final #birthday-cinematic-letter {
+    display: inline-flex;
+    align-items: center;
+}
+
+#birthday-cinematic.is-final #birthday-cinematic-next {
+    display: none;
+}
+
+@media (max-height: 800px) and (min-width: 769px) {
+    .birthday-cinematic-stage {
+        width: min(1120px, calc(100vw - 76px));
+        gap: 42px;
+    }
+
+    .birthday-cinematic-copy h2 {
+        font-size: clamp(2.7rem, 5.8vw, 5rem);
+    }
+
+    .birthday-cinematic-copy p:last-child {
+        margin-top: 16px;
+        font-size: 1rem;
+        line-height: 1.55;
+    }
+
+    .birthday-cinematic-visual {
+        min-height: 68vh;
+    }
+
+    .birthday-photo-plane {
+        width: min(28vw, 320px);
+    }
+
+    .birthday-photo-stack-card {
+        width: min(10vw, 104px);
+    }
+}
+
+@media (max-width: 768px) {
+    .birthday-cinematic-stage {
+        grid-template-columns: 1fr;
+        align-content: center;
+        gap: 22px;
+        width: min(100vw - 32px, 460px);
+        min-height: calc(100vh - 130px);
+        padding: 54px 0 76px;
+    }
+
+    .birthday-cinematic-copy {
+        text-align: center;
+    }
+
+    .birthday-cinematic-copy p:first-child {
+        margin-bottom: 12px;
+    }
+
+    .birthday-cinematic-copy h2 {
+        max-width: 12ch;
+        margin: 0 auto;
+        font-size: clamp(2.15rem, 13vw, 3.5rem);
+    }
+
+    .birthday-cinematic-copy p:last-child {
+        margin: 16px auto 0;
+        font-size: 0.95rem;
+        line-height: 1.55;
+    }
+
+    .birthday-cinematic-visual {
+        min-height: 300px;
+        order: -1;
+    }
+
+    .birthday-photo-plane {
+        width: min(62vw, 260px);
+    }
+
+    .birthday-photo-stack-card {
+        width: min(22vw, 92px);
+    }
+
+    .birthday-orbit-ring {
+        width: min(86vw, 360px);
+    }
+
+    .birthday-orbit-ring-two {
+        width: min(105vw, 430px);
+    }
+
+    .birthday-cinematic-controls {
+        bottom: 14px;
+    }
+
+    .birthday-cinematic-actions button {
+        min-height: 40px;
+        padding: 0 13px;
+        font-size: 0.86rem;
+    }
+}
+
 /* ======================================================= */
 /* 4. CÁC THÀNH PHẦN GIAO DIỆN (UI COMPONENTS)            */
 /* ======================================================= */
@@ -1211,6 +1668,44 @@ body {
 
     50% {
         box-shadow: 0 0 25px var(--theme-color-primary), 0 0 40px var(--theme-color-secondary);
+    }
+}
+
+@keyframes birthday-cinematic-drift {
+    from {
+        background-position: 0 0, 0 0, 0 0;
+    }
+
+    to {
+        background-position: -220px 160px, 180px -120px, 0 0;
+    }
+}
+
+@keyframes birthday-orbit-spin {
+    from {
+        transform: translate(-50%, -50%) rotateX(68deg) rotateZ(0deg);
+    }
+
+    to {
+        transform: translate(-50%, -50%) rotateX(68deg) rotateZ(360deg);
+    }
+}
+
+@keyframes birthday-photo-shine {
+
+    0%,
+    58% {
+        transform: translateX(-72%) rotate(8deg);
+        opacity: 0;
+    }
+
+    72% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(72%) rotate(8deg);
+        opacity: 0;
     }
 }
 
