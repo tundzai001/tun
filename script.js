@@ -3130,6 +3130,64 @@ function animate() {
     const particleInterval = !window.matchMedia("(max-width: 768px)").matches ? 400 : 700;
     if (elapsedTime * 1000 - lastParticleTime > particleInterval) {
         createTextParticle();
+        lastParticleTime = elapsedTime * 1000;
+    }
+
+    composer.render();
+}
+
+async function initThreeJS() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 4000);
+    camera.position.set(0, 150, 400);
+
+    const isHighEndDevice = !window.matchMedia("(max-width: 768px)").matches;
+
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setClearColor(0x000000, 0);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isHighEndDevice ? 2 : 1.5));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+    scene.add(ambientLight);
+
+    sunLight = new THREE.PointLight(0xffffff, 2.0, 4000);
+    scene.add(sunLight);
+
+    const hemisphereLight = new THREE.HemisphereLight(0x6080ff, 0x303050, 1.0);
+    scene.add(hemisphereLight);
+
+    scene.fog = new THREE.FogExp2(0x050a15, 0.0001);
+
+    setupLoadingManager();
+    textureLoader = new THREE.TextureLoader(loadingManager);
+
+    const textureFlare0 = textureLoader.load('https://threejs.org/examples/textures/lensflare/lensflare0.png');
+    const textureFlare3 = textureLoader.load('https://threejs.org/examples/textures/lensflare/lensflare3.png');
+
+    const lensflare = new Lensflare();
+    lensflare.addElement(new LensflareElement(textureFlare0, 512, 0, sunLight.color));
+    lensflare.addElement(new LensflareElement(textureFlare3, 60, 0.6));
+    lensflare.addElement(new LensflareElement(textureFlare3, 70, 0.7));
+    lensflare.addElement(new LensflareElement(textureFlare3, 120, 0.9));
+    lensflare.addElement(new LensflareElement(textureFlare3, 70, 1.0));
+    sunLight.add(lensflare);
+
+    spaceship = await createSpaceship();
+    scene.add(spaceship);
+
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true; controls.dampingFactor = 0.05;
+    controls.minDistance = 20; controls.maxDistance = 1200;
+
+    const renderPass = new RenderPass(scene, camera);
+    const bloomResolution = isHighEndDevice ? new THREE.Vector2(Math.floor(window.innerWidth / 1.5), Math.floor(window.innerHeight / 1.5)) : new THREE.Vector2(Math.floor(window.innerWidth / 2.5), Math.floor(window.innerHeight / 2.5));
+    bloomPass = new UnrealBloomPass(bloomResolution, 1.5, 0.4, 0.85);
+    bloomPass.threshold = 0; bloomPass.strength = 0.6; bloomPass.radius = 0.5;
+    composer = new EffectComposer(renderer);
+    composer.addPass(renderPass);
+    composer.addPass(bloomPass);
+
     controls.addEventListener('start', () => { isAutoRotating = false; });
     createStarfield();
     createSolarSystem(textureLoader);
