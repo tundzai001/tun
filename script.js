@@ -1224,11 +1224,79 @@ function getBirthdayStoryCopy(section) {
 }
 
 function getBirthdayCinematicScenes() {
-    return (birthdayStoryData.cinematicScenes || []).map(scene =>
-        Object.fromEntries(
+    const photos = getBirthdayPhotos();
+    const total = Math.max(1, photos.length);
+    const moments = [
+        {
+            kicker: "Khoảnh 01",
+            title: "Mở màn cho em",
+            body: "Tấm ảnh đầu tiên bật sáng như lời chào riêng của cả vũ trụ trong ngày này."
+        },
+        {
+            kicker: "Khoảnh 02",
+            title: "Một nụ cười được giữ lại",
+            body: "Không cần nói quá nhiều, chỉ một khung hình thôi cũng đủ làm mọi thứ mềm hơn."
+        },
+        {
+            kicker: "Khoảnh 03",
+            title: "Đi qua vùng sáng",
+            body: "Mỗi lần chuyển cảnh là một vì sao đổi hướng, còn tâm điểm vẫn luôn là em."
+        },
+        {
+            kicker: "Khoảnh 04",
+            title: "Khung hình anh thích",
+            body: "Có những bức ảnh nhìn qua là nhớ rất lâu, vì người trong ảnh làm nó đặc biệt."
+        },
+        {
+            kicker: "Khoảnh 05",
+            title: "Nhẹ thôi nhưng rất thương",
+            body: "Anh để cảnh này chậm lại một nhịp, như cách mình muốn giữ lại những điều dịu dàng."
+        },
+        {
+            kicker: "Khoảnh 06",
+            title: "Một vũ trụ rất gần",
+            body: "Không cần bay xa, đôi khi chỉ cần nhìn thấy em là mọi thứ đã đủ rực rỡ."
+        },
+        {
+            kicker: "Khoảnh 07",
+            title: "Ánh sáng nghiêng về em",
+            body: "Cảnh này dành cho những lúc anh thấy mình may mắn vì được thương em nhiều như vậy."
+        },
+        {
+            kicker: "Khoảnh 08",
+            title: "Thêm một điều muốn nói",
+            body: "Tuổi mới mong em luôn xinh đẹp, bình an, vui vẻ và được yêu thật nhiều."
+        },
+        {
+            kicker: "Khoảnh 09",
+            title: "Gần tới bí mật cuối",
+            body: "Những tấm ảnh đi qua gần hết rồi, còn một lá thư vẫn đang đợi ở phía sau."
+        },
+        {
+            kicker: "Khoảnh 10",
+            title: "Mở lá thư cuối",
+            body: "Khi em sẵn sàng, mình mở lá thư sinh nhật. Bài hát đã đợi sẵn ở đó.",
+            cta: "Mở thư sinh nhật"
+        }
+    ];
+
+    return Array.from({ length: total }, (_, index) => {
+        const template = moments[index] || moments[moments.length - 1];
+        const scene = {
+            ...template,
+            kicker: `${template.kicker.replace(/\d+$/, String(index + 1).padStart(2, '0'))} / ${String(total).padStart(2, '0')}`
+        };
+        if (index === total - 1) {
+            scene.title = "Mở lá thư cuối";
+            scene.body = "Khi em sẵn sàng, mình mở lá thư sinh nhật. Bài hát đã đợi sẵn ở đó.";
+            scene.cta = "Mở thư sinh nhật";
+        } else {
+            delete scene.cta;
+        }
+        return Object.fromEntries(
             Object.entries(scene).map(([key, value]) => [key, withBirthdayDate(value)])
-        )
-    );
+        );
+    });
 }
 
 function getBirthdayPhotos() {
@@ -1293,7 +1361,7 @@ function showBirthdayStory(forceOpenLetterButton = false, autoHide = false) {
 
     if (isBirthdayMode) {
         const birthdayCopy = getBirthdayStoryCopy('birthday');
-        if (kicker) kicker.textContent = birthdayCopy.kicker;
+        if (kicker) kicker.textContent = getBirthdayDateLabel();
         if (title) title.textContent = birthdayCopy.title;
         if (countdown) countdown.textContent = birthdayCopy.countdown;
         if (openLetterBtn) {
@@ -1303,7 +1371,6 @@ function showBirthdayStory(forceOpenLetterButton = false, autoHide = false) {
         if (storyLines) {
             storyLines.innerHTML = birthdayCopy.lines.map(line => `<span>${line}</span>`).join('');
         }
-        createBirthdayWish(birthdayCopy.wish);
     } else {
         const preludeCopy = getBirthdayStoryCopy('prelude');
         const dayText = daysUntilBirthday === 1 ? 'còn 1 ngày nữa' : `còn ${daysUntilBirthday} ngày nữa`;
@@ -1614,7 +1681,7 @@ function openBirthdayLetterFromCinematic() {
 
 function stepBirthdayCinematic(direction, immediate = false) {
     const now = performance.now();
-    if (!immediate && now - birthdayCinematicState.lastStepAt < 280) return;
+    if (!immediate && now - birthdayCinematicState.lastStepAt < 220) return;
     birthdayCinematicState.lastStepAt = now;
     const maxIndex = Math.max(0, getBirthdayPhotos().length - 1);
     const nextIndex = Math.max(0, Math.min(maxIndex, birthdayCinematicState.index + direction));
@@ -1642,9 +1709,7 @@ function renderBirthdayCinematicScene(index, immediate = false) {
     const copy = document.querySelector('.birthday-cinematic-copy');
     const photos = getBirthdayPhotos();
     const maxPhotoIndex = Math.max(0, photos.length - 1);
-    const progress = maxPhotoIndex ? index / maxPhotoIndex : 0;
-    const sceneIndex = Math.min(birthdayCinematicState.scenes.length - 1, Math.floor(progress * birthdayCinematicState.scenes.length));
-    const scene = birthdayCinematicState.scenes[sceneIndex] || {};
+    const scene = birthdayCinematicState.scenes[index] || birthdayCinematicState.scenes[birthdayCinematicState.scenes.length - 1] || {};
     const isFinal = index === maxPhotoIndex;
     const activePhotoIndex = photos.length ? index % photos.length : 0;
 
@@ -1655,7 +1720,7 @@ function renderBirthdayCinematicScene(index, immediate = false) {
             if (birthdayCinematicState.active && !document.hidden) {
                 stepBirthdayCinematic(1);
             }
-        }, 5500); // Wait 5.5s per scene
+        }, 4200);
     }
 
     // --- Update text content ---
@@ -1760,11 +1825,16 @@ function renderBirthdayCinematicScene(index, immediate = false) {
     
     const duration = immediate ? 0 : 0.8;
     const planeTransforms = [
-        { z: 120, rotateY: -8,  rotateX: 4,  x: 15, y: 0,  scale: 1.05 },
-        { z: 80,  rotateY: -4,  rotateX: 2,  x: -8, y: -4, scale: 1.02 },
-        { z: 110, rotateY: 6,   rotateX: -1, x: -18, y: -6, scale: 1.04 },
-        { z: 60,  rotateY: 2,   rotateX: 0,  x: 12, y: 4,  scale: 1.0  },
-        { z: 90,  rotateY: -6,  rotateX: -2, x: -12, y: 6,  scale: 1.03 }
+        { z: 128, rotateY: -9, rotateX: 4, x: 18, y: -2, scale: 1.06 },
+        { z: 82, rotateY: -3, rotateX: 2, x: -10, y: -8, scale: 1.02 },
+        { z: 116, rotateY: 7, rotateX: -1, x: -20, y: -4, scale: 1.05 },
+        { z: 64, rotateY: 2, rotateX: 0, x: 14, y: 7, scale: 1 },
+        { z: 96, rotateY: -7, rotateX: -2, x: -14, y: 8, scale: 1.04 },
+        { z: 136, rotateY: 8, rotateX: 3, x: 10, y: -10, scale: 1.07 },
+        { z: 74, rotateY: -10, rotateX: 1, x: -22, y: 4, scale: 1.01 },
+        { z: 108, rotateY: 4, rotateX: -4, x: 20, y: 10, scale: 1.05 },
+        { z: 86, rotateY: 11, rotateX: 2, x: -6, y: -6, scale: 1.02 },
+        { z: 58, rotateY: 0, rotateX: 0, x: 0, y: 0, scale: 1.08 }
     ];
     const target = planeTransforms[index % planeTransforms.length] || planeTransforms[0];
     birthdayCinematicState.planeTarget = target;

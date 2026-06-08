@@ -8,7 +8,7 @@ export const airportData = {
 };
 /* --- DỮ LIỆU SINH NHẬT --- */
 export const birthdayData = {
-    day: 8, month: 6,
+    day: 9, month: 6,
     photos: [
         "images/birthday/z7912769188496_fba42a0e2807fbead245ba822d2ed1e2.jpg",
         "images/birthday/z7912769240071_f07a699af75d2d169194e938421a20a3.jpg",
@@ -24,7 +24,7 @@ export const birthdayData = {
     photoFallback: "images/xinh1.jpg",
     letter: {
         title: "Gửi em, cô gái tuyệt vời nhất từng được sinh ra =))) nghe hơi sến tí nhưng mà thôi",
-        content: `<p>Hôm nay là ngày sinh nhật của em, là ngày mà mẹ em đã sinh ra em =))) anh biết nhưng mà ý là kiểu ngày mà mẹ em đẻ ra thiên thần luôn rồi ấy kiểu em tuyệt vời mà xinh xắn lại còn giỏi giang nữa omg</p><p> Có lẽ nếu xét về tình cảm dành cho em chắc anh thua mỗi mẹ em thôi ấy, anh yêu em nhiều lắm luôn í. Thôi anh nhắn v th tại anh viết thư tay cho em rồi mà =)) đọc thư tay nó mới tình cảm hơn chứ <p>Chúc em sinh nhật vui vẻ!</p></p>`
+        content: `<p>Hôm nay là ngày sinh nhật của em, là ngày mà mẹ em đã sinh ra em =))) anh biết nhưng mà ý là kiểu ngày mà mẹ em đẻ ra thiên thần luôn rồi ấy kiểu em tuyệt vời mà xinh xắn lại còn giỏi giang nữa omg</p><p> Có lẽ nếu xét về tình cảm dành cho em chắc anh thua mỗi mẹ em thôi ấy, anh yêu em nhiều lắm luôn í. Thôi anh nhắn v th tại anh viết thư tay cho em rồi mà =)) vl dòng trước này là lúc tưởng đưa ai ngờ chưa đưa thư omg so tội lỗi, siêu sorry tình yêu luôn, ê anh yêu em lắm luôn, ê đọc thư tay nó mới tình cảm hơn chứ nhưng mà lại không mang dcmm điên vl chắc là nổ mẹ đầu nất, ê anh biết là all the animations in this web so ugly or not enough for kiểu mồm chữ O mắt chữ A,ê thư chưa được dài mà đã thấy là không biết viết gì chỉ biết viết anh yêu em nhiều lắm ?? <p>Chúc em sinh nhật vui vẻ!</p></p>`
     },
     song: { file: "https://treuah.netlify.app/ordinary.mp3", title: "Ordinary - Alex Warren" }
 };

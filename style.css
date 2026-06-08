@@ -301,18 +301,19 @@ body {
     border-radius: 999px;
     background: rgba(255, 217, 112, 0.08);
     color: #ffd970;
+    font-family: 'Nunito Sans', 'Segoe UI', sans-serif;
     font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
+    font-weight: 800;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
 }
 
 .birthday-story-card h2 {
-    max-width: 11ch;
+    max-width: 14ch;
     margin: 0 auto;
-    font-family: 'Poppins', sans-serif;
-    font-size: clamp(2.15rem, 6vw, 4rem);
-    line-height: 1.04;
+    font-family: 'Nunito Sans', 'Segoe UI', sans-serif;
+    font-size: clamp(2rem, 5.4vw, 3.45rem);
+    line-height: 1.08;
     font-weight: 800;
     letter-spacing: 0;
     color: #fff7fb;
@@ -328,6 +329,7 @@ body {
     border-radius: 8px;
     background: rgba(168, 230, 207, 0.08);
     color: #c8f7e4;
+    font-family: 'Nunito Sans', 'Segoe UI', sans-serif;
     font-size: clamp(0.95rem, 2.4vw, 1.08rem);
     font-weight: 650;
     line-height: 1.45;
@@ -339,8 +341,10 @@ body {
     width: min(100%, 430px);
     margin: 20px auto 26px;
     color: rgba(255, 255, 255, 0.78);
+    font-family: 'Nunito Sans', 'Segoe UI', sans-serif;
     font-size: clamp(0.9rem, 2.2vw, 0.98rem);
-    line-height: 1.5;
+    font-weight: 600;
+    line-height: 1.55;
     text-align: left;
 }
 
@@ -380,6 +384,7 @@ body {
     padding: 0 22px;
     background: linear-gradient(135deg, #ffd970, #ff8aa8);
     color: #1c1420;
+    font-family: 'Nunito Sans', 'Segoe UI', sans-serif;
     font-size: 0.95rem;
     font-weight: 800;
     cursor: pointer;
@@ -615,6 +620,7 @@ body {
 .birthday-cinematic-copy {
     transform: translate3d(0, 0, 90px);
     will-change: transform, opacity;
+    font-family: 'Nunito Sans', 'Segoe UI', sans-serif;
 }
 
 .birthday-cinematic-copy p:first-child {
@@ -627,19 +633,21 @@ body {
     border-radius: 999px;
     background: rgba(255, 217, 112, 0.08);
     color: #ffd970;
+    font-family: 'Nunito Sans', 'Segoe UI', sans-serif;
     font-size: 0.72rem;
     font-weight: 800;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
 }
 
 .birthday-cinematic-copy h2 {
-    max-width: 11ch;
+    max-width: 13ch;
     margin: 0;
     color: #fff7fb;
-    font-size: clamp(3rem, 7vw, 6.8rem);
-    font-weight: 900;
-    line-height: 0.95;
+    font-family: 'Nunito Sans', 'Segoe UI', sans-serif;
+    font-size: clamp(2.55rem, 6.1vw, 5.9rem);
+    font-weight: 800;
+    line-height: 1.02;
     letter-spacing: 0;
     text-wrap: balance;
     text-shadow: 0 18px 70px rgba(255, 107, 157, 0.28);
@@ -649,9 +657,10 @@ body {
     max-width: 540px;
     margin-top: 22px;
     color: rgba(255, 255, 255, 0.78);
+    font-family: 'Nunito Sans', 'Segoe UI', sans-serif;
     font-size: clamp(1rem, 2vw, 1.22rem);
-    font-weight: 500;
-    line-height: 1.7;
+    font-weight: 600;
+    line-height: 1.6;
 }
 
 .birthday-cinematic-visual {
@@ -845,7 +854,10 @@ body {
 
 .birthday-cinematic-dots {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 9px;
+    max-width: min(92vw, 520px);
 }
 
 .birthday-cinematic-dots button {
@@ -1027,6 +1039,19 @@ body {
         min-height: 40px;
         padding: 0 13px;
         font-size: 0.86rem;
+    }
+
+    .birthday-cinematic-dots {
+        gap: 7px;
+        max-width: 320px;
+    }
+
+    .birthday-cinematic-dots button {
+        width: 24px;
+    }
+
+    .birthday-cinematic-dots button.is-active {
+        width: 36px;
     }
 }
 
