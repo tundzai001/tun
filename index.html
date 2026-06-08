@@ -9,8 +9,10 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style"
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Dancing+Script:wght@700&display=swap">
     <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=Dancing+Script:wght@700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Dancing+Script:wght@700&display=swap"
         rel="stylesheet">
 
     <!-- Thư viện Leaflet cho bản đồ chuyến bay -->
@@ -213,7 +215,8 @@
                 <div class="birthday-orbit-ring birthday-orbit-ring-two"></div>
                 <div class="birthday-photo-stack" id="birthday-photo-stack"></div>
                 <div class="birthday-photo-plane" id="birthday-photo-plane">
-                    <img id="birthday-cinematic-photo" alt="">
+                    <img id="birthday-cinematic-photo" class="birthday-photo-layer is-visible" alt="" loading="eager" decoding="async">
+                    <img id="birthday-cinematic-photo-b" class="birthday-photo-layer" alt="" loading="eager" decoding="async">
                     <div class="birthday-photo-shine"></div>
                 </div>
                 <div class="birthday-cinematic-planet birthday-cinematic-planet-one"></div>
