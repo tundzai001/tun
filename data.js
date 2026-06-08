@@ -8,7 +8,7 @@ export const airportData = {
 };
 /* --- DỮ LIỆU SINH NHẬT --- */
 export const birthdayData = {
-    day: 7, month: 6,
+    day: 8, month: 6,
     photos: [
         "images/birthday/z7912769188496_fba42a0e2807fbead245ba822d2ed1e2.jpg",
         "images/birthday/z7912769240071_f07a699af75d2d169194e938421a20a3.jpg",
