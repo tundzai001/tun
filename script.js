@@ -1564,6 +1564,9 @@ function renderBirthdayCinematicScene(index, immediate = false) {
     const title = document.getElementById('birthday-cinematic-title');
     const body = document.getElementById('birthday-cinematic-body');
     const dots = document.getElementById('birthday-cinematic-dots');
+    const sceneNumber = document.getElementById('birthday-cinematic-scene-number');
+    const sceneTotal = document.getElementById('birthday-cinematic-scene-total');
+    const progressFill = document.getElementById('birthday-cinematic-progress-fill');
     const prevBtn = document.getElementById('birthday-cinematic-prev');
     const nextBtn = document.getElementById('birthday-cinematic-next');
     const letterBtn = document.getElementById('birthday-cinematic-letter');
@@ -1581,6 +1584,9 @@ function renderBirthdayCinematicScene(index, immediate = false) {
     if (body) body.textContent = scene.body || '';
     if (letterBtn) letterBtn.textContent = scene.cta || 'Má»Ÿ thÆ° sinh nháº­t';
     if (photo && photos[activePhotoIndex]) photo.src = photos[activePhotoIndex];
+    if (sceneNumber) sceneNumber.textContent = String(index + 1).padStart(2, '0');
+    if (sceneTotal) sceneTotal.textContent = String(Math.max(1, birthdayCinematicState.scenes.length)).padStart(2, '0');
+    if (progressFill) progressFill.style.width = `${((index + 1) / Math.max(1, birthdayCinematicState.scenes.length)) * 100}%`;
     if (prevBtn) prevBtn.disabled = index === 0;
     if (nextBtn) nextBtn.disabled = isFinal;
     if (overlay) {
@@ -1604,8 +1610,8 @@ function renderBirthdayCinematicScene(index, immediate = false) {
     updateBirthdayPhotoStack(activePhotoIndex, index);
 
     if (typeof gsap === 'undefined') return;
-    gsap.killTweensOf([copy, visual, plane, '.birthday-cinematic-planet', '.birthday-orbit-ring']);
-    const duration = immediate ? 0 : 0.8;
+    gsap.killTweensOf([copy, visual, plane, '.birthday-cinematic-planet', '.birthday-orbit-ring', '.birthday-cinematic-beam', '.birthday-photo-stack-card']);
+    const duration = immediate ? 0 : 0.95;
     const planeTransforms = [
         { z: 120, rotateY: -18, rotateX: 8, x: 30, y: 0, scale: 0.92, filter: 'blur(1.5px) saturate(0.9)' },
         { z: 180, rotateY: -7, rotateX: 4, x: 0, y: 0, scale: 1, filter: 'blur(0px) saturate(1.08)' },
@@ -1613,8 +1619,12 @@ function renderBirthdayCinematicScene(index, immediate = false) {
         { z: 150, rotateY: 0, rotateX: 0, x: 24, y: 10, scale: 0.88, filter: 'blur(0.6px) saturate(0.96)' }
     ];
     const target = planeTransforms[index] || planeTransforms[0];
-    gsap.fromTo(copy, { autoAlpha: 0, y: 24, z: 20 }, { autoAlpha: 1, y: 0, z: 90, duration, ease: 'power3.out' });
-    gsap.fromTo(visual, { autoAlpha: 0.6, x: 40 * (index % 2 ? -1 : 1), scale: 0.96 }, { autoAlpha: 1, x: 0, scale: 1, duration, ease: 'power3.out' });
+    if (overlay) {
+        overlay.classList.add('is-transitioning');
+        setTimeout(() => overlay.classList.remove('is-transitioning'), immediate ? 0 : 680);
+    }
+    gsap.fromTo(copy, { autoAlpha: 0, y: 34, z: 0, filter: 'blur(10px)' }, { autoAlpha: 1, y: 0, z: 90, filter: 'blur(0px)', duration, ease: 'expo.out' });
+    gsap.fromTo(visual, { autoAlpha: 0.42, x: 70 * (index % 2 ? -1 : 1), scale: 0.91, rotationY: index % 2 ? -7 : 7 }, { autoAlpha: 1, x: 0, scale: isFinal ? 1.05 : 1, rotationY: 0, duration, ease: 'expo.out' });
     if (plane) {
         gsap.to(plane, {
             xPercent: -50,
@@ -1632,10 +1642,15 @@ function renderBirthdayCinematicScene(index, immediate = false) {
             transformOrigin: '50% 50%'
         });
     }
-    gsap.to('.birthday-cinematic-planet-one', { x: index * -24, y: index * 10, scale: 1 + index * 0.05, duration, ease: 'power2.out' });
-    gsap.to('.birthday-cinematic-planet-two', { x: index * 18, y: index * -14, scale: 1 + index * 0.04, duration, ease: 'power2.out' });
-    gsap.to('.birthday-orbit-ring-one', { rotationZ: index * 24, duration, ease: 'power2.out' });
-    gsap.to('.birthday-orbit-ring-two', { rotationZ: index * -18, duration, ease: 'power2.out' });
+    gsap.to('.birthday-cinematic-planet-one', { x: index * -30, y: index * 12, scale: 1 + index * 0.08, duration, ease: 'expo.out' });
+    gsap.to('.birthday-cinematic-planet-two', { x: index * 22, y: index * -18, scale: 1 + index * 0.06, duration, ease: 'expo.out' });
+    gsap.to('.birthday-orbit-ring-one', { rotationZ: index * 34, scale: isFinal ? 1.12 : 1, duration, ease: 'expo.out' });
+    gsap.to('.birthday-orbit-ring-two', { rotationZ: index * -28, scale: isFinal ? 1.18 : 1, duration, ease: 'expo.out' });
+    gsap.fromTo('.birthday-photo-stack-card:not(.is-active)', { autoAlpha: 0, scale: 0.82 }, { autoAlpha: 1, scale: 1, stagger: 0.035, duration: immediate ? 0 : 0.75, ease: 'power3.out' });
+    if (isFinal) {
+        gsap.fromTo('.birthday-cinematic-beam', { autoAlpha: 0.12 }, { autoAlpha: 0.55, duration: 1.1, yoyo: true, repeat: 1, ease: 'sine.inOut' });
+        createBirthdayConfetti(22);
+    }
 }
 
 function updateBirthdayPhotoStack(activePhotoIndex, sceneIndex) {

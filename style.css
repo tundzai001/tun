@@ -462,7 +462,10 @@ body {
 }
 
 .birthday-cinematic-stars,
-.birthday-cinematic-vignette {
+.birthday-cinematic-vignette,
+.birthday-cinematic-grain,
+.birthday-cinematic-beam,
+.birthday-cinematic-foreground {
     position: absolute;
     inset: 0;
     pointer-events: none;
@@ -492,6 +495,77 @@ body {
     background:
         radial-gradient(circle at center, transparent 0 42%, rgba(0, 0, 0, 0.52) 100%),
         linear-gradient(180deg, rgba(0, 0, 0, 0.34), transparent 22%, rgba(0, 0, 0, 0.46));
+}
+
+.birthday-cinematic-grain {
+    opacity: 0.12;
+    mix-blend-mode: screen;
+    background-image:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 7px 9px;
+    animation: birthday-grain-shift 0.28s steps(3) infinite;
+}
+
+.birthday-cinematic-beam {
+    opacity: 0.32;
+    filter: blur(12px);
+    mix-blend-mode: screen;
+    transform-origin: center;
+}
+
+.birthday-cinematic-beam-one {
+    background: linear-gradient(105deg, transparent 12%, rgba(255, 217, 112, 0.18), transparent 55%);
+    transform: translate3d(-18%, -4%, 0) rotate(-12deg);
+    animation: birthday-beam-sweep-one 8s ease-in-out infinite alternate;
+}
+
+.birthday-cinematic-beam-two {
+    background: linear-gradient(70deg, transparent 38%, rgba(78, 205, 196, 0.12), transparent 78%);
+    transform: translate3d(12%, 4%, 0) rotate(18deg);
+    animation: birthday-beam-sweep-two 10s ease-in-out infinite alternate;
+}
+
+.birthday-cinematic-foreground {
+    background:
+        radial-gradient(circle at 12% 78%, rgba(255, 217, 112, 0.38) 0 2px, transparent 3px),
+        radial-gradient(circle at 84% 18%, rgba(255, 255, 255, 0.42) 0 1px, transparent 2px),
+        radial-gradient(circle at 72% 82%, rgba(78, 205, 196, 0.35) 0 2px, transparent 3px);
+    opacity: 0.36;
+    transform: translate3d(calc(var(--scene-drift-x, 0px) * -0.8), calc(var(--scene-drift-y, 0px) * -0.8), 0) scale(1.04);
+}
+
+.birthday-cinematic-hud {
+    position: absolute;
+    left: 24px;
+    top: 24px;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: auto minmax(120px, 190px) auto;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.birthday-cinematic-progress {
+    height: 2px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.birthday-cinematic-progress span {
+    display: block;
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #ffd970, #ff8aa8, #4ecdc4);
+    box-shadow: 0 0 18px rgba(255, 217, 112, 0.45);
+    transition: width 0.75s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .birthday-cinematic-close {
@@ -527,6 +601,11 @@ body {
     min-height: 100vh;
     margin: 0 auto;
     transform-style: preserve-3d;
+    transition: filter 0.65s ease;
+}
+
+#birthday-cinematic.is-transitioning .birthday-cinematic-stage {
+    filter: saturate(1.12) contrast(1.04);
 }
 
 .birthday-cinematic-copy {
@@ -594,6 +673,17 @@ body {
     transform: translate3d(-50%, -50%, 160px) rotateY(-11deg) rotateX(5deg);
     transform-style: preserve-3d;
     will-change: transform, filter;
+}
+
+.birthday-photo-plane::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 22%),
+        radial-gradient(circle at 50% 18%, rgba(255, 217, 112, 0.12), transparent 36%);
+    pointer-events: none;
+    mix-blend-mode: screen;
 }
 
 .birthday-photo-stack {
@@ -831,9 +921,30 @@ body {
     .birthday-photo-stack-card {
         width: min(10vw, 104px);
     }
+
+    .birthday-cinematic-hud {
+        left: 20px;
+        top: 18px;
+        grid-template-columns: auto minmax(95px, 150px) auto;
+    }
 }
 
 @media (max-width: 768px) {
+    .birthday-cinematic-hud {
+        left: 16px;
+        top: 16px;
+        grid-template-columns: auto minmax(72px, 110px) auto;
+        gap: 8px;
+        font-size: 0.64rem;
+    }
+
+    .birthday-cinematic-close {
+        top: 14px;
+        right: 14px;
+        width: 38px;
+        height: 38px;
+    }
+
     .birthday-cinematic-stage {
         grid-template-columns: 1fr;
         align-content: center;
@@ -1678,6 +1789,40 @@ body {
 
     to {
         background-position: -220px 160px, 180px -120px, 0 0;
+    }
+}
+
+@keyframes birthday-grain-shift {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    50% {
+        transform: translate(-2px, 1px);
+    }
+
+    100% {
+        transform: translate(1px, -2px);
+    }
+}
+
+@keyframes birthday-beam-sweep-one {
+    from {
+        transform: translate3d(-20%, -6%, 0) rotate(-14deg) scale(1);
+    }
+
+    to {
+        transform: translate3d(8%, 4%, 0) rotate(-9deg) scale(1.12);
+    }
+}
+
+@keyframes birthday-beam-sweep-two {
+    from {
+        transform: translate3d(16%, 8%, 0) rotate(20deg) scale(1);
+    }
+
+    to {
+        transform: translate3d(-10%, -2%, 0) rotate(13deg) scale(1.08);
     }
 }
 
