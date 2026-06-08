@@ -1626,19 +1626,42 @@ function renderBirthdayCinematicScene(index, immediate = false) {
 
     // --- Photo crossfade system ---
     if (photoA && photoB && photos[activePhotoIndex]) {
-        const currentVisible = photoA.classList.contains('is-visible') ? photoA : photoB;
-        const nextLayer = currentVisible === photoA ? photoB : photoA;
+        // Determine which layer is currently in front based on zIndex
+        const isAFront = photoA.style.zIndex === '1' || photoA.classList.contains('is-visible');
+        const currentVisible = isAFront ? photoA : photoB;
+        const nextLayer = isAFront ? photoB : photoA;
         
-        // Preload next photo then crossfade
-        nextLayer.src = photos[activePhotoIndex];
-        nextLayer.onload = () => {
-            currentVisible.classList.remove('is-visible');
-            nextLayer.classList.add('is-visible');
-        };
-        // Fallback if already cached (onload may not fire)
-        if (nextLayer.complete && nextLayer.naturalWidth > 0) {
-            currentVisible.classList.remove('is-visible');
-            nextLayer.classList.add('is-visible');
+        if (nextLayer.dataset.photoIndex !== String(activePhotoIndex)) {
+            nextLayer.dataset.photoIndex = activePhotoIndex;
+            
+            const doCrossfade = () => {
+                // Ensure the new image is in front and transparent
+                gsap.set(nextLayer, { zIndex: 1, opacity: 0 });
+                // Ensure the old image is behind and fully visible
+                gsap.set(currentVisible, { zIndex: 0, opacity: 1 });
+                
+                // Fade in the new image over the old one
+                gsap.to(nextLayer, { 
+                    opacity: 1, 
+                    duration: immediate ? 0 : 0.65, 
+                    ease: 'power2.inOut',
+                    onComplete: () => {
+                        // Clean up the old image once hidden
+                        gsap.set(currentVisible, { opacity: 0 });
+                        currentVisible.classList.remove('is-visible');
+                        nextLayer.classList.add('is-visible');
+                    }
+                });
+            };
+
+            nextLayer.onload = doCrossfade;
+            nextLayer.src = photos[activePhotoIndex];
+            
+            // Fallback if immediately available from cache
+            if (nextLayer.complete && nextLayer.naturalWidth > 0) {
+                nextLayer.onload = null;
+                doCrossfade();
+            }
         }
     }
 

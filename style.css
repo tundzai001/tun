@@ -760,7 +760,6 @@ body {
     backface-visibility: hidden;
     transform: translateZ(0);
     opacity: 0;
-    transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1);
     z-index: 0;
 }
 
