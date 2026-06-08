@@ -1384,7 +1384,8 @@ const birthdayCinematicState = {
     lastStepAt: 0,
     touchStartY: 0,
     canvasRaf: null,
-    particles: []
+    particles: [],
+    planeTarget: { z: 180, rotateY: -7, rotateX: 4, x: 0, y: 0, scale: 1, filter: 'blur(0px) saturate(1.08)' }
 };
 
 function setupBirthdayCinematicControls() {
@@ -1423,10 +1424,24 @@ function setupBirthdayCinematicControls() {
     overlay.addEventListener('mousemove', event => {
         if (!birthdayCinematicState.active) return;
         const plane = document.getElementById('birthday-photo-plane');
-        if (!plane) return;
+        if (!plane || typeof gsap === 'undefined') return;
         const x = (event.clientX / window.innerWidth - 0.5) * 2;
         const y = (event.clientY / window.innerHeight - 0.5) * 2;
-        plane.style.transform = `translate3d(-50%, -50%, ${160 + birthdayCinematicState.index * 18}px) rotateY(${-11 + x * 8}deg) rotateX(${5 - y * 6}deg) translateX(${x * 10}px) translateY(${y * 8}px)`;
+        const target = birthdayCinematicState.planeTarget;
+        gsap.to(plane, {
+            xPercent: -50,
+            yPercent: -50,
+            x: target.x + x * 12,
+            y: target.y + y * 9,
+            z: target.z,
+            rotationY: target.rotateY + x * 7,
+            rotationX: target.rotateX - y * 5,
+            scale: target.scale,
+            filter: target.filter,
+            duration: 0.35,
+            overwrite: 'auto',
+            ease: 'power2.out'
+        });
     }, { passive: true });
 
     birthdayCinematicState.initialized = true;
@@ -1549,9 +1564,9 @@ function openBirthdayLetterFromCinematic() {
 
 function stepBirthdayCinematic(direction, immediate = false) {
     const now = performance.now();
-    if (!immediate && now - birthdayCinematicState.lastStepAt < 720) return;
+    if (!immediate && now - birthdayCinematicState.lastStepAt < 520) return;
     birthdayCinematicState.lastStepAt = now;
-    const maxIndex = Math.max(0, birthdayCinematicState.scenes.length - 1);
+    const maxIndex = Math.max(0, getBirthdayPhotos().length - 1);
     const nextIndex = Math.max(0, Math.min(maxIndex, birthdayCinematicState.index + direction));
     if (nextIndex === birthdayCinematicState.index) return;
     birthdayCinematicState.index = nextIndex;
@@ -1574,10 +1589,13 @@ function renderBirthdayCinematicScene(index, immediate = false) {
     const photo = document.getElementById('birthday-cinematic-photo');
     const visual = document.querySelector('.birthday-cinematic-visual');
     const copy = document.querySelector('.birthday-cinematic-copy');
-    const scene = birthdayCinematicState.scenes[index] || {};
-    const isFinal = index === birthdayCinematicState.scenes.length - 1;
     const photos = getBirthdayPhotos();
-    const activePhotoIndex = photos.length ? (index * 3) % photos.length : 0;
+    const maxPhotoIndex = Math.max(0, photos.length - 1);
+    const progress = maxPhotoIndex ? index / maxPhotoIndex : 0;
+    const sceneIndex = Math.min(birthdayCinematicState.scenes.length - 1, Math.floor(progress * birthdayCinematicState.scenes.length));
+    const scene = birthdayCinematicState.scenes[sceneIndex] || {};
+    const isFinal = index === maxPhotoIndex;
+    const activePhotoIndex = photos.length ? index % photos.length : 0;
 
     if (kicker) kicker.textContent = scene.kicker || '';
     if (title) title.textContent = scene.title || '';
@@ -1585,8 +1603,8 @@ function renderBirthdayCinematicScene(index, immediate = false) {
     if (letterBtn) letterBtn.textContent = scene.cta || 'Má»Ÿ thÆ° sinh nháº­t';
     if (photo && photos[activePhotoIndex]) photo.src = photos[activePhotoIndex];
     if (sceneNumber) sceneNumber.textContent = String(index + 1).padStart(2, '0');
-    if (sceneTotal) sceneTotal.textContent = String(Math.max(1, birthdayCinematicState.scenes.length)).padStart(2, '0');
-    if (progressFill) progressFill.style.width = `${((index + 1) / Math.max(1, birthdayCinematicState.scenes.length)) * 100}%`;
+    if (sceneTotal) sceneTotal.textContent = String(Math.max(1, photos.length)).padStart(2, '0');
+    if (progressFill) progressFill.style.width = `${((index + 1) / Math.max(1, photos.length)) * 100}%`;
     if (prevBtn) prevBtn.disabled = index === 0;
     if (nextBtn) nextBtn.disabled = isFinal;
     if (overlay) {
@@ -1595,8 +1613,8 @@ function renderBirthdayCinematicScene(index, immediate = false) {
         overlay.style.setProperty('--scene-drift-y', `${index * 12}px`);
     }
 
-    if (dots && dots.children.length !== birthdayCinematicState.scenes.length) {
-        dots.innerHTML = birthdayCinematicState.scenes.map((_, dotIndex) => `<button type="button" aria-label="Cáº£nh ${dotIndex + 1}"></button>`).join('');
+    if (dots && dots.children.length !== photos.length) {
+        dots.innerHTML = photos.map((_, dotIndex) => `<button type="button" aria-label="Photo ${dotIndex + 1}"></button>`).join('');
         Array.from(dots.children).forEach((dot, dotIndex) => {
             dot.addEventListener('click', () => {
                 birthdayCinematicState.index = dotIndex;
@@ -1613,12 +1631,14 @@ function renderBirthdayCinematicScene(index, immediate = false) {
     gsap.killTweensOf([copy, visual, plane, '.birthday-cinematic-planet', '.birthday-orbit-ring', '.birthday-cinematic-beam', '.birthday-photo-stack-card']);
     const duration = immediate ? 0 : 0.95;
     const planeTransforms = [
-        { z: 120, rotateY: -18, rotateX: 8, x: 30, y: 0, scale: 0.92, filter: 'blur(1.5px) saturate(0.9)' },
-        { z: 180, rotateY: -7, rotateX: 4, x: 0, y: 0, scale: 1, filter: 'blur(0px) saturate(1.08)' },
-        { z: 230, rotateY: 10, rotateX: -2, x: -36, y: -8, scale: 0.96, filter: 'blur(0px) saturate(1.15)' },
-        { z: 150, rotateY: 0, rotateX: 0, x: 24, y: 10, scale: 0.88, filter: 'blur(0.6px) saturate(0.96)' }
+        { z: 275, rotateY: -14, rotateX: 7, x: 22, y: 0, scale: 1.18, filter: 'blur(0px) saturate(1.12)' },
+        { z: 235, rotateY: -6, rotateX: 4, x: -10, y: -6, scale: 1.12, filter: 'blur(0px) saturate(1.08)' },
+        { z: 265, rotateY: 9, rotateX: -2, x: -38, y: -12, scale: 1.14, filter: 'blur(0px) saturate(1.15)' },
+        { z: 225, rotateY: 3, rotateX: 0, x: 24, y: 8, scale: 1.08, filter: 'blur(0px) saturate(1.04)' },
+        { z: 250, rotateY: -10, rotateX: -3, x: -18, y: 12, scale: 1.13, filter: 'blur(0px) saturate(1.12)' }
     ];
-    const target = planeTransforms[index] || planeTransforms[0];
+    const target = planeTransforms[index % planeTransforms.length] || planeTransforms[0];
+    birthdayCinematicState.planeTarget = target;
     if (overlay) {
         overlay.classList.add('is-transitioning');
         setTimeout(() => overlay.classList.remove('is-transitioning'), immediate ? 0 : 680);
@@ -1646,7 +1666,6 @@ function renderBirthdayCinematicScene(index, immediate = false) {
     gsap.to('.birthday-cinematic-planet-two', { x: index * 22, y: index * -18, scale: 1 + index * 0.06, duration, ease: 'expo.out' });
     gsap.to('.birthday-orbit-ring-one', { rotationZ: index * 34, scale: isFinal ? 1.12 : 1, duration, ease: 'expo.out' });
     gsap.to('.birthday-orbit-ring-two', { rotationZ: index * -28, scale: isFinal ? 1.18 : 1, duration, ease: 'expo.out' });
-    gsap.fromTo('.birthday-photo-stack-card:not(.is-active)', { autoAlpha: 0, scale: 0.82 }, { autoAlpha: 1, scale: 1, stagger: 0.035, duration: immediate ? 0 : 0.75, ease: 'power3.out' });
     if (isFinal) {
         gsap.fromTo('.birthday-cinematic-beam', { autoAlpha: 0.12 }, { autoAlpha: 0.55, duration: 1.1, yoyo: true, repeat: 1, ease: 'sine.inOut' });
         createBirthdayConfetti(22);
