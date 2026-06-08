@@ -681,6 +681,10 @@ body {
     
 }
 
+.birthday-photo-plane.is-photo-loading::after {
+    opacity: 0.78;
+}
+
 .birthday-photo-plane::after {
     content: "";
     position: absolute;
@@ -761,6 +765,7 @@ body {
     transform: translateZ(0);
     opacity: 0;
     z-index: 0;
+    will-change: opacity;
 }
 
 .birthday-photo-layer.is-visible {

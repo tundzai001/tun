@@ -1385,8 +1385,32 @@ const birthdayCinematicState = {
     touchStartY: 0,
     canvasRaf: null,
     particles: [],
+    autoplayTimer: null,
+    photoCache: new Map(),
+    photoRequestId: 0,
     planeTarget: { z: 180, rotateY: -7, rotateX: 4, x: 0, y: 0, scale: 1, filter: 'blur(0px) saturate(1.08)' }
 };
+
+function loadBirthdayPhoto(src) {
+    if (!src) return Promise.reject(new Error('Missing birthday photo source'));
+    const cached = birthdayCinematicState.photoCache.get(src);
+    if (cached) return cached.promise;
+
+    const img = new Image();
+    img.decoding = 'async';
+    img.loading = 'eager';
+    const promise = new Promise((resolve, reject) => {
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error(`Birthday photo failed to load: ${src}`));
+    });
+    birthdayCinematicState.photoCache.set(src, { img, promise });
+    img.src = src;
+    return promise;
+}
+
+function preloadBirthdayPhotos(photos) {
+    photos.forEach(src => loadBirthdayPhoto(src).catch(() => {}));
+}
 
 function setupBirthdayCinematicControls() {
     if (birthdayCinematicState.initialized) return;
@@ -1462,31 +1486,32 @@ function openBirthdayCinematic() {
     birthdayCinematicState.scenes = getBirthdayCinematicScenes();
     birthdayCinematicState.index = 0;
     birthdayCinematicState.lastStepAt = 0;
+    birthdayCinematicState.photoRequestId = 0;
     birthdayCinematicState.active = true;
     document.body.style.overflow = 'hidden';
 
     const photos = getBirthdayPhotos();
-    
-    // Preload all photos in background for smooth crossfade
-    photos.forEach(src => {
-        const img = new Image();
-        img.src = src;
-    });
+    preloadBirthdayPhotos(photos);
 
     if (photoA && photoB) {
         const fallback = birthdayData.photoFallback || 'images/xinh1.jpg';
         if (plane) plane.classList.remove('is-fallback');
-        
-        // Initialize layer A as visible with first photo
+
         photoA.onerror = () => {
             if (photoA.src.includes(fallback)) return;
             if (plane) plane.classList.add('is-fallback');
             photoA.src = fallback;
         };
         photoA.src = photos[0] || fallback;
+        photoA.dataset.photoIndex = '0';
         photoA.classList.add('is-visible');
+        photoA.style.opacity = '1';
+        photoA.style.zIndex = '1';
         photoB.classList.remove('is-visible');
+        photoB.dataset.photoIndex = '';
         photoB.src = '';
+        photoB.style.opacity = '0';
+        photoB.style.zIndex = '0';
     }
     if (stack) {
         stack.innerHTML = photos.map((src, index) => `
@@ -1509,6 +1534,11 @@ function closeBirthdayCinematic() {
     const overlay = document.getElementById('birthday-cinematic');
     if (!overlay) return;
     birthdayCinematicState.active = false;
+    birthdayCinematicState.photoRequestId += 1;
+    if (birthdayCinematicState.autoplayTimer) {
+        clearTimeout(birthdayCinematicState.autoplayTimer);
+        birthdayCinematicState.autoplayTimer = null;
+    }
     document.body.style.overflow = '';
     stopBirthdayCinematicCanvas();
     overlay.classList.remove('is-active');
@@ -1636,42 +1666,65 @@ function renderBirthdayCinematicScene(index, immediate = false) {
 
     // --- Photo crossfade system ---
     if (photoA && photoB && photos[activePhotoIndex]) {
-        // Determine which layer is currently in front based on zIndex
-        const isAFront = photoA.style.zIndex === '1' || photoA.classList.contains('is-visible');
-        const currentVisible = isAFront ? photoA : photoB;
-        const nextLayer = isAFront ? photoB : photoA;
-        
-        if (nextLayer.dataset.photoIndex !== String(activePhotoIndex)) {
-            nextLayer.dataset.photoIndex = activePhotoIndex;
-            
-            const doCrossfade = () => {
-                // Ensure the new image is in front and transparent
+        const targetPhotoKey = String(activePhotoIndex);
+        const targetPhotoSrc = photos[activePhotoIndex];
+        const visibleLayer = photoA.classList.contains('is-visible') ? photoA : photoB.classList.contains('is-visible') ? photoB : photoA;
+        const nextLayer = visibleLayer === photoA ? photoB : photoA;
+
+        if (visibleLayer.dataset.photoIndex !== targetPhotoKey) {
+            const requestId = ++birthdayCinematicState.photoRequestId;
+            const fallback = birthdayData.photoFallback || 'images/xinh1.jpg';
+            if (plane) plane.classList.add('is-photo-loading');
+
+            const showRequestedPhoto = (src, isFallback = false) => {
+                if (
+                    !birthdayCinematicState.active ||
+                    requestId !== birthdayCinematicState.photoRequestId ||
+                    birthdayCinematicState.index !== activePhotoIndex
+                ) return;
+                if (plane) {
+                    plane.classList.remove('is-photo-loading');
+                    plane.classList.toggle('is-fallback', isFallback);
+                }
+
+                nextLayer.onload = null;
+                nextLayer.onerror = null;
+                nextLayer.dataset.photoIndex = targetPhotoKey;
+                if (nextLayer.getAttribute('src') !== src) nextLayer.src = src;
+
+                if (typeof gsap === 'undefined') {
+                    visibleLayer.style.opacity = '0';
+                    visibleLayer.style.zIndex = '0';
+                    visibleLayer.classList.remove('is-visible');
+                    nextLayer.style.opacity = '1';
+                    nextLayer.style.zIndex = '1';
+                    nextLayer.classList.add('is-visible');
+                    return;
+                }
+
+                gsap.killTweensOf([visibleLayer, nextLayer]);
                 gsap.set(nextLayer, { zIndex: 1, opacity: 0 });
-                // Ensure the old image is behind and fully visible
-                gsap.set(currentVisible, { zIndex: 0, opacity: 1 });
-                
-                // Fade in the new image over the old one
-                gsap.to(nextLayer, { 
-                    opacity: 1, 
-                    duration: immediate ? 0 : 0.65, 
-                    ease: 'power2.inOut',
+                gsap.set(visibleLayer, { zIndex: 0, opacity: 1 });
+                gsap.to(nextLayer, {
+                    opacity: 1,
+                    duration: immediate ? 0 : 0.48,
+                    ease: 'power2.out',
+                    overwrite: true,
                     onComplete: () => {
-                        // Clean up the old image once hidden
-                        gsap.set(currentVisible, { opacity: 0 });
-                        currentVisible.classList.remove('is-visible');
+                        if (requestId !== birthdayCinematicState.photoRequestId) return;
+                        gsap.set(visibleLayer, { opacity: 0, zIndex: 0 });
+                        visibleLayer.classList.remove('is-visible');
                         nextLayer.classList.add('is-visible');
                     }
                 });
             };
 
-            nextLayer.onload = doCrossfade;
-            nextLayer.src = photos[activePhotoIndex];
-            
-            // Fallback if immediately available from cache
-            if (nextLayer.complete && nextLayer.naturalWidth > 0) {
-                nextLayer.onload = null;
-                doCrossfade();
-            }
+            loadBirthdayPhoto(targetPhotoSrc)
+                .then(() => showRequestedPhoto(targetPhotoSrc))
+                .catch(() => showRequestedPhoto(fallback, true));
+        } else if (plane) {
+            birthdayCinematicState.photoRequestId += 1;
+            plane.classList.remove('is-photo-loading');
         }
     }
 
@@ -3087,6 +3140,9 @@ async function init() {
     }, 900000);
 
     runBirthdayCheck();
+    if (isBirthdayMode || isBirthdayPreludeMode) {
+        preloadBirthdayPhotos(getBirthdayPhotos());
+    }
     runMarch8thCheck();
     setupUIEventListeners();
     await initThreeJS();
