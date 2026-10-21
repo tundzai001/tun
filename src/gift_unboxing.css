@@ -522,17 +522,26 @@ dialog::backdrop {
   background: #100910db;
   backdrop-filter: blur(14px);
 }
-dialog[open] {
-  animation: dialog-in .25s ease-out;
+dialog[open]::backdrop {
+  animation: backdrop-in .52s ease-out both;
 }
-@keyframes dialog-in {
+dialog.is-closing::backdrop {
+  animation: backdrop-out .28s ease-in both;
+}
+@keyframes backdrop-in {
   from {
     opacity: 0;
-    transform: translateY(12px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+  }
+}
+@keyframes backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
   }
 }
 .dialog-close {
@@ -963,4 +972,121 @@ dialog[open] {
 }
 body.awaiting-gift {
   overflow: hidden;
+}
+body.dialog-open {
+  overflow: hidden;
+}
+.entrance {
+  transition:
+    opacity .8s ease,
+    visibility .8s,
+    transform .8s cubic-bezier(.4, 0, .2, 1),
+    filter .8s ease;
+}
+.entrance.is-dismissed {
+  transform: scale(1.07);
+  filter: blur(12px);
+}
+.entrance-orbit {
+  box-shadow: 0 0 80px #ce78940a, inset 0 0 80px #ce78940a;
+}
+.photo-outgoing {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.primary-button,
+.entrance-button {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 5px 22px #d9bb8d0a;
+}
+.primary-button:before,
+.entrance-button:before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background:
+    linear-gradient(
+      110deg,
+      transparent 35%,
+      #fff5 50%,
+      transparent 65%);
+  transform: translateX(-120%);
+  transition: transform .65s cubic-bezier(.2, .6, .2, 1);
+  pointer-events: none;
+}
+.primary-button:hover:before,
+.entrance-button:hover:before {
+  transform: translateX(120%);
+}
+.primary-button:hover,
+.entrance-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 34px #d9bb8d20;
+}
+button:active {
+  transform: scale(.95);
+}
+.primary-button svg,
+.entrance-button svg,
+.site-footer a svg,
+.dialog-close svg,
+.text-button svg {
+  transition: transform .35s cubic-bezier(.2, .8, .2, 1);
+}
+.primary-button:hover svg:last-child,
+.entrance-button:hover svg,
+.site-footer a:hover svg {
+  transform: translateX(5px);
+}
+.primary-button:hover svg:first-child {
+  transform: rotate(-8deg);
+}
+.dialog-close:hover svg {
+  transform: rotate(90deg);
+}
+.text-button:hover svg {
+  transform: rotate(-65deg);
+}
+.thumbnail {
+  transition:
+    transform .35s cubic-bezier(.2, .8, .2, 1),
+    opacity .3s,
+    border-color .3s,
+    box-shadow .3s;
+}
+.thumbnail:hover {
+  transform: translateY(-4px);
+}
+.thumbnail.is-active {
+  box-shadow: 0 0 18px #d9bb8d16;
+}
+.music-button[aria-pressed=true] {
+  background: #d9bb8d0a;
+  box-shadow: 0 0 22px #d9bb8d0a;
+}
+.gift-stage:has(canvas[data-state=opening]) .stage-halo {
+  animation: reveal-glow 3.2s ease-in-out;
+}
+@keyframes reveal-glow {
+  0%, 100% {
+    opacity: .65;
+    transform: scale(.9);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.22);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .entrance.is-dismissed,
+  button:hover,
+  button:active,
+  .thumbnail:hover {
+    transform: none;
+  }
+  .entrance.is-dismissed {
+    filter: none;
+  }
 }

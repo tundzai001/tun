@@ -49,6 +49,16 @@ export class GiftBoxScene {
     this.onResize();
     this.renderer.setAnimationLoop(() => {
       this.controls.update();
+      if (this.sparkleProgress.value > 0 && this.sparkleProgress.value < 1) {
+        const progress = this.sparkleProgress.value;
+        const positions = this.sparkles.geometry.attributes.position;
+        for (let i = 0; i < positions.count; i++) {
+          const angle = i * 2.39996;
+          const radius = progress * (0.35 + (i % 9) * 0.09);
+          positions.setXYZ(i, Math.cos(angle) * radius, 0.9 + progress * (0.5 + (i % 11) * 0.14) - progress * progress * 0.6, Math.sin(angle) * radius);
+        }
+        positions.needsUpdate = true;
+      }
       this.renderer.render(this.scene, this.camera);
     });
     canvas.dataset.state = 'loading';
@@ -145,6 +155,7 @@ export class GiftBoxScene {
     this.flower.scale.setScalar(0.001);
     this.gift.add(this.flower);
     this.buildRose();
+    this.buildSparkles();
     const pedestalMaterial = new THREE.MeshStandardMaterial({ color: 0x292029, roughness: 0.48, metalness: 0.22 });
     const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(1.38, 1.42, 0.14, 96), pedestalMaterial);
     pedestal.position.y = -0.035;
@@ -157,47 +168,113 @@ export class GiftBoxScene {
   }
 
   buildRose() {
-    const stemMaterial = new THREE.MeshStandardMaterial({ color: 0x315239, roughness: 0.65 });
-    const stem = new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0.04, 0.5, 0), new THREE.Vector3(-0.04, 1.1, 0), new THREE.Vector3(0, 1.5, 0)]);
-    this.flower.add(new THREE.Mesh(new THREE.TubeGeometry(stem, 40, 0.018, 10, false), stemMaterial));
-    for (const side of [-1, 1]) {
-      const leaf = new THREE.Shape();
-      leaf.moveTo(0, 0); leaf.bezierCurveTo(0.12, 0.2, 0.42, 0.2, 0.58, 0.06); leaf.bezierCurveTo(0.4, -0.08, 0.12, -0.1, 0, 0);
-      const mesh = new THREE.Mesh(new THREE.ShapeGeometry(leaf, 20), new THREE.MeshStandardMaterial({ color: 0x3a6240, side: THREE.DoubleSide, roughness: 0.7 }));
-      mesh.position.set(0, side === 1 ? 0.72 : 0.98, 0);
-      mesh.rotation.set(-0.4, side === 1 ? 0.2 : Math.PI - 0.2, 0.35);
-      this.flower.add(mesh);
-    }
-    const bloom = new THREE.Group();
-    bloom.position.y = 1.46;
-    bloom.rotation.x = 0.62;
-    this.flower.add(bloom);
-    const petalMaterial = new THREE.MeshPhysicalMaterial({ vertexColors: true, side: THREE.DoubleSide, roughness: 0.6, sheen: 0.25, sheenColor: 0xc85e7a, sheenRoughness: 0.7 });
-    for (let layer = 0; layer < 5; layer++) {
-      const count = 5 + layer;
-      for (let n = 0; n < count; n++) {
-        const geometry = new THREE.PlaneGeometry(1, 1, 22, 22);
-        const positions = geometry.attributes.position;
-        const colors = [];
-        const angle = n / count * Math.PI * 2 + layer * 1.7;
-        for (let i = 0; i < positions.count; i++) {
-          const u = (positions.getX(i) + 0.5) * 2 - 1;
-          const v = positions.getY(i) + 0.5;
-          const spread = (0.06 + layer * 0.065) * Math.sin(v * Math.PI * 0.65);
-          const a = angle + u * (0.7 + layer * 0.035) * Math.sin(v * Math.PI * 0.58);
-          const r = 0.025 + layer * 0.032 + spread * v + 0.09 * Math.pow(v, 5);
-          const y = v * (0.6 - layer * 0.07) - 0.12 * Math.pow(v, 6) - 0.09 * u * u * v + 0.012 * Math.sin(u * 4 + n) * v ** 4;
-          positions.setXYZ(i, Math.sin(a) * r, y, Math.cos(a) * r);
-          const color = new THREE.Color(0x530b21).lerp(new THREE.Color(0xca4569), v * 0.7 + layer * 0.025);
-          colors.push(color.r, color.g, color.b);
+    const green = new THREE.MeshStandardMaterial({ color: 0x284934, roughness: 0.72, side: THREE.DoubleSide });
+    const veinMaterial = new THREE.MeshStandardMaterial({ color: 0x728250, roughness: 0.85 });
+    const stem = new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0, 0), new THREE.Vector3(-0.045, 0.45, 0.015), new THREE.Vector3(0.025, 0.95, 0), new THREE.Vector3(0, 1.4, 0)]);
+    this.flower.add(new THREE.Mesh(new THREE.TubeGeometry(stem, 48, 0.014, 12, false), green));
+    for (const [side, height, length] of [[1, 0.65, 0.49], [-1, 0.95, 0.4]]) {
+      const branch = new THREE.Group();
+      branch.position.set(0, height, 0);
+      branch.rotation.set(-0.25, side === 1 ? 0.15 : Math.PI + 0.15, 0.45);
+      this.flower.add(branch);
+      const geometry = new THREE.PlaneGeometry(1, 1, 28, 12);
+      const positions = geometry.attributes.position;
+      for (let i = 0; i < positions.count; i++) {
+        const t = positions.getX(i) + 0.5;
+        const u = positions.getY(i) * 2;
+        positions.setXYZ(i, t * length, u * 0.115 * Math.sin(Math.PI * t) ** 0.8, 0.065 * Math.sin(Math.PI * t) - 0.045 * u * u * Math.sin(Math.PI * t));
+      }
+      geometry.computeVertexNormals();
+      branch.add(new THREE.Mesh(geometry, green));
+      const midrib = new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(length * 0.5, 0, 0.069), new THREE.Vector3(length, 0, 0)]);
+      branch.add(new THREE.Mesh(new THREE.TubeGeometry(midrib, 24, 0.002, 5, false), veinMaterial));
+      for (let k = 1; k < 5; k++) {
+        const t = k / 6;
+        for (const edge of [-1, 1]) {
+          const vein = new THREE.QuadraticBezierCurve3(new THREE.Vector3(t * length, 0, 0.067 * Math.sin(Math.PI * t)), new THREE.Vector3((t + 0.09) * length, edge * 0.05, 0.046), new THREE.Vector3((t + 0.16) * length, edge * 0.09 * Math.sin(Math.PI * t), 0.023));
+          branch.add(new THREE.Mesh(new THREE.TubeGeometry(vein, 8, 0.0008, 3, false), veinMaterial));
         }
-        geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-        geometry.computeVertexNormals();
-        const petal = new THREE.Mesh(geometry, petalMaterial);
-        petal.castShadow = true;
-        bloom.add(petal);
       }
     }
+
+    this.bloom = new THREE.Group();
+    this.bloom.position.y = 1.38;
+    this.bloom.rotation.set(0.68, -0.12, -0.07);
+    this.flower.add(this.bloom);
+    // Continuous rose surface by Paul Nylander, with our own sampling, shading
+    // and bud morph. https://nylander.wordpress.com/2006/06/21/rose-shaped-parametric-surface/
+    const radialSteps = 36, angularSteps = 900;
+    const positions = [], closed = [], colors = [], indices = [], uvs = [];
+    for (let j = 0; j <= angularSteps; j++) {
+      const theta = -2 + j / angularSteps * (20 * Math.PI + 2);
+      const phi = Math.PI / 2 * Math.exp(-theta / (8 * Math.PI));
+      const phase = ((3.6 * theta % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      const scallop = 1 - 0.5 * (1.25 * (1 - phase / Math.PI) ** 2 - 0.25) ** 2;
+      for (let i = 0; i <= radialSteps; i++) {
+        const t = i / radialSteps;
+        const fold = 1.95653 * t * t * (1.27689 * t - 1) ** 2 * Math.sin(phi);
+        const radius = scallop * (t * Math.sin(phi) + fold * Math.cos(phi));
+        const height = scallop * (t * Math.cos(phi) - fold * Math.sin(phi));
+        const x = radius * Math.sin(theta) * 0.62;
+        const y = height * 0.48;
+        const z = radius * Math.cos(theta) * 0.62;
+        positions.push(x, y, z);
+        closed.push(x * 0.3, y * 0.75 + t * 0.12, z * 0.3);
+        uvs.push(phase / (2 * Math.PI), t);
+        const color = new THREE.Color(0x460b20).lerp(new THREE.Color(0xb94365), Math.pow(t, 0.65) * 0.64 + 0.06 * Math.sin(theta * 0.12));
+        colors.push(color.r, color.g, color.b);
+        if (i < radialSteps && j < angularSteps) {
+          const a = j * (radialSteps + 1) + i, b = a + radialSteps + 1;
+          indices.push(a, b, a + 1, a + 1, b, b + 1);
+        }
+      }
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    geometry.morphAttributes.position = [new THREE.Float32BufferAttribute(closed, 3)];
+    const budGeometry = geometry.clone();
+    budGeometry.setAttribute('position', new THREE.Float32BufferAttribute(closed, 3));
+    budGeometry.computeVertexNormals();
+    geometry.morphAttributes.normal = [budGeometry.attributes.normal.clone()];
+    budGeometry.dispose();
+    const textureCanvas = document.createElement('canvas');
+    textureCanvas.width = textureCanvas.height = 128;
+    const context = textureCanvas.getContext('2d');
+    const pixels = context.createImageData(128, 128);
+    for (let i = 0; i < pixels.data.length; i += 4) {
+      const value = 120 + Math.random() * 20 + 8 * Math.sin((i / 4 % 128) * 0.8);
+      pixels.data.set([value, value, value, 255], i);
+    }
+    context.putImageData(pixels, 0, 0);
+    const petalMaterial = new THREE.MeshPhysicalMaterial({ vertexColors: true, side: THREE.DoubleSide, roughness: 0.72, sheen: 0.18, sheenColor: 0x9e3855, sheenRoughness: 0.85, bumpMap: new THREE.CanvasTexture(textureCanvas), bumpScale: 0.003 });
+    this.roseHead = new THREE.Mesh(geometry, petalMaterial);
+    this.bloom.add(this.roseHead);
+    // The green calyx supports the blossom, without a visible stem/flower gap.
+    const calyx = new THREE.Mesh(new THREE.SphereGeometry(0.09, 24, 16), green);
+    calyx.scale.set(0.8, 1.15, 0.8);
+    calyx.position.y = -0.035;
+    this.bloom.add(calyx);
+  }
+
+  buildSparkles() {
+    this.sparkleProgress = { value: 0 };
+    const textureCanvas = document.createElement('canvas');
+    textureCanvas.width = textureCanvas.height = 32;
+    const context = textureCanvas.getContext('2d');
+    const gradient = context.createRadialGradient(16, 16, 0, 16, 16, 16);
+    gradient.addColorStop(0, '#fff4df');
+    gradient.addColorStop(0.18, '#e8cba0');
+    gradient.addColorStop(1, 'rgba(232,203,160,0)');
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, 32, 32);
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(72 * 3), 3));
+    this.sparkles = new THREE.Points(geometry, new THREE.PointsMaterial({ color: 0xffdca6, size: 0.04, transparent: true, opacity: 0, depthWrite: false, map: new THREE.CanvasTexture(textureCanvas), blending: THREE.AdditiveBlending }));
+    this.gift.add(this.sparkles);
   }
 
   onResize() {
@@ -222,12 +299,37 @@ export class GiftBoxScene {
       this.canvas.dataset.state = 'open';
       onLetterReady?.();
     } });
-    const duration = this.reducedMotion ? 0 : 1.6;
-    this.timeline.to(this.lid.position, { x: -0.85, y: 0.68, z: -1.0, duration, ease: 'power2.inOut' }, 0);
-    this.timeline.to(this.lid.rotation, { x: -1.4, y: -0.2, z: -0.5, duration, ease: 'power2.inOut' }, 0);
-    this.timeline.to(this.flower.scale, { x: 1, y: 1, z: 1, duration, ease: 'power2.out' }, duration * 0.3);
-    this.timeline.to(this.flower.position, { y: 0.85, duration, ease: 'power2.out' }, duration * 0.3);
+    const duration = this.reducedMotion ? 0 : 1.8;
+    this.timeline.to(this.lid.position, { y: 1.55, duration: duration * 0.36, ease: 'power2.out' }, 0);
+    this.timeline.to(this.lid.position, { x: -0.85, y: 0.68, z: -1.0, duration: duration * 0.8, ease: 'power2.inOut' }, duration * 0.25);
+    this.timeline.to(this.lid.rotation, { x: -1.4, y: -0.2, z: -0.5, duration, ease: 'power2.inOut' }, duration * 0.15);
+    this.timeline.to(this.flower.scale, { x: 1, y: 1, z: 1, duration, ease: 'power3.out' }, duration * 0.3);
+    this.timeline.to(this.flower.position, { y: 0.85, duration, ease: 'power3.out' }, duration * 0.3);
+    this.roseHead.morphTargetInfluences[0] = 1;
+    this.timeline.to(this.roseHead.morphTargetInfluences, { 0: 0, duration: duration * 1.1, ease: 'sine.inOut' }, duration * 0.55);
+    this.timeline.fromTo(this.flower.rotation, { z: -0.055 }, { z: 0, duration: duration * 1.4, ease: 'elastic.out(0.6,0.4)' }, duration * 0.45);
+    if (!this.reducedMotion) {
+      this.sparkleProgress.value = 0.001;
+      this.timeline.to(this.sparkleProgress, { value: 1, duration: 2.5, ease: 'power1.out' }, 0.4);
+      this.timeline.fromTo(this.sparkles.material, { opacity: 0.85 }, { opacity: 0, duration: 2.2, ease: 'power1.in' }, 0.7);
+    }
     this.timeline.call(() => onWingsReady?.(), [], 0);
+  }
+
+  replay() {
+    this.timeline?.kill();
+    this.controls.enabled = false;
+    this.isOpened = false;
+    this.canvas.dataset.state = 'closing';
+    const duration = this.reducedMotion ? 0 : 0.7;
+    this.timeline = gsap.timeline({ onComplete: () => {
+      this.reset();
+      this.playUnboxingSequence();
+    } });
+    this.timeline.to(this.flower.scale, { x: 0.001, y: 0.001, z: 0.001, duration: duration * 0.8, ease: 'power2.in' }, 0);
+    this.timeline.to(this.lid.position, { x: 0, y: 1.04, z: 0, duration, ease: 'power2.inOut' }, duration * 0.35);
+    this.timeline.to(this.lid.rotation, { x: 0, y: 0, z: 0, duration, ease: 'power2.inOut' }, duration * 0.35);
+    this.timeline.to(this.sparkles.material, { opacity: 0, duration: duration * 0.3 }, 0);
   }
 
   reset() {
@@ -237,6 +339,8 @@ export class GiftBoxScene {
     this.lid.rotation.set(0, 0, 0);
     this.flower.position.y = 0.5;
     this.flower.scale.setScalar(0.001);
-    this.onResize();
+    this.flower.rotation.z = 0;
+    this.sparkleProgress.value = 0;
+    this.sparkles.material.opacity = 0;
   }
 }

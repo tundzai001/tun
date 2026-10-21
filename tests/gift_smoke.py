@@ -22,18 +22,26 @@ with sync_playwright() as p:
     assert page.locator('#scene-status').is_hidden(), '3D scene failed to initialize'
     page.screenshot(path=str(ARTIFACTS / 'desktop.png'))
     page.get_by_role('button', name='Đọc thư anh viết').click()
+    assert page.locator('#letter-dialog').get_attribute('data-state') == 'opening'
+    assert page.locator('#letter-dialog').evaluate('(e) => e.getAnimations().some(a => a.playState === "running")')
+    page.wait_for_function("document.querySelector('#letter-dialog').dataset.state === 'open'")
     assert page.locator('#letter-dialog').evaluate('(e) => e.open')
     page.keyboard.press('Escape')
+    assert page.locator('#letter-dialog').get_attribute('data-state') == 'closing'
+    assert page.locator('#letter-dialog').evaluate('(e) => e.open && e.getAnimations().some(a => a.playState === "running")')
+    page.wait_for_function("!document.querySelector('#letter-dialog').open")
     assert not page.locator('#letter-dialog').evaluate('(e) => e.open')
     for i in range(5):
         page.locator(f'[data-photo="{i}"]').click()
         assert page.locator('#portrait').evaluate('(e) => e.complete && e.naturalWidth > 0')
         assert page.locator(f'[data-photo="{i}"]').get_attribute('aria-pressed') == 'true'
+    assert page.locator('#portrait').evaluate('(e) => e.getAnimations().some(a => a.playState === "running")')
     page.get_by_role('button', name='Xem nguyên ảnh').click()
     page.keyboard.press('ArrowRight')
     assert page.locator('#full-number').inner_text() == '01 / 05'
     page.screenshot(path=str(ARTIFACTS / 'gallery.png'))
     page.keyboard.press('Escape')
+    page.wait_for_function("!document.querySelector('#photo-dialog').open")
     # Replaying mid-animation must cancel the old timeline cleanly.
     page.get_by_role('button', name='Mở lại').click()
     page.wait_for_timeout(250)
@@ -59,6 +67,10 @@ with sync_playwright() as p:
     assert page.locator('#entrance').count() == 0
     page.wait_for_function("document.querySelector('#gift-webgl-canvas').dataset.state === 'open'")
     assert page.locator('#scene-status').is_hidden()
+    page.get_by_role('button', name='Đọc thư anh viết').click()
+    assert page.locator('#letter-dialog').get_attribute('data-state') == 'open'
+    page.keyboard.press('Escape')
+    assert not page.locator('#letter-dialog').evaluate('(e) => e.open')
     assert not errors, errors
     # A device without WebGL must still offer the letter and complete album.
     fallback = browser.new_page(viewport={'width':375,'height':812})

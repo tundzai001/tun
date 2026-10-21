@@ -1,6 +1,7 @@
 import { GiftBoxScene } from './gift_box_scene.js';
 import { audioManager } from './audio_manager.js';
 import { october20Data } from '../data.js';
+import gsap from 'gsap';
 
 const paths = {
   heart: '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>',
@@ -24,8 +25,11 @@ export class GiftUnboxingApp {
       { src: 'images/love/photo_lib_5.jpg', title: 'Dành riêng cho em', note: 'Em luôn xứng đáng với những điều đẹp nhất.', position: '50% 35%' },
     ];
     this.index = 0;
+    this.reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.dialogMotion = new WeakMap();
     this.entered = /gift\.html$/.test(location.pathname);
     this.createDOM();
+    this.setupMotion();
     audioManager.setupMusic(october20Data.song?.file);
     this.setupEvents();
     this.setupScene();
@@ -91,25 +95,92 @@ export class GiftUnboxingApp {
     document.getElementById('rotate-hint').textContent = 'Tặng em tất cả dịu dàng';
   }
 
+  setupMotion() {
+    if (this.reducedMotion) { this.reveal = gsap.timeline(); return; }
+    const duration = this.reducedMotion ? 0 : 0.9;
+    this.reveal = gsap.timeline({ paused: !this.entered, defaults: { duration, ease: 'power3.out' } });
+    this.reveal.from('.site-header', { y: -18, opacity: 0, clearProps: 'transform,opacity' }, 0.1)
+      .from('.love-copy > *', { y: 28, opacity: 0, stagger: this.reducedMotion ? 0 : 0.11, clearProps: 'transform,opacity' }, 0.15)
+      .from('.gift-stage', { y: 35, opacity: 0, scale: 0.94, clearProps: 'transform,opacity' }, 0)
+      .from('.memory-heading, .portrait-button', { y: 30, opacity: 0, stagger: this.reducedMotion ? 0 : 0.14, clearProps: 'transform,opacity' }, 0.35)
+      .from('.thumbnail', { y: 16, opacity: 0, stagger: this.reducedMotion ? 0 : 0.06, clearProps: 'transform,opacity' }, 0.75)
+      .from('.memory-note, .site-footer', { y: 10, opacity: 0, clearProps: 'transform,opacity' }, 0.9);
+    if (!this.reducedMotion && !this.entered) {
+      gsap.from('.entrance > :not(.entrance-orbit)', { y: 22, opacity: 0, duration: 1.1, stagger: 0.12, ease: 'power3.out', clearProps: 'transform,opacity' });
+      gsap.from('.entrance-orbit', { scale: 0.78, opacity: 0, duration: 1.8, ease: 'power3.out', clearProps: 'transform,opacity' });
+    }
+  }
+
+  openDialog(dialog) {
+    this.dialogMotion.get(dialog)?.cancel();
+    dialog.classList.remove('is-closing');
+    if (!dialog.open) dialog.showModal();
+    dialog.dataset.state = this.reducedMotion ? 'open' : 'opening';
+    document.body.classList.add('dialog-open');
+    if (this.reducedMotion) return;
+    const animation = dialog.animate([
+      { opacity: 0, transform: 'translateY(34px) scale(.94)', filter: 'blur(6px)' },
+      { opacity: 1, transform: 'translateY(0) scale(1)', filter: 'blur(0)' },
+    ], { duration: 520, easing: 'cubic-bezier(.16,1,.3,1)' });
+    this.dialogMotion.set(dialog, animation);
+    if (dialog.id === 'letter-dialog') gsap.fromTo(dialog.querySelectorAll('article > .eyebrow, article > h2, .letter-body p, .letter-signature'), { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, stagger: 0.055, delay: 0.12, ease: 'power3.out', overwrite: true, clearProps: 'transform,opacity' });
+    animation.finished.then(() => { dialog.dataset.state = 'open'; }).catch(() => {});
+  }
+
+  closeDialog(dialog) {
+    if (!dialog.open || dialog.dataset.state === 'closing') return;
+    const style = getComputedStyle(dialog);
+    const from = { opacity: style.opacity, transform: style.transform, filter: style.filter };
+    this.dialogMotion.get(dialog)?.cancel();
+    const finish = () => {
+      dialog.close();
+      dialog.classList.remove('is-closing');
+      dialog.dataset.state = 'closed';
+      document.body.classList.remove('dialog-open');
+    };
+    if (this.reducedMotion) { finish(); return; }
+    dialog.dataset.state = 'closing';
+    dialog.classList.add('is-closing');
+    const animation = dialog.animate([from, { opacity: 0, transform: 'translateY(22px) scale(.97)', filter: 'blur(4px)' }], { duration: 280, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards' });
+    this.dialogMotion.set(dialog, animation);
+    animation.finished.then(() => { finish(); animation.cancel(); }).catch(() => {});
+  }
+
+  swapImage(image, photo) {
+    if (image.getAttribute('src') === photo.src) return;
+    image.parentElement.querySelectorAll('.photo-outgoing').forEach(element => element.remove());
+    const outgoing = image.cloneNode();
+    outgoing.removeAttribute('id');
+    outgoing.classList.add('photo-outgoing');
+    outgoing.alt = '';
+    outgoing.setAttribute('aria-hidden', 'true');
+    if (!this.reducedMotion && image.getAttribute('src')) image.after(outgoing);
+    image.src = photo.src;
+    image.alt = photo.title;
+    if (this.reducedMotion) return;
+    image.getAnimations().forEach(animation => animation.cancel());
+    image.animate([{ opacity: 0.35, transform: 'scale(1.06)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 650, easing: 'cubic-bezier(.16,1,.3,1)' });
+    if (outgoing.isConnected) outgoing.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450, easing: 'ease-out' }).finished.then(() => outgoing.remove()).catch(() => outgoing.remove());
+  }
+
   selectPhoto(index) {
     this.index = (index + this.photos.length) % this.photos.length;
     const photo = this.photos[this.index];
     const portrait = document.getElementById('portrait');
-    portrait.src = photo.src;
-    portrait.alt = photo.title;
+    this.swapImage(portrait, photo);
     portrait.style.objectPosition = photo.position;
     document.getElementById('photo-title').textContent = photo.title;
     document.getElementById('photo-note').textContent = photo.note;
     const counter = `${String(this.index + 1).padStart(2, '0')} / 05`;
     document.getElementById('photo-number').textContent = counter;
-    document.getElementById('full-photo').src = photo.src;
-    document.getElementById('full-photo').alt = photo.title;
+    this.swapImage(document.getElementById('full-photo'), photo);
     document.getElementById('full-title').textContent = photo.title;
     document.getElementById('full-number').textContent = counter;
     document.querySelectorAll('[data-photo]').forEach((button, i) => {
       button.classList.toggle('is-active', i === this.index);
       button.setAttribute('aria-pressed', String(i === this.index));
     });
+    if (!this.reducedMotion) gsap.fromTo('#photo-title, #photo-note, #full-title', { y: 8, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: 'power2.out', overwrite: true, clearProps: 'transform,opacity' });
   }
 
   setupEvents() {
@@ -121,28 +192,29 @@ export class GiftUnboxingApp {
       entrance.classList.add('is-dismissed');
       entrance.inert = true;
       this.startMusic();
+      this.reveal.play(0);
       if (this.ready) this.scene.playUnboxingSequence();
       document.getElementById('read-letter').focus({ preventScroll: true });
     }, { once: true });
     document.getElementById('read-letter').addEventListener('click', () => {
-      document.getElementById('letter-dialog').showModal();
+      this.openDialog(document.getElementById('letter-dialog'));
     });
     document.getElementById('replay-gift').addEventListener('click', () => {
-      this.scene.reset();
-      this.scene.playUnboxingSequence();
+      this.scene.replay();
     });
     document.querySelectorAll('[data-photo]').forEach(button => button.addEventListener('click', () => this.selectPhoto(Number(button.dataset.photo))));
     document.getElementById('open-photo').addEventListener('click', () => {
       this.selectPhoto(this.index);
-      document.getElementById('photo-dialog').showModal();
+      this.openDialog(document.getElementById('photo-dialog'));
     });
     document.getElementById('photo-prev').addEventListener('click', () => this.selectPhoto(this.index - 1));
     document.getElementById('photo-next').addEventListener('click', () => this.selectPhoto(this.index + 1));
     document.querySelectorAll('dialog').forEach(dialog => {
-      dialog.querySelector('[data-close]').addEventListener('click', () => dialog.close());
+      dialog.querySelector('[data-close]').addEventListener('click', () => this.closeDialog(dialog));
+      dialog.addEventListener('cancel', event => { event.preventDefault(); this.closeDialog(dialog); });
       dialog.addEventListener('click', event => { if (event.target === dialog) {
         const bounds = dialog.getBoundingClientRect();
-        if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
+        if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) this.closeDialog(dialog);
       } });
     });
     document.getElementById('photo-dialog').addEventListener('keydown', event => {
