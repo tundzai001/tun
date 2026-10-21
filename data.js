@@ -90,28 +90,13 @@ export const birthdayStoryData = {
 export const october20Data = {
     day: 20, month: 10,
     photos: [
-        "images/love/photobooth_16_oct_1.jpg",
         "images/love/photo_lib_1.jpg",
-        "images/love/photobooth_16_oct_2.jpg",
         "images/love/photo_lib_2.jpg",
-        "images/love/photobooth_16_oct_3.jpg",
-        "images/love/photo_lib_3.jpg",
-        "images/love/photobooth_16_oct_4.jpg",
         "images/love/photo_lib_4.jpg",
-        "images/love/photobooth_16_oct_5.jpg",
-        "images/love/photo_lib_5.jpg",
-        "images/love/photobooth_3_oct_1.jpg",
-        "images/love/photobooth_3_oct_2.jpg",
-        "images/love/photobooth_3_oct_3.jpg",
-        "images/birthday/z7912769188496_fba42a0e2807fbead245ba822d2ed1e2.jpg",
-        "images/birthday/z7912769240071_f07a699af75d2d169194e938421a20a3.jpg",
-        "images/birthday/z7912769283827_92061c656206c440fda4b368213e802f.jpg",
-        "images/birthday/z7912769348321_05bd0cd58607eef5227700ef1c313ea8.jpg",
-        "images/birthday/z7912769388906_37630896355a641f184ee37d9a6693ec.jpg",
-        "images/birthday/z7912769432323_6b32251c989510cad34986c71edff852.jpg",
-        "images/birthday/z7912769496467_534fa31f0157927c08bc20eedc16c568.jpg"
+        "images/love/photo_lib_3.jpg",
+        "images/love/photo_lib_5.jpg"
     ],
-    photoFallback: "images/love/photobooth_16_oct_1.jpg",
+    photoFallback: "images/love/photo_lib_1.jpg",
     letter: {
         title: "Chúc Mừng Ngày 20/10 Người Yêu Tuyệt Vời Nhất Của Anh 🌹❤️",
         content: `<p>Chúc mừng ngày Phụ nữ Việt Nam 20/10 tình yêu của anh! Hôm nay là ngày để cả thế giới tôn vinh phái đẹp, nhưng đối với anh, em là cô gái xinh đẹp, đáng yêu và đặc biệt nhất vũ trụ này.</p>
