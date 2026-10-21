@@ -39,7 +39,7 @@ html, body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: radial-gradient(110% 90% at 50% 25%, rgba(232, 23, 93, 0.16) 0%, rgba(255, 180, 50, 0.06) 40%, rgba(10, 12, 20, 0.95) 75%, #05060a 100%);
+  background: #020205;
 }
 
 /* 3D Canvas */
@@ -53,13 +53,9 @@ html, body {
   z-index: 1;
 }
 
-/* Spatial Ambient Glows */
+/* Spatial Ambient Glows - disabled to keep space crystal clear OLED black */
 .spatial-ambient-glow {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-  background: radial-gradient(circle at 50% 35%, rgba(255, 101, 132, 0.08) 0%, transparent 65%);
+  display: none;
 }
 
 /* Loading Veil */
