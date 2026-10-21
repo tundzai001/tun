@@ -2469,3 +2469,33 @@ body.state-night {
         transform: scale(1.15);
     }
 }
+
+/* VIP Gift 3D Button */
+.vip-gift-floating-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #b8860b, #ffd700);
+    color: #fff;
+    font-size: 1.4rem;
+    text-decoration: none;
+    box-shadow: 0 4px 18px rgba(255, 215, 0, 0.45);
+    border: 2px solid #fff;
+    animation: gift-bounce 2.2s infinite ease-in-out;
+    cursor: pointer;
+    transition: transform 0.25s, box-shadow 0.25s;
+    z-index: 100;
+}
+
+.vip-gift-floating-btn:hover {
+    transform: scale(1.15) rotate(10deg);
+    box-shadow: 0 6px 26px rgba(255, 215, 0, 0.75);
+}
+
+@keyframes gift-bounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-7px) scale(1.08); }
+}

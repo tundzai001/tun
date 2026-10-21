@@ -1,0 +1,32 @@
+{
+  "name": "tun",
+  "version": "1.0.0",
+  "description": "Our Little Universe with VIP 3D Gift Box Unboxing Story",
+  "type": "module",
+  "scripts": {
+    "build": "node build.js",
+    "blender": "/Applications/Blender.app/Contents/MacOS/Blender -b -P scripts/generate_models.py",
+    "dev": "npx serve ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tundzai001/tun.git"
+  },
+  "keywords": [
+    "threejs",
+    "blender",
+    "gift-box",
+    "3d",
+    "github-pages"
+  ],
+  "author": "tundzai001",
+  "license": "ISC",
+  "dependencies": {
+    "canvas-confetti": "^1.9.4",
+    "gsap": "^3.14.2",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}
