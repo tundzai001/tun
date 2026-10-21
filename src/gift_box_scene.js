@@ -76,7 +76,7 @@ export class GiftBoxScene {
     this.controls.maxPolarAngle = Math.PI / 2 + 0.02;
     this.controls.minDistance = 2.8;
     this.controls.maxDistance = 9.0;
-    this.controls.target.set(0, 1.1, 0);
+    this.controls.target.set(0, 0.95, 0);
 
     // 5. Studio Environment & Lighting
     this.setupLighting();
@@ -606,9 +606,9 @@ export class GiftBoxScene {
       }, 0.9);
 
       tl.to(this.flower.scale, {
-        x: 0.58,
-        y: 0.58,
-        z: 0.58,
+        x: 0.52,
+        y: 0.52,
+        z: 0.52,
         duration: 2.2,
         ease: 'back.out(1.1)'
       }, 0.9);
