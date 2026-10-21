@@ -98,10 +98,11 @@ export const october20Data = {
     ],
     photoFallback: "images/love/photo_lib_1.jpg",
     letter: {
-        title: "Chúc Mừng Ngày 20/10 Người Yêu Tuyệt Vời Nhất Của Anh 🌹❤️",
-        content: `<p>Chúc mừng ngày Phụ nữ Việt Nam 20/10 tình yêu của anh! Hôm nay là ngày để cả thế giới tôn vinh phái đẹp, nhưng đối với anh, em là cô gái xinh đẹp, đáng yêu và đặc biệt nhất vũ trụ này.</p>
-        <p>Bông hoa hồng 3D lấp lánh này anh dành tặng riêng cho em — nở rực rỡ và không bao giờ tàn, cũng giống như tình cảm chân thành và ngọt ngào nhất anh dành cho em vậy.</p>
-        <p>Anh gom lại những bức ảnh kỷ niệm gần nhất của hai đứa mình, từng nụ cười, từng ánh mắt, từng khoảnh khắc ở bên em đều là những điều vô giá mà anh luôn trân trọng. Cảm ơn em vì đã luôn ở bên anh, cùng anh chia sẻ từng niềm vui nỗi buồn.</p>
+        title: "Chúc Mừng Ngày 20/10 Tình Yêu 🌹❤️",
+        content: `<p>Chúc mừng ngày Phụ nữ Việt Nam 20/10 nhé tình yêu của anh! anh biết là bức thư này anh viết chậm, anh xin lỗi nhiều lắm, sorry vì giờ em mới có thể đọc bức thư này.. thôi thì mình cứ set đúng giờ đọc này là ngày 20/10 đi nhé. Hôm nay là ngày để cả thế giới tôn vinh phái đẹp, nhưng đối với anh thì em là cô gái xinh đẹp, đáng yêu, học giỏi, ngoan ngoãn và chắc là đặc biệt nhất cái universal này rồi.</p>
+        <p>Bông hoa hồng lấp lánh này anh dành tặng riêng cho em — nở rực rỡ và không bao giờ tàn... ( anh làm thế này thì có giời cũng không tàn được hê hê) anh cũng muốn đặt hoa cho em nhưng mà for real, anh không biết tìm ở đâu nên thôi, bó hoa in tơ nét này cho nó ô sờ kê, lưu giữ lại luôn nhé kekekekke, về rồi anh bù bó thật nhé, anh yêu em lắm luôn, à bó hoa này cũng giống như tình cảm của anh dành cho em ấy, luôn luôn ok, chỉ có tươi roi rói thôi chứ không héo được kkkkk, quế ô ca luôn chứ đùa.</p>
+        <p>Anh gom lại những bức ảnh kỷ niệm gần nhất của hai đứa mình ý anh là mấy ảnh của em =)) eii í là anh thấy em xinh thật, kiểu dịu dàng ấy quá's là's ô's kê's luôn ấy, em xinh vl mặc dù anh biết là mình có ảnh cùng nhau cũng ít thôi .., thề là anh nhớ từng nụ cười, từng ánh mắt, từng khoảnh khắc em bên cạnh đều là những điều vô giá mà anh luôn trân trọng. Anh Cảm ơn em vì đã luôn ở bên anh, cùng anh chia sẻ từng niềm vui nỗi buồn nhé, anh yêu em lắm luôn</p>
+        <p>Anh ở Hà Nội, em ở Thành Đô, giữa hai đứa là cả một quãng đường dài mà có những hôm anh chỉ ước bước qua màn hình là tới. Những lúc Hà Nội lên đèn, anh lại nghĩ không biết bên em hôm nay có lạnh không, em ăn gì, có mệt không, có nhớ anh một tí nào không =))) Anh chưa thể đứng trước mặt em với một bó hoa, nên gửi em tạm một góc vũ trụ này nhé. Đợi ngày gặp lại, anh muốn được nghe em kể hết những ngày xa nhau, rồi ôm em thật lâu, bù cả phần nhớ của hai đứa.</p>
         <p>Chúc em ngày 20/10 ngập tràn niềm vui, luôn rạng rỡ, tự tin, hạnh phúc và được anh yêu thương chiều chuộng nhiều hơn mỗi ngày nhé!</p>
         <p>Anh yêu em nhiều lắm bae ơi! Happy Vietnamese Women's Day 20/10! 🌹✨💖</p>`
     },

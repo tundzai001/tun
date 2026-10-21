@@ -1,805 +1,242 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import gsap from 'gsap';
-import { audioManager } from './audio_manager.js';
 
 export class GiftBoxScene {
-  constructor(canvasElement, onReadyCallback) {
-    this.canvas = canvasElement;
-    this.onReadyCallback = onReadyCallback;
-    this.scene = null;
-    this.camera = null;
-    this.renderer = null;
-    this.controls = null;
-
-    // 3D Objects
-    this.boxGroup = new THREE.Group();
-    this.flowerGroup = new THREE.Group();
-    this.boxBase = null;
-    this.boxLid = null;
-    this.flower = null;
-    this.blossomHead = null;
-
-    // Lights
-    this.boxInteriorLight = null;
-    this.flowerSpotlight = null;
-
-    // Particle systems & Cosmic Atmosphere
-    this.starfield = null;
-    this.nebulae = [];
-    this.shootingStars = [];
-    this.idleParticles = null;
-    this.burstParticles = null;
-
-    // Textures cache
-    this.starTex = null;
-    this.glowTex = null;
-
-    // State
-    this.isOpened = false;
-    this.isAnimating = false;
-    this.modelsLoaded = 0;
-    this.clock = new THREE.Clock();
-    this.mouse = new THREE.Vector2();
-
-    this.init();
-  }
-
-  init() {
-    // 1. Scene - Crystal pure OLED deep space (NO muddy fog!)
+  constructor(canvas, onReady) {
+    this.canvas = canvas;
+    this.reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.scene = new THREE.Scene();
-
-    // 2. Camera: Framed perfectly for Apple Spatial presentation
-    const aspect = window.innerWidth / window.innerHeight;
-    this.camera = new THREE.PerspectiveCamera(40, aspect, 0.1, 100);
-    this.camera.position.set(0, 1.9, 5.0);
-
-    // 3. Renderer with HDR tone mapping
-    this.renderer = new THREE.WebGLRenderer({
-      canvas: this.canvas,
-      antialias: true,
-      alpha: true,
-      powerPreference: 'high-performance'
-    });
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.camera = new THREE.PerspectiveCamera(34, 1, 0.1, 50);
+    this.renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.35;
+    this.renderer.toneMappingExposure = 0.95;
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-    // 4. OrbitControls
-    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.renderer.shadowMap.type = THREE.PCFShadowMap;
+    const pmrem = new THREE.PMREMGenerator(this.renderer);
+    const room = new RoomEnvironment();
+    this.environment = pmrem.fromScene(room, 0.04);
+    this.scene.environment = this.environment.texture;
+    this.scene.environmentIntensity = 0.65;
+    room.dispose();
+    pmrem.dispose();
+    this.scene.add(new THREE.HemisphereLight(0xffe8db, 0x30202b, 0.65));
+    const key = new THREE.DirectionalLight(0xffead5, 2.4);
+    key.position.set(3, 6, 5);
+    key.castShadow = true;
+    key.shadow.mapSize.set(1024, 1024);
+    key.shadow.normalBias = 0.035;
+    this.scene.add(key);
+    const rim = new THREE.DirectionalLight(0xff9cae, 1.2);
+    rim.position.set(-4, 3, -2);
+    this.scene.add(rim);
+    this.controls = new OrbitControls(this.camera, canvas);
     this.controls.enableDamping = true;
-    this.controls.dampingFactor = 0.05;
-    this.controls.maxPolarAngle = Math.PI / 2 + 0.02;
-    this.controls.minDistance = 2.8;
-    this.controls.maxDistance = 9.0;
-    this.controls.target.set(0, 0.95, 0);
-
-    // 5. Studio Environment & Lighting
-    this.setupLighting();
-
-    // 6. Ground Ambient Occlusion Contact Shadow
-    this.setupContactShadow();
-
-    // 7. Celestial 3D Cosmic Environment (3000 Stars, Nebulae, Meteors)
-    this.setupCosmicEnvironment();
-
-    // 8. Delicate Floating Fairy Stardust & Confetti
-    this.setupParticles();
-
-    // 9. Load GLB Models
-    this.scene.add(this.boxGroup);
-    this.scene.add(this.flowerGroup);
-    this.loadModels();
-
-    // 10. Event Listeners
-    window.addEventListener('resize', this.onResize.bind(this));
-    window.addEventListener('pointermove', this.onPointerMove.bind(this));
-
-    // 11. Animation Loop
-    this.animate = this.animate.bind(this);
-    requestAnimationFrame(this.animate);
-  }
-
-  setupLighting() {
-    // Spatial Studio Ambient: Clean, rich, dark
-    const ambient = new THREE.AmbientLight(0x221a28, 1.4);
-    this.scene.add(ambient);
-
-    // Key Light (Warm Champagne Key)
-    const keyLight = new THREE.DirectionalLight(0xfff5e6, 3.6);
-    keyLight.position.set(3.5, 6.5, 4.5);
-    keyLight.castShadow = true;
-    keyLight.shadow.mapSize.width = 1024;
-    keyLight.shadow.mapSize.height = 1024;
-    keyLight.shadow.bias = -0.0001;
-    this.scene.add(keyLight);
-
-    // Rim Light (Vibrant Rose Edge)
-    const rimLight = new THREE.DirectionalLight(0xff2d65, 3.2);
-    rimLight.position.set(-4.5, 4.0, -3.5);
-    this.scene.add(rimLight);
-
-    // Soft Cyan Accent Fill
-    const fillLight = new THREE.DirectionalLight(0x4aa3df, 1.3);
-    fillLight.position.set(0, -1.5, 3.5);
-    this.scene.add(fillLight);
-
-    // Backlight Crown behind Rose
-    const roseBacklight = new THREE.PointLight(0xff4081, 2.8, 6);
-    roseBacklight.position.set(0, 1.4, -0.6);
-    this.scene.add(roseBacklight);
-
-    // Box Interior Spotlight (Erupts from inside box when opened)
-    this.boxInteriorLight = new THREE.PointLight(0xffd700, 0, 7);
-    this.boxInteriorLight.position.set(0, 0.6, 0);
-    this.scene.add(this.boxInteriorLight);
-
-    // Flower Spotlight
-    this.flowerSpotlight = new THREE.PointLight(0xff6584, 0, 5);
-    this.flowerSpotlight.position.set(0, 1.8, 0);
-    this.scene.add(this.flowerSpotlight);
-  }
-
-  setupContactShadow() {
-    // Soft circular radial contact shadow directly under gift box
-    const sCanvas = document.createElement('canvas');
-    sCanvas.width = 256;
-    sCanvas.height = 256;
-    const sCtx = sCanvas.getContext('2d');
-    const sGrad = sCtx.createRadialGradient(128, 128, 0, 128, 128, 128);
-    sGrad.addColorStop(0, 'rgba(0, 0, 0, 0.85)');
-    sGrad.addColorStop(0.35, 'rgba(0, 0, 0, 0.55)');
-    sGrad.addColorStop(0.65, 'rgba(0, 0, 0, 0.18)');
-    sGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    sCtx.fillStyle = sGrad;
-    sCtx.fillRect(0, 0, 256, 256);
-    const shadowTex = new THREE.CanvasTexture(sCanvas);
-
-    const shadowGeo = new THREE.PlaneGeometry(4.0, 4.0);
-    const shadowMat = new THREE.MeshBasicMaterial({
-      map: shadowTex,
-      transparent: true,
-      depthWrite: false
+    this.controls.enablePan = false;
+    this.controls.enableZoom = false;
+    this.controls.minPolarAngle = 0.95;
+    this.controls.maxPolarAngle = 1.5;
+    this.controls.minAzimuthAngle = -0.65;
+    this.controls.maxAzimuthAngle = 0.75;
+    this.controls.target.set(0, 1.25, 0);
+    this.controls.enabled = false;
+    this.buildGift();
+    this.resizeObserver = new ResizeObserver(() => this.onResize());
+    this.resizeObserver.observe(canvas.parentElement);
+    this.onResize();
+    this.renderer.setAnimationLoop(() => {
+      this.controls.update();
+      this.renderer.render(this.scene, this.camera);
     });
-    const shadowPlane = new THREE.Mesh(shadowGeo, shadowMat);
-    shadowPlane.rotation.x = -Math.PI / 2;
-    shadowPlane.position.y = -0.01;
-    this.scene.add(shadowPlane);
+    canvas.dataset.state = 'loading';
+    this.renderer.compileAsync(this.scene, this.camera).then(() => {
+      canvas.dataset.state = 'ready';
+      onReady();
+    }).catch(error => onReady(error));
   }
 
-  setupCosmicEnvironment() {
-    // 1. Crisp Star Texture (Pinpoint sparkling star with soft corona)
-    const starCanvas = document.createElement('canvas');
-    starCanvas.width = 32;
-    starCanvas.height = 32;
-    const sCtx = starCanvas.getContext('2d');
-    const sGrad = sCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
-    sGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-    sGrad.addColorStop(0.2, 'rgba(255, 255, 255, 0.9)');
-    sGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.25)');
-    sGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-    sCtx.fillStyle = sGrad;
-    sCtx.fillRect(0, 0, 32, 32);
-    this.starTex = new THREE.CanvasTexture(starCanvas);
+  rounded(w, h, d, material, parent, x = 0, y = 0, z = 0, radius = 0.035) {
+    const mesh = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 4, radius), material);
+    mesh.position.set(x, y, z);
+    mesh.castShadow = mesh.receiveShadow = true;
+    parent.add(mesh);
+    return mesh;
+  }
 
-    // 2. Pure Deep Space Starfield (3,600 sparkling stars in infinite black cosmos)
-    const starCount = 3600;
-    const starGeo = new THREE.BufferGeometry();
-    const starPositions = new Float32Array(starCount * 3);
-    const starColors = new Float32Array(starCount * 3);
-
-    const palette = [
-      new THREE.Color(0xffffff), // Diamond brilliant white
-      new THREE.Color(0xfff5e6), // Warm champagne gold
-      new THREE.Color(0xd6e8ff), // Icy starlight blue
-      new THREE.Color(0xffccd7), // Soft romantic pink
-      new THREE.Color(0xe0d4ff)  // Soft violet
-    ];
-
-    for (let i = 0; i < starCount; i++) {
-      let x, y, z;
-      if (i % 4 === 0) {
-        // Subtle Milky Way galactic lane
-        const t = (Math.random() - 0.5) * 55;
-        x = t;
-        y = t * 0.42 + (Math.random() - 0.5) * 8;
-        z = -18 - Math.random() * 22;
-      } else {
-        // Deep celestial sphere
-        const radius = 24.0 + Math.random() * 42.0;
-        const theta = Math.random() * Math.PI * 2;
-        const phi = Math.acos(Math.random() * 2 - 1);
-        x = radius * Math.sin(phi) * Math.cos(theta);
-        y = radius * Math.sin(phi) * Math.sin(theta);
-        z = radius * Math.cos(phi);
+  buildGift() {
+    const fabricCanvas = document.createElement('canvas');
+    fabricCanvas.width = fabricCanvas.height = 128;
+    const fabricContext = fabricCanvas.getContext('2d');
+    const fabricPixels = fabricContext.createImageData(128, 128);
+    for (let i = 0; i < fabricPixels.data.length; i += 4) {
+      const value = 100 + Math.random() * 55;
+      fabricPixels.data.set([value, value, value, 255], i);
+    }
+    fabricContext.putImageData(fabricPixels, 0, 0);
+    const fabric = new THREE.CanvasTexture(fabricCanvas);
+    fabric.wrapS = fabric.wrapT = THREE.RepeatWrapping;
+    fabric.repeat.set(5, 5);
+    const velvet = new THREE.MeshPhysicalMaterial({ color: 0x561126, roughness: 0.65, metalness: 0.03, sheen: 0.3, sheenColor: 0x9a3b54, sheenRoughness: 0.7, bumpMap: fabric, bumpScale: 0.008 });
+    const lining = new THREE.MeshStandardMaterial({ color: 0x35101c, roughness: 0.95 });
+    const gold = new THREE.MeshPhysicalMaterial({ color: 0xe3bc7c, metalness: 0.7, roughness: 0.32 });
+    const satin = new THREE.MeshPhysicalMaterial({ color: 0xe3c39a, metalness: 0.32, roughness: 0.34, sheen: 0.8, sheenColor: 0xffefd8, side: THREE.DoubleSide });
+    this.gift = new THREE.Group();
+    this.gift.rotation.y = -0.22;
+    this.scene.add(this.gift);
+    this.rounded(1.64, 0.12, 1.4, velvet, this.gift, 0, 0.12);
+    this.rounded(1.64, 0.86, 0.08, velvet, this.gift, 0, 0.53, 0.66);
+    this.rounded(1.64, 0.86, 0.08, velvet, this.gift, 0, 0.53, -0.66);
+    this.rounded(0.08, 0.86, 1.3, velvet, this.gift, -0.78, 0.53);
+    this.rounded(0.08, 0.86, 1.3, velvet, this.gift, 0.78, 0.53);
+    this.rounded(1.46, 0.09, 1.2, lining, this.gift, 0, 0.27);
+    this.rounded(1.65, 0.018, 1.41, gold, this.gift, 0, 0.16, 0, 0.008);
+    for (const x of [-0.78, 0.78]) this.rounded(0.085, 0.02, 1.4, gold, this.gift, x, 0.96, 0, 0.008);
+    for (const z of [-0.66, 0.66]) this.rounded(1.64, 0.02, 0.085, gold, this.gift, 0, 0.96, z, 0.008);
+    this.rounded(0.23, 0.83, 0.012, satin, this.gift, 0, 0.55, 0.707, 0.005);
+    this.rounded(0.23, 0.83, 0.012, satin, this.gift, 0, 0.55, -0.707, 0.005);
+    this.lid = new THREE.Group();
+    this.lid.position.y = 1.04;
+    this.gift.add(this.lid);
+    this.rounded(1.76, 0.18, 1.52, velvet, this.lid);
+    this.rounded(1.77, 0.022, 1.53, gold, this.lid, 0, -0.065, 0, 0.01);
+    this.rounded(0.24, 0.014, 1.54, satin, this.lid, 0, 0.098, 0, 0.005);
+    this.rounded(1.78, 0.014, 0.24, satin, this.lid, 0, 0.106, 0, 0.005);
+    // Broad satin ribbon surfaces, with soft folds at the knot.
+    for (const side of [-1, 1]) {
+      const curve = new THREE.CubicBezierCurve3(new THREE.Vector3(0, 0.15, 0), new THREE.Vector3(side * 1.05, 0.85, -0.1), new THREE.Vector3(side * 0.95, 0.12, -0.2), new THREE.Vector3(0, 0.15, 0));
+      const vertices = [], indices = [];
+      for (let i = 0; i <= 64; i++) {
+        const p = curve.getPoint(i / 64);
+        const width = 0.1 * Math.sin(Math.PI * i / 64) + 0.025;
+        for (const edge of [-1, 1]) vertices.push(p.x, p.y + edge * width * 0.3, p.z + edge * width);
+        if (i < 64) { const a = i * 2; indices.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
       }
-
-      starPositions[i * 3] = x;
-      starPositions[i * 3 + 1] = y;
-      starPositions[i * 3 + 2] = z;
-
-      const col = palette[Math.floor(Math.random() * palette.length)];
-      const brightness = 0.55 + Math.random() * 0.45;
-      starColors[i * 3] = col.r * brightness;
-      starColors[i * 3 + 1] = col.g * brightness;
-      starColors[i * 3 + 2] = col.b * brightness;
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      geometry.setIndex(indices);
+      geometry.computeVertexNormals();
+      this.lid.add(new THREE.Mesh(geometry, satin));
     }
-
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-    starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
-
-    const starMat = new THREE.PointsMaterial({
-      size: 0.16,
-      map: this.starTex,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.92,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    });
-
-    this.starfield = new THREE.Points(starGeo, starMat);
-    this.scene.add(this.starfield);
-
-    // 3. Subtle Distant Cosmic Dust Clouds (Delicate, deep, not foggy!)
-    const distantNebulae = [
-      { r: 210, g: 30, b: 90, a: 0.08, scale: 22, pos: [0, 2.5, -12] },    // Soft halo behind flower
-      { r: 120, g: 40, b: 200, a: 0.06, scale: 28, pos: [12, 6, -18] },   // Distant violet wisp right
-      { r: 240, g: 80, b: 120, a: 0.05, scale: 26, pos: [-12, 4, -18] }   // Distant rose wisp left
-    ];
-
-    distantNebulae.forEach((cfg) => {
-      const nCanvas = document.createElement('canvas');
-      nCanvas.width = 256;
-      nCanvas.height = 256;
-      const nCtx = nCanvas.getContext('2d');
-      const nGrad = nCtx.createRadialGradient(128, 128, 0, 128, 128, 128);
-      nGrad.addColorStop(0, `rgba(${cfg.r}, ${cfg.g}, ${cfg.b}, ${cfg.a})`);
-      nGrad.addColorStop(0.4, `rgba(${cfg.r}, ${cfg.g}, ${cfg.b}, ${cfg.a * 0.4})`);
-      nGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      nCtx.fillStyle = nGrad;
-      nCtx.fillRect(0, 0, 256, 256);
-
-      const nTex = new THREE.CanvasTexture(nCanvas);
-      const nMat = new THREE.SpriteMaterial({
-        map: nTex,
-        blending: THREE.AdditiveBlending,
-        transparent: true,
-        opacity: 0.8,
-        depthWrite: false
-      });
-      const sprite = new THREE.Sprite(nMat);
-      sprite.position.set(cfg.pos[0], cfg.pos[1], cfg.pos[2]);
-      sprite.scale.set(cfg.scale, cfg.scale, 1);
-      sprite.userData = {
-        baseOpacity: 0.8,
-        rotSpeed: (Math.random() - 0.5) * 0.0002,
-        pulseSpeed: 0.5,
-        pulseOffset: Math.random() * Math.PI
-      };
-      this.scene.add(sprite);
-      this.nebulae.push(sprite);
-    });
-
-    // 4. Shooting Stars (Meteors with elegant trails)
-    this.shootingStars = [];
-    for (let i = 0; i < 3; i++) {
-      const sGeo = new THREE.BufferGeometry();
-      const sPos = new Float32Array(6);
-      sGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
-      const sMat = new THREE.LineBasicMaterial({
-        color: 0xfff4e6,
-        transparent: true,
-        opacity: 0,
-        blending: THREE.AdditiveBlending,
-        linewidth: 2
-      });
-      const sLine = new THREE.Line(sGeo, sMat);
-      sLine.userData = {
-        active: false,
-        delay: Math.random() * 3.0 + 1.0,
-        progress: 0,
-        speed: 1.6 + Math.random() * 0.8,
-        startPos: new THREE.Vector3(),
-        dir: new THREE.Vector3(-1.3, -0.6, -0.15).normalize(),
-        length: 3.2
-      };
-      this.scene.add(sLine);
-      this.shootingStars.push(sLine);
-    }
+    this.rounded(0.22, 0.14, 0.22, satin, this.lid, 0, 0.18);
+    const seal = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.018, 48), gold);
+    seal.rotation.x = Math.PI / 2;
+    seal.position.set(0, 0.57, 0.725);
+    this.gift.add(seal);
+    const labelCanvas = document.createElement('canvas');
+    labelCanvas.width = 512;
+    labelCanvas.height = 256;
+    const label = labelCanvas.getContext('2d');
+    label.textAlign = 'center';
+    label.fillStyle = '#d9bb8d';
+    label.font = 'italic 64px Georgia';
+    label.fillText('pour toi', 256, 110);
+    label.font = '22px Georgia';
+    label.fillText('2 0 . 1 0', 256, 162);
+    const labelMap = new THREE.CanvasTexture(labelCanvas);
+    labelMap.colorSpace = THREE.SRGBColorSpace;
+    const labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.46, 0.23), new THREE.MeshBasicMaterial({ map: labelMap, transparent: true, depthWrite: false, toneMapped: false }));
+    labelMesh.position.set(0.43, 0.56, 0.707);
+    this.gift.add(labelMesh);
+    this.flower = new THREE.Group();
+    this.flower.position.y = 0.5;
+    this.flower.scale.setScalar(0.001);
+    this.gift.add(this.flower);
+    this.buildRose();
+    const pedestalMaterial = new THREE.MeshStandardMaterial({ color: 0x292029, roughness: 0.48, metalness: 0.22 });
+    const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(1.38, 1.42, 0.14, 96), pedestalMaterial);
+    pedestal.position.y = -0.035;
+    pedestal.receiveShadow = true;
+    this.scene.add(pedestal);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.39, 0.008, 8, 120), gold);
+    ring.rotation.x = Math.PI / 2;
+    ring.position.y = -0.005;
+    this.scene.add(ring);
   }
 
-  setupParticles() {
-    // 1. Delicate Floating Stardust (Fairy Dust around the chest & flower)
-    const dustCount = 100;
-    const dustGeo = new THREE.BufferGeometry();
-    const dustPos = new Float32Array(dustCount * 3);
-    const dustColor = new Float32Array(dustCount * 3);
-
-    const dustPalette = [
-      new THREE.Color(0xffd280), // Champagne gold
-      new THREE.Color(0xff6584), // Rose glow
-      new THREE.Color(0xffffff)  // Pure light
-    ];
-
-    for (let i = 0; i < dustCount; i++) {
-      dustPos[i * 3] = (Math.random() - 0.5) * 4.8;
-      dustPos[i * 3 + 1] = 0.3 + Math.random() * 3.5;
-      dustPos[i * 3 + 2] = (Math.random() - 0.5) * 4.8;
-
-      const c = dustPalette[Math.floor(Math.random() * dustPalette.length)];
-      dustColor[i * 3] = c.r;
-      dustColor[i * 3 + 1] = c.g;
-      dustColor[i * 3 + 2] = c.b;
+  buildRose() {
+    const stemMaterial = new THREE.MeshStandardMaterial({ color: 0x315239, roughness: 0.65 });
+    const stem = new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0.04, 0.5, 0), new THREE.Vector3(-0.04, 1.1, 0), new THREE.Vector3(0, 1.5, 0)]);
+    this.flower.add(new THREE.Mesh(new THREE.TubeGeometry(stem, 40, 0.018, 10, false), stemMaterial));
+    for (const side of [-1, 1]) {
+      const leaf = new THREE.Shape();
+      leaf.moveTo(0, 0); leaf.bezierCurveTo(0.12, 0.2, 0.42, 0.2, 0.58, 0.06); leaf.bezierCurveTo(0.4, -0.08, 0.12, -0.1, 0, 0);
+      const mesh = new THREE.Mesh(new THREE.ShapeGeometry(leaf, 20), new THREE.MeshStandardMaterial({ color: 0x3a6240, side: THREE.DoubleSide, roughness: 0.7 }));
+      mesh.position.set(0, side === 1 ? 0.72 : 0.98, 0);
+      mesh.rotation.set(-0.4, side === 1 ? 0.2 : Math.PI - 0.2, 0.35);
+      this.flower.add(mesh);
     }
-
-    dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
-    dustGeo.setAttribute('color', new THREE.BufferAttribute(dustColor, 3));
-
-    // Glowing particle texture
-    const pCanvas = document.createElement('canvas');
-    pCanvas.width = 64;
-    pCanvas.height = 64;
-    const ctx = pCanvas.getContext('2d');
-    const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-    grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-    grad.addColorStop(0.25, 'rgba(255, 240, 200, 0.9)');
-    grad.addColorStop(0.6, 'rgba(255, 120, 160, 0.3)');
-    grad.addColorStop(1, 'rgba(255, 100, 150, 0)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 64, 64);
-    this.glowTex = new THREE.CanvasTexture(pCanvas);
-
-    const dustMat = new THREE.PointsMaterial({
-      size: 0.042,
-      map: this.glowTex,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.85,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    });
-
-    this.idleParticles = new THREE.Points(dustGeo, dustMat);
-    this.scene.add(this.idleParticles);
-
-    // 2. Confetti Burst
-    const burstCount = 180;
-    const burstGeo = new THREE.BufferGeometry();
-    const burstPos = new Float32Array(burstCount * 3);
-    const burstVelo = [];
-
-    for (let i = 0; i < burstCount; i++) {
-      burstPos[i * 3] = 0;
-      burstPos[i * 3 + 1] = 0.6;
-      burstPos[i * 3 + 2] = 0;
-
-      const theta = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 3.2 + 2.0;
-      const spread = Math.random() * 1.5;
-      burstVelo.push({
-        vx: Math.cos(theta) * spread,
-        vy: speed,
-        vz: Math.sin(theta) * spread,
-        life: 0
-      });
-    }
-
-    burstGeo.setAttribute('position', new THREE.BufferAttribute(burstPos, 3));
-    const burstMat = new THREE.PointsMaterial({
-      size: 0.18,
-      map: this.glowTex,
-      transparent: true,
-      opacity: 0,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    });
-
-    this.burstParticles = new THREE.Points(burstGeo, burstMat);
-    this.burstParticles.userData = { velos: burstVelo, active: false };
-    this.scene.add(this.burstParticles);
-  }
-
-  loadModels() {
-    const loader = new GLTFLoader();
-
-    // Apple VisionOS Luxury PBR Materials
-    const goldMat = new THREE.MeshPhysicalMaterial({
-      color: 0xffd280,
-      metalness: 0.96,
-      roughness: 0.12,
-      clearcoat: 0.4,
-      clearcoatRoughness: 0.1
-    });
-
-    const velvetMat = new THREE.MeshPhysicalMaterial({
-      color: 0x6e081e,
-      metalness: 0.12,
-      roughness: 0.35,
-      clearcoat: 0.3
-    });
-
-    const cushionMat = new THREE.MeshStandardMaterial({
-      color: 0x180206,
-      roughness: 0.95,
-      metalness: 0.05
-    });
-
-    const petalMat = new THREE.MeshPhysicalMaterial({
-      color: 0xe8175d,
-      roughness: 0.28,
-      metalness: 0.08,
-      emissive: 0x5a001a,
-      emissiveIntensity: 0.35
-    });
-
-    const stemMat = new THREE.MeshStandardMaterial({
-      color: 0x145a2b,
-      roughness: 0.35,
-      metalness: 0.08
-    });
-
-    // 1. Luxury Gift Box
-    loader.load(
-      'models/luxury_gift_box.glb',
-      (gltf) => {
-        const boxScene = gltf.scene;
-
-        boxScene.traverse((child) => {
-          if (child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
-            if (child.name.includes('Accents') || child.name.includes('Trim') || child.name.includes('Gold')) {
-              child.material = goldMat;
-            } else if (child.name.includes('Cushion')) {
-              child.material = cushionMat;
-            } else if (child.name.includes('Base') || child.name.includes('Lid')) {
-              child.material = velvetMat;
-            }
-          }
-        });
-
-        this.boxBase = boxScene.getObjectByName('Box_Base');
-        this.boxLid = boxScene.getObjectByName('Box_Lid');
-
-        this.boxGroup.add(boxScene);
-        this.boxGroup.position.set(0, 0, 0);
-
-        this.checkModelsReady();
-      },
-      undefined,
-      (err) => console.error('Error loading box GLB:', err)
-    );
-
-    // 2. Enchanted Rose
-    loader.load(
-      'models/magic_flower.glb',
-      (gltf) => {
-        this.flower = gltf.scene;
-        this.flower.traverse((child) => {
-          if (child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
-            if (child.name.includes('Petal') || child.name.includes('Blossom')) {
-              child.material = petalMat;
-            } else if (child.name.includes('Stamen')) {
-              child.material = goldMat;
-            } else {
-              child.material = stemMat;
-            }
-          }
-        });
-
-        this.blossomHead = this.flower.getObjectByName('Blossom_Head');
-
-        // Initial state: scaled to 0 inside box
-        this.flower.position.set(0, 0.1, 0);
-        this.flower.scale.set(0.001, 0.001, 0.001);
-        this.flower.visible = true;
-        this.flowerGroup.add(this.flower);
-
-        this.checkModelsReady();
-      },
-      undefined,
-      (err) => console.error('Error loading flower GLB:', err)
-    );
-  }
-
-  checkModelsReady() {
-    this.modelsLoaded++;
-    if (this.modelsLoaded >= 2 && this.onReadyCallback) {
-      this.onReadyCallback();
+    const bloom = new THREE.Group();
+    bloom.position.y = 1.46;
+    bloom.rotation.x = 0.62;
+    this.flower.add(bloom);
+    const petalMaterial = new THREE.MeshPhysicalMaterial({ vertexColors: true, side: THREE.DoubleSide, roughness: 0.6, sheen: 0.25, sheenColor: 0xc85e7a, sheenRoughness: 0.7 });
+    for (let layer = 0; layer < 5; layer++) {
+      const count = 5 + layer;
+      for (let n = 0; n < count; n++) {
+        const geometry = new THREE.PlaneGeometry(1, 1, 22, 22);
+        const positions = geometry.attributes.position;
+        const colors = [];
+        const angle = n / count * Math.PI * 2 + layer * 1.7;
+        for (let i = 0; i < positions.count; i++) {
+          const u = (positions.getX(i) + 0.5) * 2 - 1;
+          const v = positions.getY(i) + 0.5;
+          const spread = (0.06 + layer * 0.065) * Math.sin(v * Math.PI * 0.65);
+          const a = angle + u * (0.7 + layer * 0.035) * Math.sin(v * Math.PI * 0.58);
+          const r = 0.025 + layer * 0.032 + spread * v + 0.09 * Math.pow(v, 5);
+          const y = v * (0.6 - layer * 0.07) - 0.12 * Math.pow(v, 6) - 0.09 * u * u * v + 0.012 * Math.sin(u * 4 + n) * v ** 4;
+          positions.setXYZ(i, Math.sin(a) * r, y, Math.cos(a) * r);
+          const color = new THREE.Color(0x530b21).lerp(new THREE.Color(0xca4569), v * 0.7 + layer * 0.025);
+          colors.push(color.r, color.g, color.b);
+        }
+        geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+        geometry.computeVertexNormals();
+        const petal = new THREE.Mesh(geometry, petalMaterial);
+        petal.castShadow = true;
+        bloom.add(petal);
+      }
     }
   }
 
   onResize() {
-    if (!this.camera || !this.renderer) return;
-    this.camera.aspect = window.innerWidth / window.innerHeight;
+    const { width, height } = this.canvas.parentElement.getBoundingClientRect();
+    if (!width || !height) return;
+    this.camera.aspect = width / height;
+    this.camera.position.set(3.1, 3, 6.5).multiplyScalar(Math.max(1, 0.72 / this.camera.aspect));
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setSize(width, height, false);
+    this.controls.update();
   }
 
-  onPointerMove(e) {
-    this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-    this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
-    // Subtle spatial parallax
-    if (this.camera && !this.controls.state) {
-      gsap.to(this.camera.position, {
-        x: this.mouse.x * 0.35,
-        y: 1.6 + this.mouse.y * 0.25,
-        duration: 1.2,
-        ease: 'power2.out'
-      });
-    }
-  }
-
-  // Automatic Cinematic Storytelling Unbox Sequence with GSAP Timeline
-  playUnboxingSequence(callbacks = {}) {
-    if (this.isOpened || this.isAnimating) return;
+  playUnboxingSequence({ onWingsReady, onLetterReady } = {}) {
+    if (this.isAnimating || this.isOpened) return;
     this.isAnimating = true;
-
-    // Play unboxing audio chime
-    audioManager.playUnboxSound();
-
-    const tl = gsap.timeline({
-      onComplete: () => {
-        this.isOpened = true;
-        this.isAnimating = false;
-        if (callbacks.onLetterReady) callbacks.onLetterReady();
-      }
-    });
-
-    // 1. Box anticipation shake (0.0s - 0.35s)
-    tl.to(this.boxGroup.position, {
-      x: '+=0.04',
-      duration: 0.05,
-      repeat: 6,
-      yoyo: true,
-      ease: 'sine.inOut'
-    }, 0);
-
-    // 2. Interior golden glow & spotlight (0.3s)
-    tl.to(this.boxInteriorLight, {
-      intensity: 6.5,
-      duration: 1.2,
-      ease: 'power2.out'
-    }, 0.3);
-
-    // 3. Lid lifts up and glides back flat onto the floor behind the box (0.35s)
-    if (this.boxLid) {
-      tl.to(this.boxLid.position, {
-        x: 0,
-        y: -0.1,
-        z: -2.2,
-        duration: 1.8,
-        ease: 'power3.out'
-      }, 0.35);
-
-      tl.to(this.boxLid.rotation, {
-        x: -Math.PI * 0.75,
-        z: 0.04,
-        duration: 1.8,
-        ease: 'power3.out'
-      }, 0.35);
-    }
-
-    // 4. Confetti Burst & Flower Bloom audio (0.8s)
-    tl.add(() => {
-      this.triggerConfettiBurst();
-      audioManager.playBloomSound();
-    }, 0.8);
-
-    // 5. Enchanted Rose ascends and blooms majestically (0.9s - 3.2s)
-    if (this.flower) {
-      this.flower.visible = true;
-
-      tl.to(this.flower.position, {
-        y: 0.75,
-        duration: 2.2,
-        ease: 'back.out(1.1)'
-      }, 0.9);
-
-      tl.to(this.flower.scale, {
-        x: 0.52,
-        y: 0.52,
-        z: 0.52,
-        duration: 2.2,
-        ease: 'back.out(1.1)'
-      }, 0.9);
-
-      tl.to(this.flower.rotation, {
-        y: Math.PI * 2,
-        duration: 2.4,
-        ease: 'power2.out'
-      }, 0.9);
-
-      tl.to(this.flowerSpotlight, {
-        intensity: 6.5,
-        duration: 1.5
-      }, 1.2);
-    }
-
-    // 6. Wings of 5 girlfriend photos slide in (1.5s)
-    tl.add(() => {
-      if (callbacks.onWingsReady) callbacks.onWingsReady();
-    }, 1.5);
+    this.canvas.dataset.state = 'opening';
+    this.controls.enabled = false;
+    this.timeline = gsap.timeline({ onComplete: () => {
+      this.isAnimating = false;
+      this.isOpened = true;
+      this.controls.enabled = true;
+      this.canvas.dataset.state = 'open';
+      onLetterReady?.();
+    } });
+    const duration = this.reducedMotion ? 0 : 1.6;
+    this.timeline.to(this.lid.position, { x: -0.85, y: 0.68, z: -1.0, duration, ease: 'power2.inOut' }, 0);
+    this.timeline.to(this.lid.rotation, { x: -1.4, y: -0.2, z: -0.5, duration, ease: 'power2.inOut' }, 0);
+    this.timeline.to(this.flower.scale, { x: 1, y: 1, z: 1, duration, ease: 'power2.out' }, duration * 0.3);
+    this.timeline.to(this.flower.position, { y: 0.85, duration, ease: 'power2.out' }, duration * 0.3);
+    this.timeline.call(() => onWingsReady?.(), [], 0);
   }
 
-  triggerConfettiBurst() {
-    if (!this.burstParticles) return;
-    this.burstParticles.material.opacity = 1;
-    this.burstParticles.userData.active = true;
-    const positions = this.burstParticles.geometry.attributes.position.array;
-    const velos = this.burstParticles.userData.velos;
-
-    for (let i = 0; i < velos.length; i++) {
-      positions[i * 3] = 0;
-      positions[i * 3 + 1] = 0.6;
-      positions[i * 3 + 2] = 0;
-      velos[i].life = 1.0;
-    }
-    this.burstParticles.geometry.attributes.position.needsUpdate = true;
-  }
-
-  // Reset / Replay
   reset() {
-    this.isOpened = false;
-    this.isAnimating = false;
-
-    if (this.boxLid) {
-      gsap.to(this.boxLid.position, { x: 0, y: 0, z: 0, duration: 0.9, ease: 'power2.inOut' });
-      gsap.to(this.boxLid.rotation, { x: 0, y: 0, z: 0, duration: 0.9, ease: 'power2.inOut' });
-    }
-
-    if (this.flower) {
-      gsap.to(this.flower.position, { y: 0.1, duration: 0.7 });
-      gsap.to(this.flower.scale, {
-        x: 0.001,
-        y: 0.001,
-        z: 0.001,
-        duration: 0.7,
-        onComplete: () => {
-          this.flower.visible = false;
-        }
-      });
-    }
-
-    gsap.to(this.boxInteriorLight, { intensity: 0, duration: 0.7 });
-    gsap.to(this.flowerSpotlight, { intensity: 0, duration: 0.7 });
-    if (this.burstParticles) this.burstParticles.material.opacity = 0;
-  }
-
-  animate() {
-    requestAnimationFrame(this.animate);
-    const elapsedTime = this.clock.getElapsedTime();
-
-    // 1. Gentle idle floating
-    if (!this.isOpened && !this.isAnimating && this.boxGroup) {
-      this.boxGroup.position.y = Math.sin(elapsedTime * 1.6) * 0.04;
-      this.boxGroup.rotation.y = Math.sin(elapsedTime * 0.8) * 0.05;
-    }
-
-    // 2. Rose slow levitation and majestic spin
-    if (this.isOpened && this.flower) {
-      this.flower.rotation.y += 0.005;
-      this.flower.position.y = 0.75 + Math.sin(elapsedTime * 2.0) * 0.025;
-    }
-
-    // 3. Deep Starfield Cosmic Drift
-    if (this.starfield) {
-      this.starfield.rotation.y += 0.00015;
-      this.starfield.rotation.x += 0.00005;
-    }
-
-    // 4. Romantic Cosmic Nebulae Breathing
-    if (this.nebulae && this.nebulae.length > 0) {
-      this.nebulae.forEach((neb) => {
-        neb.material.rotation += neb.userData.rotSpeed || 0.0001;
-        const pulse = Math.sin(elapsedTime * neb.userData.pulseSpeed + neb.userData.pulseOffset);
-        neb.material.opacity = neb.userData.baseOpacity + pulse * 0.08;
-      });
-    }
-
-    // 5. Shooting Stars / Meteors
-    if (this.shootingStars && this.shootingStars.length > 0) {
-      this.shootingStars.forEach((star) => {
-        const d = star.userData;
-        if (!d.active) {
-          d.delay -= 0.016;
-          if (d.delay <= 0) {
-            d.active = true;
-            d.progress = 0;
-            d.speed = 1.4 + Math.random() * 1.0;
-            d.startPos.set(
-              12 + Math.random() * 16,
-              10 + Math.random() * 10,
-              -12 - Math.random() * 14
-            );
-            star.material.opacity = 0;
-          }
-        } else {
-          d.progress += 0.016 * d.speed;
-          const currentHead = d.startPos.clone().addScaledVector(d.dir, d.progress * 28.0);
-          const currentTail = d.startPos.clone().addScaledVector(d.dir, Math.max(0, d.progress * 28.0 - d.length));
-
-          const posArr = star.geometry.attributes.position.array;
-          posArr[0] = currentHead.x;
-          posArr[1] = currentHead.y;
-          posArr[2] = currentHead.z;
-          posArr[3] = currentTail.x;
-          posArr[4] = currentTail.y;
-          posArr[5] = currentTail.z;
-          star.geometry.attributes.position.needsUpdate = true;
-
-          // Fade in and out
-          if (d.progress < 0.25) {
-            star.material.opacity = d.progress * 3.5;
-          } else if (d.progress > 0.65) {
-            star.material.opacity = Math.max(0, (1.0 - d.progress) * 2.8);
-          } else {
-            star.material.opacity = 0.9;
-          }
-
-          if (d.progress >= 1.0) {
-            d.active = false;
-            star.material.opacity = 0;
-            d.delay = Math.random() * 4.5 + 1.5;
-          }
-        }
-      });
-    }
-
-    // 6. Floating fairy stardust with organic curl sway
-    if (this.idleParticles) {
-      const positions = this.idleParticles.geometry.attributes.position.array;
-      const count = positions.length / 3;
-      for (let i = 0; i < count; i++) {
-        const idx = i * 3;
-        // Upward gentle drift
-        positions[idx + 1] += 0.0035;
-        // Gentle organic sine wave sway
-        positions[idx] += Math.sin(elapsedTime * 1.2 + i * 0.5) * 0.0018;
-        positions[idx + 2] += Math.cos(elapsedTime * 1.0 + i * 0.7) * 0.0018;
-
-        if (positions[idx + 1] > 4.2) {
-          positions[idx + 1] = 0.2;
-        }
-      }
-      this.idleParticles.geometry.attributes.position.needsUpdate = true;
-    }
-
-    // 7. Confetti burst physics
-    if (this.burstParticles && this.burstParticles.userData.active) {
-      const positions = this.burstParticles.geometry.attributes.position.array;
-      const velos = this.burstParticles.userData.velos;
-      let activeCount = 0;
-
-      for (let i = 0; i < velos.length; i++) {
-        if (velos[i].life > 0) {
-          activeCount++;
-          positions[i * 3] += velos[i].vx * 0.016;
-          positions[i * 3 + 1] += velos[i].vy * 0.016;
-          positions[i * 3 + 2] += velos[i].vz * 0.016;
-          velos[i].vy -= 0.07;
-          velos[i].life -= 0.008;
-        }
-      }
-      this.burstParticles.geometry.attributes.position.needsUpdate = true;
-      if (activeCount === 0) {
-        this.burstParticles.userData.active = false;
-        gsap.to(this.burstParticles.material, { opacity: 0, duration: 0.5 });
-      }
-    }
-
-    if (this.controls) this.controls.update();
-    if (this.renderer && this.scene && this.camera) {
-      this.renderer.render(this.scene, this.camera);
-    }
+    this.timeline?.kill();
+    this.isAnimating = this.isOpened = false;
+    this.lid.position.set(0, 1.04, 0);
+    this.lid.rotation.set(0, 0, 0);
+    this.flower.position.y = 0.5;
+    this.flower.scale.setScalar(0.001);
+    this.onResize();
   }
 }
